@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="얼굴 사진을 브라우저 안에서만 분석해 고양이상, 강아지상, 여우상 등 분위기 기반 동물상 결과를 보여주는 무료 테스트입니다." />
+  <meta name="description" content="얼굴 사진을 브라우저 안에서만 분석해 동물상 결과, 분위기 리포트, 사진 촬영 팁을 제공하는 무료 얼굴 분위기 테스트입니다." />
   <meta name="theme-color" content="#f6f1e8" />
-  <title>동물상 테스트 - 내 얼굴 분위기 분석</title>
+  <title>동물상 테스트 - 내 얼굴 분위기 분석 리포트</title>
   <link href="style.css" rel="stylesheet" />
 </head>
 <body>
@@ -14,9 +14,10 @@
     <nav class="site-nav" aria-label="주요 메뉴">
       <a href="index.html#test">테스트</a>
       <a href="index.html#guide">이용안내</a>
+      <a href="animal-types.html">동물상 사전</a>
+      <a href="photo-guide.html">촬영가이드</a>
       <a href="about.html">소개</a>
       <a href="privacy.html">개인정보</a>
-      <a href="contact.html">문의</a>
     </nav>
   </header>
 
@@ -25,7 +26,7 @@
       <div class="intro-copy">
         <p class="eyebrow">Face Animal Match</p>
         <h1 id="page-title">내 얼굴은 어떤 동물상일까?</h1>
-        <p class="lead">사진의 밝기, 대비, 색감, 구도 같은 시각적 분위기를 바탕으로 가장 가까운 동물상 이미지를 보여줍니다. 사진은 서버로 전송하지 않고 브라우저 안에서만 처리됩니다.</p>
+        <p class="lead">사진의 밝기, 대비, 색감, 구도 같은 시각적 분위기를 바탕으로 동물상 결과와 상세 리포트를 제공합니다. 사진은 서버로 전송하지 않고 브라우저 안에서만 처리됩니다.</p>
       </div>
       <div class="score-card" aria-label="분석 기준">
         <span>눈매</span>
@@ -56,7 +57,7 @@
 
       <aside class="result-panel" aria-live="polite">
         <div class="result-empty" id="resultEmpty">
-          <p>사진을 올리고 분석하면 결과가 여기에 표시됩니다.</p>
+          <p>사진을 올리고 분석하면 결과와 상세 리포트가 여기에 표시됩니다.</p>
         </div>
 
         <div class="result-content" id="resultContent" hidden>
@@ -69,11 +70,40 @@
           <div class="traits" id="traits"></div>
           <div class="meters" id="meters" aria-label="동물상 점수"></div>
 
+          <div class="report-box" id="reportBox"></div>
+
           <div class="result-actions">
             <button class="ghost" id="copyButton" type="button">결과 복사</button>
           </div>
         </div>
       </aside>
+    </section>
+
+    <section class="content-section utility-section" aria-labelledby="utility-title">
+      <div class="section-heading">
+        <p class="eyebrow">Extra Tools</p>
+        <h2 id="utility-title">결과를 더 잘 해석하는 부가 기능</h2>
+      </div>
+      <div class="utility-grid">
+        <article class="utility-card">
+          <h3>촬영 체크리스트</h3>
+          <ul class="check-list">
+            <li>얼굴이 화면 중앙에 있는 사진</li>
+            <li>역광보다 정면 또는 측면 자연광</li>
+            <li>과한 보정 필터가 없는 원본에 가까운 사진</li>
+            <li>한 명만 나온 사진</li>
+          </ul>
+        </article>
+        <article class="utility-card">
+          <h3>최근 테스트 기록</h3>
+          <div class="history-list" id="historyList">아직 저장된 결과가 없습니다.</div>
+        </article>
+        <article class="utility-card">
+          <h3>오늘의 분위기 팁</h3>
+          <p id="dailyTip">사진은 밝기보다 빛의 방향이 더 중요합니다. 얼굴 한쪽만 너무 어두우면 결과가 강한 인상으로 기울 수 있습니다.</p>
+          <button class="ghost small-button" id="tipButton" type="button">다른 팁 보기</button>
+        </article>
+      </div>
     </section>
 
     <section class="content-section" id="guide" aria-labelledby="guide-title">
@@ -85,14 +115,17 @@
         <article class="article-card">
           <h3>정면 사진을 사용하는 이유</h3>
           <p>동물상 테스트는 얼굴의 실제 신원이나 생체 정보를 판별하는 도구가 아니라, 사진에서 느껴지는 시각적 분위기를 분류하는 엔터테인먼트 도구입니다. 정면 사진을 사용하면 좌우 밝기와 구도 차이가 줄어들어 결과가 덜 흔들립니다.</p>
+          <a class="text-link" href="photo-guide.html">촬영 가이드 보기</a>
         </article>
         <article class="article-card">
           <h3>조명과 배경이 결과에 주는 영향</h3>
           <p>강한 역광, 어두운 실내, 색이 진한 필터는 이미지의 밝기와 대비를 크게 바꿉니다. 밝고 균일한 조명에서 촬영한 사진은 강아지상, 토끼상처럼 부드러운 결과가 잘 나오고, 대비가 강한 사진은 고양이상이나 여우상 점수가 높아질 수 있습니다.</p>
+          <a class="text-link" href="result-guide.html">결과 해석법 읽기</a>
         </article>
         <article class="article-card">
           <h3>결과를 가볍게 해석하기</h3>
           <p>고양이상은 또렷하고 차분한 이미지, 강아지상은 밝고 친근한 이미지, 사슴상은 단정하고 맑은 이미지처럼 분위기 키워드로 이해하면 좋습니다. 결과는 외모 평가가 아니라 사진에서 받은 인상을 표현하는 참고용 콘텐츠입니다.</p>
+          <a class="text-link" href="animal-types.html">동물상별 특징 보기</a>
         </article>
       </div>
     </section>
@@ -103,30 +136,24 @@
         <h2 id="animals-title">대표 동물상 해석</h2>
       </div>
       <div class="type-list">
-        <article>
-          <h3>고양이상</h3>
-          <p>선명한 대비와 차분한 분위기가 어울리는 타입입니다. 시크하고 정돈된 인상, 조용하지만 존재감 있는 이미지로 설명할 수 있습니다.</p>
-        </article>
-        <article>
-          <h3>강아지상</h3>
-          <p>밝은 톤과 부드러운 인상이 어울리는 타입입니다. 친근함, 활기, 편안함이 첫인상으로 잘 드러나는 사진에서 자주 나타납니다.</p>
-        </article>
-        <article>
-          <h3>여우상</h3>
-          <p>대비와 윤곽감이 강하게 느껴질 때 가까운 결과입니다. 세련되고 날렵한 이미지, 또렷한 분위기를 가진 사진에서 점수가 올라갑니다.</p>
-        </article>
-        <article>
-          <h3>사슴상</h3>
-          <p>균형감 있고 맑은 인상에 가까운 타입입니다. 과한 대비보다 안정적인 조명과 단정한 구도에서 자연스럽게 나타납니다.</p>
-        </article>
-        <article>
-          <h3>토끼상</h3>
-          <p>밝고 부드러운 이미지가 잘 드러날 때 어울리는 타입입니다. 귀엽고 산뜻한 분위기를 가볍게 표현하는 결과입니다.</p>
-        </article>
-        <article>
-          <h3>곰상</h3>
-          <p>온화하고 안정적인 톤이 강할 때 가까운 결과입니다. 편안함, 신뢰감, 차분함을 중심으로 해석하면 좋습니다.</p>
-        </article>
+        <article><h3>고양이상</h3><p>선명한 대비와 차분한 분위기가 어울리는 타입입니다. 시크하고 정돈된 인상, 조용하지만 존재감 있는 이미지로 설명할 수 있습니다.</p></article>
+        <article><h3>강아지상</h3><p>밝은 톤과 부드러운 인상이 어울리는 타입입니다. 친근함, 활기, 편안함이 첫인상으로 잘 드러나는 사진에서 자주 나타납니다.</p></article>
+        <article><h3>여우상</h3><p>대비와 윤곽감이 강하게 느껴질 때 가까운 결과입니다. 세련되고 날렵한 이미지, 또렷한 분위기를 가진 사진에서 점수가 올라갑니다.</p></article>
+        <article><h3>사슴상</h3><p>균형감 있고 맑은 인상에 가까운 타입입니다. 과한 대비보다 안정적인 조명과 단정한 구도에서 자연스럽게 나타납니다.</p></article>
+        <article><h3>토끼상</h3><p>밝고 부드러운 이미지가 잘 드러날 때 어울리는 타입입니다. 귀엽고 산뜻한 분위기를 가볍게 표현하는 결과입니다.</p></article>
+        <article><h3>곰상</h3><p>온화하고 안정적인 톤이 강할 때 가까운 결과입니다. 편안함, 신뢰감, 차분함을 중심으로 해석하면 좋습니다.</p></article>
+      </div>
+    </section>
+
+    <section class="content-section" aria-labelledby="reading-title">
+      <div class="section-heading">
+        <p class="eyebrow">Reading</p>
+        <h2 id="reading-title">함께 읽으면 좋은 글</h2>
+      </div>
+      <div class="article-grid">
+        <article class="article-card"><h3>동물상별 분위기 사전</h3><p>각 동물상이 어떤 사진 분위기와 연결되는지 더 자세히 정리했습니다.</p><a class="text-link" href="animal-types.html">읽기</a></article>
+        <article class="article-card"><h3>사진 촬영 가이드</h3><p>테스트 결과가 흔들리지 않도록 조명, 구도, 배경을 고르는 방법을 설명합니다.</p><a class="text-link" href="photo-guide.html">읽기</a></article>
+        <article class="article-card"><h3>결과 해석 가이드</h3><p>매칭률과 보조 동물상 점수를 어떻게 읽으면 좋은지 안내합니다.</p><a class="text-link" href="result-guide.html">읽기</a></article>
       </div>
     </section>
 
@@ -136,18 +163,9 @@
         <h2 id="faq-title">자주 묻는 질문</h2>
       </div>
       <div class="faq-list">
-        <details>
-          <summary>사진이 서버에 저장되나요?</summary>
-          <p>아니요. 이 테스트는 브라우저의 캔버스 기능으로 이미지를 읽고 계산합니다. 별도의 계정 가입, 사진 업로드 서버, 데이터베이스 저장 기능을 사용하지 않습니다.</p>
-        </details>
-        <details>
-          <summary>결과가 사람마다 정확하게 맞나요?</summary>
-          <p>아닙니다. 이 서비스는 과학적 진단이나 신원 확인 도구가 아니라 사진 분위기를 재미있게 분류하는 콘텐츠입니다. 조명, 필터, 각도에 따라 결과가 달라질 수 있습니다.</p>
-        </details>
-        <details>
-          <summary>어떤 사진을 쓰면 좋나요?</summary>
-          <p>얼굴이 중앙에 있고 배경이 단순하며 밝기가 고른 사진을 권장합니다. 여러 명이 함께 나온 사진이나 과한 필터가 적용된 사진은 결과가 불안정할 수 있습니다.</p>
-        </details>
+        <details><summary>사진이 서버에 저장되나요?</summary><p>아니요. 이 테스트는 브라우저의 캔버스 기능으로 이미지를 읽고 계산합니다. 별도의 계정 가입, 사진 업로드 서버, 데이터베이스 저장 기능을 사용하지 않습니다.</p></details>
+        <details><summary>결과가 사람마다 정확하게 맞나요?</summary><p>아닙니다. 이 서비스는 과학적 진단이나 신원 확인 도구가 아니라 사진 분위기를 재미있게 분류하는 콘텐츠입니다. 조명, 필터, 각도에 따라 결과가 달라질 수 있습니다.</p></details>
+        <details><summary>어떤 사진을 쓰면 좋나요?</summary><p>얼굴이 중앙에 있고 배경이 단순하며 밝기가 고른 사진을 권장합니다. 여러 명이 함께 나온 사진이나 과한 필터가 적용된 사진은 결과가 불안정할 수 있습니다.</p></details>
       </div>
     </section>
   </main>
