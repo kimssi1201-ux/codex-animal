@@ -365,3 +365,58 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+
+.blog-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.blog-list-item {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 20px;
+}
+
+.blog-list-item h2 {
+  margin-bottom: 8px;
+  font-size: 1.2rem;
+}
+
+.blog-list-item a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.blog-list-item a:hover {
+  color: var(--accent-dark);
+}
+
+.blog-list-item p {
+  margin-bottom: 0;
+}
+
+.blog-post h2 {
+  margin-top: 34px;
+}
+
+.related-box {
+  display: grid;
+  gap: 8px;
+  margin-top: 32px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 18px;
+}
+
+.related-box a {
+  color: var(--accent-dark);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.related-box a:hover {
+  text-decoration: underline;
+}
