@@ -1,15 +1,70 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+  <meta name="theme-color" content="#f6f1e8" />
+  <title>동물상 테스트</title>
+  <link href="style.css" rel="stylesheet" />
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+  <main class="app-shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div class="intro-copy">
+        <p class="eyebrow">Face Animal Match</p>
+        <h1 id="page-title">내 얼굴은 어떤 동물상일까?</h1>
+        <p class="lead">사진을 올리면 얼굴 분위기를 분석해 가장 가까운 동물상을 보여줍니다. 이미지는 브라우저 안에서만 처리됩니다.</p>
+      </div>
+      <div class="score-card" aria-label="분석 기준">
+        <span>눈매</span>
+        <span>인상</span>
+        <span>색감</span>
+        <span>구도</span>
+      </div>
+    </section>
+
+    <section class="workspace" aria-label="동물상 분석기">
+      <div class="upload-panel">
+        <label class="drop-zone" id="dropZone" for="imageInput">
+          <input id="imageInput" type="file" accept="image/*" />
+          <canvas id="previewCanvas" width="720" height="720" aria-label="업로드한 얼굴 사진 미리보기"></canvas>
+          <div class="empty-state" id="emptyState">
+            <span class="upload-icon" aria-hidden="true">+</span>
+            <strong>얼굴 사진 업로드</strong>
+            <small>정면 사진일수록 결과가 안정적입니다</small>
+          </div>
+        </label>
+
+        <div class="actions">
+          <button class="primary" id="analyzeButton" type="button" disabled>분석하기</button>
+          <button class="ghost" id="resetButton" type="button" disabled>다시 선택</button>
+        </div>
+      </div>
+
+      <aside class="result-panel" aria-live="polite">
+        <div class="result-empty" id="resultEmpty">
+          <p>사진을 올리고 분석하면 결과가 여기에 표시됩니다.</p>
+        </div>
+
+        <div class="result-content" id="resultContent" hidden>
+          <div class="animal-mark" id="animalMark" aria-hidden="true">CAT</div>
+          <p class="result-kicker">가장 가까운 동물상</p>
+          <h2 id="animalName">고양이상</h2>
+          <p class="match" id="matchScore">0% match</p>
+          <p class="description" id="animalDescription"></p>
+
+          <div class="traits" id="traits"></div>
+
+          <div class="meters" id="meters" aria-label="동물상 점수"></div>
+
+          <div class="result-actions">
+            <button class="ghost" id="copyButton" type="button">결과 복사</button>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script defer src="main.js"></script>
 </body>
 </html>
-
