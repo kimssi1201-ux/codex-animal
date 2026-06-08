@@ -11,6 +11,8 @@ const ROBOTS_TXT = `User-agent: *
 Allow: /
 Sitemap: ${SITE_URL}/sitemap.xml
 `;
+const ADS_TXT = `google.com, pub-6066428844912614, DIRECT, f08c47fec0942fa0
+`;
 
 function canonicalUrl(requestUrl) {
   const url = new URL(requestUrl);
@@ -41,6 +43,15 @@ export async function onRequest(context) {
 
   if (requestUrl.pathname === "/robots.txt") {
     return new Response(ROBOTS_TXT, {
+      headers: {
+        "content-type": "text/plain; charset=utf-8",
+        "cache-control": "no-cache, max-age=0",
+      },
+    });
+  }
+
+  if (requestUrl.pathname === "/ads.txt") {
+    return new Response(ADS_TXT, {
       headers: {
         "content-type": "text/plain; charset=utf-8",
         "cache-control": "no-cache, max-age=0",
