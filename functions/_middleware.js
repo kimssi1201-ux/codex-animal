@@ -1,5 +1,7 @@
 const ADSENSE_SNIPPET =
   '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6066428844912614" crossorigin="anonymous"></script>';
+const NAVER_VERIFICATION =
+  '<meta name="naver-site-verification" content="74a2206ab416200464688bbb207be6e25e76bc7c" />';
 const SITE_URL = "https://www.moneyarchive.kr";
 const SITEMAP_XML = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -76,6 +78,10 @@ export async function onRequest(context) {
 
   if (!html.includes("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")) {
     headAdditions.push(ADSENSE_SNIPPET);
+  }
+
+  if (!html.includes("naver-site-verification")) {
+    headAdditions.push(NAVER_VERIFICATION);
   }
 
   if (!html.includes('rel="canonical"') && !html.includes("rel='canonical'")) {
