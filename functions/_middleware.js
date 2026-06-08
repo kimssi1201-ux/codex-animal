@@ -4,6 +4,12 @@ const NAVER_VERIFICATION =
   '<meta name="naver-site-verification" content="74a2206ab416200464688bbb207be6e25e76bc7c" />';
 const RSS_LINK =
   '<link rel="alternate" type="application/rss+xml" title="RSS" href="https://www.moneyarchive.kr/feed.xml">';
+const DETAIL_COMPACT_CSS =
+  ".detail h2{font-size:24px;margin:0}.detail p{margin:0}.detail .compact-note{color:var(--muted)}.detail .meta-list{grid-template-columns:1fr}.detail .actions a,.detail .actions button{flex:1 1 130px}";
+const DETAIL_COPY =
+  "마커별 위치, 주요 어종, 길찾기, 현재 예보를 짧게 정리했습니다.";
+const DETAIL_PANEL_COMPACT =
+  "function renderDetail(){const p=byId(selected);els.detail.innerHTML=`${tags(p)}<div><h2>${p.n}</h2><p class='muted'>${p.a} · 위도 ${p.lat.toFixed(4)}, 경도 ${p.lng.toFixed(4)}</p></div><p class='compact-note'>${p.note}</p><div class='fish'>${p.fish.map(f=>`<span>${f}</span>`).join('')}</div><div class='meta-list'><div><small>추천 시간</small><b>${p.best}</b></div><div><small>주의</small><b>${p.warn}</b></div></div>${miniForecast(p)}<div class='actions'><a class='btn primary' href='${nmap(p)}' target='_blank' rel='noreferrer'>네이버 지도</a><a class='btn secondary' href='${gmap(p)}' target='_blank' rel='noreferrer'>구글 지도</a></div>`}function renderGrid()";
 const SITE_URL = "https://www.moneyarchive.kr";
 const SITEMAP_XML = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -101,7 +107,21 @@ export async function onRequest(context) {
     return response;
   }
 
-  const html = await response.text();
+  let html = await response.text();
+
+  html = html.replace(
+    "마커를 누르면 사진, 좌표, 길찾기, 바다 예보가 함께 바뀝니다.",
+    DETAIL_COPY,
+  );
+
+  if (!html.includes(".detail .compact-note")) {
+    html = html.replace("</style>", `${DETAIL_COMPACT_CSS}</style>`);
+  }
+
+  html = html.replace(
+    /function renderDetail\(\)\{[\s\S]*?function renderGrid\(\)/,
+    DETAIL_PANEL_COMPACT,
+  );
 
   const headers = new Headers(response.headers);
   headers.delete("content-length");
