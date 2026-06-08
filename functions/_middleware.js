@@ -1,6 +1,16 @@
 const ADSENSE_SNIPPET =
   '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6066428844912614" crossorigin="anonymous"></script>';
 const SITE_URL = "https://www.moneyarchive.kr";
+const SITEMAP_XML = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>${SITE_URL}/</loc><lastmod>2026-06-08</lastmod></url>
+  <url><loc>${SITE_URL}/privacy</loc><lastmod>2026-06-08</lastmod></url>
+</urlset>
+`;
+const ROBOTS_TXT = `User-agent: *
+Allow: /
+Sitemap: ${SITE_URL}/sitemap.xml
+`;
 
 function canonicalUrl(requestUrl) {
   const url = new URL(requestUrl);
@@ -18,6 +28,26 @@ function canonicalUrl(requestUrl) {
 }
 
 export async function onRequest(context) {
+  const requestUrl = new URL(context.request.url);
+
+  if (requestUrl.pathname === "/sitemap.xml") {
+    return new Response(SITEMAP_XML, {
+      headers: {
+        "content-type": "application/xml; charset=utf-8",
+        "cache-control": "no-cache, max-age=0",
+      },
+    });
+  }
+
+  if (requestUrl.pathname === "/robots.txt") {
+    return new Response(ROBOTS_TXT, {
+      headers: {
+        "content-type": "text/plain; charset=utf-8",
+        "cache-control": "no-cache, max-age=0",
+      },
+    });
+  }
+
   const response = await context.next();
   const contentType = response.headers.get("content-type") || "";
 
