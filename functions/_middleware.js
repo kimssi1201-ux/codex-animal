@@ -1,5 +1,5 @@
 const ADSENSE_SNIPPET =
-  '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6066428844912614" crossorigin="anonymous"></script>';
+  '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>';
 const NAVER_VERIFICATION =
   '<meta name="naver-site-verification" content="74a2206ab416200464688bbb207be6e25e76bc7c" />';
 const RSS_LINK =
@@ -27,7 +27,7 @@ const ROBOTS_TXT = `User-agent: *
 Allow: /
 Sitemap: ${SITE_URL}/sitemap.xml
 `;
-const ADS_TXT = `google.com, pub-6066428844912614, DIRECT, f08c47fec0942fa0
+const ADS_TXT = `google.com, pub-8468106244002167, DIRECT, f08c47fec0942fa0
 `;
 const FEED_XML = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
@@ -173,6 +173,8 @@ export async function onRequest(context) {
   }
 
   let html = await response.text();
+
+  html = html.replace(/ca-pub-\d+/g, "ca-pub-8468106244002167");
 
   html = upgradeHomepage(html);
 
