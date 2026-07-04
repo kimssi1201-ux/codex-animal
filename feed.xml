@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>트래블 아카이브</title>
+    <title>서울 축제 아카이브</title>
     <link>https://www.moneyarchive.kr/</link>
     <atom:link href="https://www.moneyarchive.kr/feed.xml" rel="self" type="application/rss+xml" />
-    <description>가볼 만한 곳, 여행 정보, 예약 전 체크와 큐레이션을 모아 보여주는 여행 매거진입니다.</description>
+    <description>서울 축제, 서울 가볼 만한 곳, 방문 전 체크 정보를 모아 보여주는 서울 여행 매거진입니다.</description>
     <language>ko-KR</language>
-    <lastBuildDate>Fri, 03 Jul 2026 00:00:00 +0900</lastBuildDate>
-    <pubDate>Fri, 03 Jul 2026 00:00:00 +0900</pubDate>
+    <lastBuildDate>Sat, 04 Jul 2026 00:00:00 +0900</lastBuildDate>
+    <pubDate>Sat, 04 Jul 2026 00:00:00 +0900</pubDate>
     <ttl>60</ttl>
     <item>
-      <title>7월 제주 서쪽 여행, 바다 산책과 노을 카페 동선</title>
-      <link>https://www.moneyarchive.kr/places/jeju-west-summer-course/</link>
-      <guid isPermaLink="true">https://www.moneyarchive.kr/places/jeju-west-summer-course/</guid>
-      <description>애월 해안도로, 협재 해변, 금능 노을, 한림 카페를 하루 안에 묶는 여름 제주 서쪽 코스입니다.</description>
-      <category>국내여행</category>
-      <pubDate>Fri, 03 Jul 2026 00:00:00 +0900</pubDate>
+      <title>이번 주 서울 축제와 가볼 만한 곳 한 번에 보기</title>
+      <link>https://www.moneyarchive.kr/seoul/festival-weekend-guide/</link>
+      <guid isPermaLink="true">https://www.moneyarchive.kr/seoul/festival-weekend-guide/</guid>
+      <description>광화문, 노들섬, 남산골한옥마을, DDP, 서울숲처럼 이동하기 쉬운 서울 명소를 축제와 전시 일정 중심으로 묶었습니다.</description>
+      <category>서울 축제</category>
+      <pubDate>Sat, 04 Jul 2026 00:00:00 +0900</pubDate>
     </item>
     <item>
-      <title>부산 해운대 숙소 고를 때 위치와 취소 조건 보는 법</title>
-      <link>https://www.moneyarchive.kr/booking/busan-haeundae-stay-check/</link>
-      <guid isPermaLink="true">https://www.moneyarchive.kr/booking/busan-haeundae-stay-check/</guid>
-      <description>숙소 예약 전 위치, 후기, 무료 취소, 이동 동선을 함께 확인하는 기준을 정리했습니다.</description>
-      <category>숙소</category>
-      <pubDate>Fri, 03 Jul 2026 00:00:00 +0900</pubDate>
+      <title>서울 축제 가기 전 예약, 우천, 혼잡 시간 확인 순서</title>
+      <link>https://www.moneyarchive.kr/seoul/festival-before-visit-check/</link>
+      <guid isPermaLink="true">https://www.moneyarchive.kr/seoul/festival-before-visit-check/</guid>
+      <description>서울 축제 방문 전 일정, 예약 여부, 대중교통, 우천 취소, 혼잡 시간대를 확인하는 순서입니다.</description>
+      <category>방문 전 체크</category>
+      <pubDate>Sat, 04 Jul 2026 00:00:00 +0900</pubDate>
     </item>
   </channel>
 </rss>

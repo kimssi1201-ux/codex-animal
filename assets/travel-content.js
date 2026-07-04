@@ -1,246 +1,246 @@
 export const todayKeywords = [
-  { label: "제주 가볼만한 곳", href: "/tags/jeju-places/" },
-  { label: "서울 숲길", href: "/tags/seoul-walk/" },
-  { label: "부산 숙소", href: "/tags/busan-stay/" },
-  { label: "도쿄 항공권", href: "/tags/tokyo-flight/" },
-  { label: "여름 축제", href: "/tags/summer-festival/" },
-  { label: "방콕 투어", href: "/tags/bangkok-tour/" },
-  { label: "강릉 여행", href: "/tags/gangneung-trip/" },
-  { label: "할인코드", href: "/booking/coupons/" }
+  { label: "광화문광장", href: "/tags/gwanghwamun-square/" },
+  { label: "서울 여름 축제", href: "/tags/seoul-summer-festival/" },
+  { label: "한강 야경", href: "/tags/hangang-night/" },
+  { label: "남산골한옥마을", href: "/tags/namsangol/" },
+  { label: "노들섬", href: "/tags/nodeul-island/" },
+  { label: "DDP 전시", href: "/tags/ddp/" },
+  { label: "서울숲", href: "/tags/seoul-forest/" },
+  { label: "무료 전시", href: "/tags/free-exhibition/" }
 ];
 
 export const featuredArticle = {
-  category: "국내여행",
-  title: "7월 제주 서쪽 여행, 바다 산책과 노을 카페 동선",
-  excerpt: "애월 해안도로, 협재 해변, 금능 노을, 한림 카페를 하루 안에 무리 없이 묶는 여름 제주 서쪽 코스입니다. 더운 시간대는 실내와 카페로 피하고 해 질 무렵 바다 산책에 집중했습니다.",
-  date: "7월 3일",
+  category: "서울 축제",
+  title: "이번 주 서울 축제와 가볼 만한 곳 한 번에 보기",
+  excerpt: "광화문, 노들섬, 남산골한옥마을, DDP, 서울숲처럼 이동하기 쉬운 서울 명소를 축제와 전시 일정 중심으로 묶었습니다. 방문 전 운영 시간과 예약 여부만 확인하면 짧은 일정도 충분히 알차게 보낼 수 있습니다.",
+  date: "7월 4일",
   readTime: "8분 읽기",
-  href: "/places/jeju-west-summer-course/",
-  image: "https://images.unsplash.com/photo-1542259009477-d625272157b7?auto=format&fit=crop&w=1400&q=82",
-  alt: "제주 해안도로와 푸른 바다"
+  href: "/seoul/festival-weekend-guide/",
+  image: "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=1400&q=82",
+  alt: "서울 도심 야경과 광장"
 };
 
 export const latestArticles = [
   {
-    category: "국내여행",
-    title: "서울 숲길 산책, 성수 카페까지 이어지는 반나절 코스",
-    date: "7월 3일",
+    category: "서울 축제",
+    title: "남산골한옥마을 여름 행사, 한옥 산책과 함께 보는 법",
+    date: "7월 4일",
     readTime: "5분 읽기",
-    href: "/places/seoul-forest-walk/"
+    href: "/seoul/namsangol-summer-event/"
   },
   {
-    category: "숙소",
-    title: "부산 해운대 숙소 고를 때 위치와 취소 조건 보는 법",
-    date: "7월 3일",
+    category: "가볼 만한 곳",
+    title: "노들섬 전시와 한강 노을을 묶는 저녁 코스",
+    date: "7월 4일",
     readTime: "6분 읽기",
-    href: "/booking/busan-haeundae-stay-check/"
+    href: "/seoul/nodeul-island-evening-course/"
   },
   {
-    category: "공연/축제",
-    title: "여름 밤바다 축제, 일정 확인 전 체크할 세 가지",
-    date: "7월 3일",
+    category: "서울 축제",
+    title: "광화문 미디어파사드와 도심 야간 산책 코스",
+    date: "7월 4일",
+    readTime: "6분 읽기",
+    href: "/seoul/gwanghwamun-night-media/"
+  },
+  {
+    category: "방문 전 체크",
+    title: "서울 축제 가기 전 예약, 우천, 혼잡 시간 확인 순서",
+    date: "7월 4일",
     readTime: "4분 읽기",
-    href: "/info/summer-night-festival-check/"
-  },
-  {
-    category: "해외여행",
-    title: "도쿄 항공권 검색 전 날짜별 가격 차이 줄이는 방법",
-    date: "7월 3일",
-    readTime: "7분 읽기",
-    href: "/booking/tokyo-flight-date-check/"
+    href: "/seoul/festival-before-visit-check/"
   }
 ];
 
 export const placeArticles = [
   {
-    category: "국내여행",
-    title: "강릉 바다 산책로와 커피거리 하루 동선",
-    excerpt: "경포와 강문 해변, 안목 커피거리, 초당마을을 이동 피로가 적은 순서로 묶었습니다.",
-    date: "7월 3일",
-    readTime: "7분 읽기",
-    href: "/places/gangneung-seaside-cafe-course/",
-    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=82",
-    alt: "해변 산책로와 푸른 하늘"
-  },
-  {
-    category: "해외여행",
-    title: "방콕 첫 여행자를 위한 왕궁·강변·야시장 코스",
-    excerpt: "한낮 더위를 피하고 강변 이동과 저녁 야시장을 중심으로 구성한 초행자용 일정입니다.",
-    date: "7월 2일",
-    readTime: "8분 읽기",
-    href: "/places/bangkok-first-trip-route/",
-    image: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=900&q=82",
-    alt: "방콕 도시와 사원 풍경"
-  },
-  {
-    category: "공연/축제",
-    title: "여름 지역 축제 갈 때 교통과 숙소를 먼저 보는 이유",
-    excerpt: "축제 일정만 보고 떠나기 전, 주차와 셔틀, 숙소 취소 조건까지 먼저 확인해야 합니다.",
-    date: "7월 2일",
-    readTime: "5분 읽기",
-    href: "/info/summer-festival-plan/",
-    image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=900&q=82",
-    alt: "야외 축제 조명과 사람들"
-  },
-  {
-    category: "숙소",
-    title: "제주 오션뷰 숙소 예약 전 위치 확인 체크리스트",
-    excerpt: "사진 속 전망보다 실제 이동 거리, 주차, 주변 식당, 무료 취소 여부를 먼저 확인합니다.",
-    date: "7월 1일",
+    category: "서울 축제",
+    title: "남산골한옥마을 여름나기, 전통 공간에서 쉬어가는 코스",
+    excerpt: "한옥마을 행사와 남산 산책을 함께 묶기 좋습니다. 무더운 시간대는 실내 체험과 그늘 동선을 먼저 확인하세요.",
+    date: "7월 4일",
     readTime: "6분 읽기",
-    href: "/booking/jeju-ocean-view-stay-check/",
-    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=900&q=82",
-    alt: "휴양지 숙소와 수영장"
+    href: "/seoul/namsangol-summer-course/",
+    image: "https://images.unsplash.com/photo-1580806901764-2f12d0f84378?auto=format&fit=crop&w=900&q=82",
+    alt: "서울 전통 한옥과 마당"
   },
   {
-    category: "국내여행",
-    title: "전주 한옥마을 야경과 시장 먹거리 저녁 코스",
-    excerpt: "낮 더위를 피하고 한옥 골목, 전망 포인트, 남부시장 먹거리를 저녁 동선으로 정리했습니다.",
-    date: "7월 1일",
-    readTime: "7분 읽기",
-    href: "/places/jeonju-night-market-course/",
-    image: "https://images.unsplash.com/photo-1535189043414-47a3c49a0bed?auto=format&fit=crop&w=900&q=82",
-    alt: "전통 건축 골목과 저녁 조명"
-  },
-  {
-    category: "해외여행",
-    title: "도쿄 3박 4일, 쇼핑과 근교를 나누는 일정표",
-    excerpt: "시부야·신주쿠 쇼핑일과 근교 이동일을 분리해 체력을 아끼는 도시 여행 계획입니다.",
-    date: "6월 30일",
-    readTime: "9분 읽기",
-    href: "/places/tokyo-4days-plan/",
-    image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=900&q=82",
-    alt: "도쿄 도심 교차로"
-  },
-  {
-    category: "국내여행",
-    title: "통영 동피랑과 강구안 야경을 묶는 반나절 코스",
-    excerpt: "오후 늦게 골목을 걷고 해 질 무렵 항구 야경과 중앙시장 먹거리로 마무리합니다.",
-    date: "6월 29일",
+    category: "가볼 만한 곳",
+    title: "노들섬, 전시와 한강 야경을 같이 보는 서울 코스",
+    excerpt: "전시 관람 후 한강대교와 강변 산책까지 이어지는 저녁 동선입니다. 해 질 무렵 방문하면 체류 만족도가 높습니다.",
+    date: "7월 4일",
     readTime: "6분 읽기",
-    href: "/places/tongyeong-halfday-night-view/",
+    href: "/seoul/nodeul-island-hangang-course/",
     image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=82",
-    alt: "해안 도시와 바다"
+    alt: "강변과 노을"
   },
   {
-    category: "공연/축제",
-    title: "비 오는 날에도 갈 만한 실내 여행지 고르는 기준",
-    excerpt: "박물관, 시장, 복합문화공간을 이동 거리와 체류 시간 기준으로 고르는 방법입니다.",
-    date: "6월 29일",
+    category: "서울 축제",
+    title: "광화문광장 미디어파사드, 밤 산책으로 보기 좋은 자리",
+    excerpt: "세종문화회관 외벽과 광화문광장 주변을 중심으로 도심 야간 콘텐츠를 가볍게 둘러보는 코스입니다.",
+    date: "7월 4일",
     readTime: "5분 읽기",
-    href: "/info/rainy-day-indoor-trip/",
+    href: "/seoul/gwanghwamun-media-night/",
+    image: "https://images.unsplash.com/photo-1548115184-bc6544d06a58?auto=format&fit=crop&w=900&q=82",
+    alt: "서울 도심 광장 야경"
+  },
+  {
+    category: "가볼 만한 곳",
+    title: "DDP 전시와 동대문 야시장, 실내외를 나누는 반나절 코스",
+    excerpt: "낮에는 전시와 디자인 공간을 보고 저녁에는 동대문 야경과 먹거리 동선으로 이어가기 좋습니다.",
+    date: "7월 4일",
+    readTime: "7분 읽기",
+    href: "/seoul/ddp-dongdaemun-halfday/",
     image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=900&q=82",
-    alt: "실내 건축 공간"
+    alt: "곡선형 현대 건축 공간"
+  },
+  {
+    category: "가볼 만한 곳",
+    title: "서울숲과 성수 카페거리, 걷기 좋은 주말 코스",
+    excerpt: "숲길 산책과 전시형 카페, 편집숍을 함께 묶는 코스입니다. 더운 날은 실내 휴식 지점을 미리 정해두세요.",
+    date: "7월 4일",
+    readTime: "6분 읽기",
+    href: "/seoul/seoul-forest-seongsu-walk/",
+    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=82",
+    alt: "도심 공원 산책로"
+  },
+  {
+    category: "서울 축제",
+    title: "세종문화회관 공연 주간, 광화문 식사 동선까지 정리",
+    excerpt: "공연 시작 전후로 식사와 카페를 가까운 구역에서 해결할 수 있게 광화문 중심 동선을 잡았습니다.",
+    date: "7월 4일",
+    readTime: "5분 읽기",
+    href: "/seoul/sejong-center-performance-route/",
+    image: "https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=900&q=82",
+    alt: "공연장 객석과 무대 조명"
+  },
+  {
+    category: "가볼 만한 곳",
+    title: "북촌·인사동, 전시와 전통 골목을 함께 보는 낮 코스",
+    excerpt: "실내 전시와 골목 산책을 번갈아 넣어 여름에도 무리 없이 걷는 서울 도심 코스입니다.",
+    date: "7월 4일",
+    readTime: "7분 읽기",
+    href: "/seoul/bukchon-insadong-gallery-walk/",
+    image: "https://images.unsplash.com/photo-1535189043414-47a3c49a0bed?auto=format&fit=crop&w=900&q=82",
+    alt: "전통 골목과 낮 풍경"
+  },
+  {
+    category: "가볼 만한 곳",
+    title: "석촌호수와 잠실, 야외 산책과 실내몰을 나누는 코스",
+    excerpt: "호수 산책, 전망, 실내 쇼핑몰을 날씨에 따라 바꿔 넣기 쉬운 서울 동남권 코스입니다.",
+    date: "7월 4일",
+    readTime: "6분 읽기",
+    href: "/seoul/seokchon-lake-jamsil-course/",
+    image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=900&q=82",
+    alt: "도시 고층 건물과 호수 주변"
   }
 ];
 
 export const bookingChecks = [
   {
-    title: "호텔",
-    excerpt: "위치, 후기, 무료 취소, 조식 포함 여부를 먼저 비교합니다.",
+    title: "일정 확인",
+    excerpt: "서울문화포털과 행사 공식 페이지에서 날짜, 회차, 휴관일을 먼저 확인합니다.",
     href: "#",
-    action: "호텔 비교 준비 중"
+    action: "공식 일정 확인"
   },
   {
-    title: "항공권",
-    excerpt: "출발 요일과 시간대별 가격 차이를 확인한 뒤 검색 조건을 좁힙니다.",
+    title: "예약 여부",
+    excerpt: "무료 행사라도 좌석이나 체험 프로그램은 사전 예약이 필요한 경우가 있습니다.",
     href: "#",
-    action: "항공권 검색 준비 중"
+    action: "예약 필요 여부 보기"
   },
   {
-    title: "투어·입장권",
-    excerpt: "운영 시간, 포함 사항, 환불 규정, 집결 위치를 함께 확인합니다.",
+    title: "교통 동선",
+    excerpt: "축제 당일에는 주차보다 지하철 출구와 도보 동선을 먼저 잡는 편이 안정적입니다.",
     href: "#",
-    action: "투어 체크 준비 중"
+    action: "대중교통 체크"
   },
   {
-    title: "할인코드",
-    excerpt: "시즌 쿠폰, 카드 할인, 첫 예약 혜택을 예약 직전에 다시 봅니다.",
+    title: "우천·혼잡",
+    excerpt: "야외 행사는 우천 취소와 혼잡 시간대가 변수입니다. 저녁 행사라면 귀가 동선도 함께 봅니다.",
     href: "#",
-    action: "할인코드 준비 중"
+    action: "방문 전 체크"
   }
 ];
 
 export const curationArticles = [
   {
-    category: "여행 정보",
-    title: "여름 여행 가방에 먼저 넣을 준비물 12가지",
-    excerpt: "우산, 보조배터리, 얇은 겉옷, 물놀이 용품처럼 빠뜨리기 쉬운 준비물을 정리했습니다.",
-    date: "7월 3일",
+    category: "서울 축제",
+    title: "서울 여름 축제는 낮보다 저녁 동선이 편합니다",
+    excerpt: "광장, 한강, 야외 공연은 해 질 무렵 체감 온도가 낮아져 이동과 관람이 훨씬 수월합니다.",
+    date: "7월 4일",
     readTime: "4분 읽기",
-    href: "/info/summer-packing-list/"
+    href: "/seoul/summer-festival-evening-tip/"
   },
   {
-    category: "교통",
-    title: "렌터카 예약 전 보험과 반납 시간을 확인하는 법",
-    excerpt: "면책 범위와 야간 반납 조건을 먼저 보면 현장 추가 비용을 줄일 수 있습니다.",
-    date: "7월 2일",
-    readTime: "5분 읽기",
-    href: "/booking/rentcar-insurance-check/"
-  },
-  {
-    category: "맛집",
-    title: "관광지 맛집 찾을 때 리뷰보다 먼저 볼 것",
-    excerpt: "영업시간, 브레이크타임, 대기 방식, 주차 가능 여부가 실제 만족도를 좌우합니다.",
-    date: "7월 2일",
-    readTime: "5분 읽기",
-    href: "/info/travel-restaurant-check/"
-  },
-  {
-    category: "해외여행",
-    title: "환전과 현지 결제, 출국 전 체크 순서",
-    excerpt: "현금 비중, 해외 결제 카드, 교통카드 충전 방법을 목적지별로 나누어 준비합니다.",
-    date: "7월 1일",
+    category: "가볼 만한 곳",
+    title: "광화문에서 정동길까지, 전시와 산책을 잇는 코스",
+    excerpt: "세종문화회관, 서울시립미술관, 정동길을 도보로 묶어 도심 문화 산책 코스를 만들 수 있습니다.",
+    date: "7월 4일",
     readTime: "6분 읽기",
-    href: "/info/exchange-card-check/"
+    href: "/seoul/gwanghwamun-jeongdong-walk/"
   },
   {
-    category: "가족여행",
-    title: "아이와 가는 숙소는 수영장보다 동선을 먼저 봅니다",
-    excerpt: "침대 구성, 세탁 가능 여부, 편의점 거리, 주차 동선까지 같이 확인해야 편합니다.",
-    date: "6월 30일",
+    category: "서울 축제",
+    title: "한강 행사 갈 때 돗자리보다 먼저 확인할 것",
+    excerpt: "가까운 지하철역, 화장실 위치, 편의점 거리, 귀가 시간대를 먼저 정하면 현장 피로가 줄어듭니다.",
+    date: "7월 4일",
     readTime: "5분 읽기",
-    href: "/booking/family-stay-route-check/"
+    href: "/seoul/hangang-event-checklist/"
   },
   {
-    category: "일정표",
-    title: "2박 3일 여행 일정이 빡빡해지는 이유",
-    excerpt: "체크인 시간과 식사 시간을 먼저 고정하면 이동 욕심을 줄이고 일정이 안정됩니다.",
-    date: "6월 30일",
-    readTime: "6분 읽기",
-    href: "/info/three-day-trip-plan/"
+    category: "가볼 만한 곳",
+    title: "비 오는 날 서울에서 갈 만한 실내 전시 코스",
+    excerpt: "DDP, 서울공예박물관, 서울시립미술관처럼 비가 와도 이동 부담이 적은 공간을 중심으로 정리했습니다.",
+    date: "7월 4일",
+    readTime: "5분 읽기",
+    href: "/seoul/rainy-day-exhibition-course/"
+  },
+  {
+    category: "방문 전 체크",
+    title: "무료 전시와 무료 공연, 현장 대기 줄 줄이는 방법",
+    excerpt: "오픈 직후와 종료 직전보다 중간 시간대를 선택하고, 주변 대체 코스를 함께 준비하는 편이 좋습니다.",
+    date: "7월 4일",
+    readTime: "4분 읽기",
+    href: "/seoul/free-event-waiting-tip/"
+  },
+  {
+    category: "가볼 만한 곳",
+    title: "아이와 가기 좋은 서울 문화 공간 고르는 기준",
+    excerpt: "그늘, 실내 휴식, 화장실, 유모차 이동 가능 여부를 먼저 보면 가족 나들이가 편해집니다.",
+    date: "7월 4일",
+    readTime: "5분 읽기",
+    href: "/seoul/family-culture-place-check/"
   }
 ];
 
 export const categoryGroups = [
   {
-    title: "가볼만한 곳",
-    description: "국내외 여행지, 계절 코스, 주말 일정",
+    title: "서울 축제",
+    description: "계절 행사, 야간 공연, 문화 축제, 무료 행사",
     links: [
-      { label: "국내 여행지", href: "/places/domestic/" },
-      { label: "해외 여행지", href: "/places/overseas/" },
-      { label: "전국 관광지", href: "/places/korea/" },
-      { label: "도시별 가이드", href: "/places/city-guide/" }
+      { label: "이번 주 서울 축제", href: "/seoul/festivals/this-week/" },
+      { label: "서울 여름 축제", href: "/seoul/festivals/summer/" },
+      { label: "무료 공연·전시", href: "/seoul/festivals/free/" },
+      { label: "야간 행사", href: "/seoul/festivals/night/" }
     ]
   },
   {
-    title: "여행 정보",
-    description: "준비물, 교통, 일정, 현장 체크",
+    title: "서울 가볼 만한 곳",
+    description: "광화문, 한강, 성수, DDP, 남산골, 노들섬",
     links: [
-      { label: "여행 가이드", href: "/info/guide/" },
-      { label: "최신 글", href: "/posts/" },
-      { label: "검색하기", href: "/search/" },
-      { label: "태그 모아보기", href: "/tags/" }
+      { label: "광화문·정동", href: "/seoul/places/gwanghwamun/" },
+      { label: "한강·노들섬", href: "/seoul/places/hangang/" },
+      { label: "성수·서울숲", href: "/seoul/places/seongsu/" },
+      { label: "북촌·인사동", href: "/seoul/places/bukchon/" }
     ]
   },
   {
-    title: "예약 전 체크",
-    description: "호텔, 항공권, 투어, 할인 조건",
+    title: "방문 전 체크",
+    description: "운영 시간, 예약, 교통, 우천, 혼잡도",
     links: [
-      { label: "호텔 비교", href: "#" },
-      { label: "항공권 검색", href: "#" },
-      { label: "투어·티켓", href: "#" },
-      { label: "할인코드", href: "#" }
+      { label: "공식 일정 확인", href: "#" },
+      { label: "예약 필요 여부", href: "#" },
+      { label: "대중교통 동선", href: "#" },
+      { label: "우천 취소 체크", href: "#" }
     ]
   }
 ];
@@ -248,43 +248,43 @@ export const categoryGroups = [
 export const faqs = [
   {
     question: "메인에서는 무엇을 먼저 보면 좋나요?",
-    answer: "목적지가 정해지지 않았다면 가볼 만한 곳과 큐레이션 글을 먼저 보고, 목적지가 정해졌다면 예약 전 체크 카드에서 숙소와 항공권 조건을 확인하면 좋습니다."
+    answer: "오늘 갈 곳을 찾는다면 TODAY 키워드와 최신 글을 먼저 보고, 주말 코스를 짜는 중이라면 가볼 만한 곳 카드에서 광화문, 한강, 남산골, 노들섬처럼 이동하기 쉬운 구역을 고르면 좋습니다."
   },
   {
-    question: "예약 페이지와 매거진 글은 어떻게 연결되나요?",
-    answer: "매거진 글은 여행지를 고르는 기준과 동선을 제공하고, 예약 전 체크 영역은 위치, 가격, 취소 조건처럼 실제 예약 전에 확인할 기준으로 이어집니다."
+    question: "서울 축제 정보는 예약 페이지와 어떻게 연결되나요?",
+    answer: "현재 외부 제휴 예약 링크는 넣지 않았습니다. 대신 행사 날짜, 예약 필요 여부, 대중교통, 우천 취소처럼 방문 전 확인해야 할 항목으로 자연스럽게 이어지게 구성했습니다."
   },
   {
     question: "검색엔진이 이해하기 쉬운 구조인가요?",
-    answer: "여행지, 일정, 숙소, 항공권, 투어, 축제 같은 검색 의도를 카테고리와 내부 링크로 묶고, 카드마다 카테고리와 제목, 요약, 날짜를 분리해 해석하기 쉽게 구성했습니다."
+    answer: "서울 축제, 서울 가볼 만한 곳, 방문 전 체크라는 검색 의도를 제목과 카테고리, 내부 링크에 반복적으로 배치해 메인 페이지의 주제를 명확하게 만들었습니다."
   }
 ];
 
 export const footerLinks = {
   booking: [
-    { label: "호텔 최저가", href: "#" },
-    { label: "항공권 검색", href: "#" },
-    { label: "투어·액티비티", href: "#" },
-    { label: "여행 할인코드", href: "#" }
+    { label: "공식 일정 확인", href: "#" },
+    { label: "사전 예약 체크", href: "#" },
+    { label: "우천 취소 확인", href: "#" },
+    { label: "혼잡 시간 피하기", href: "#" }
   ],
   hub: [
-    { label: "여행지 가이드", href: "/places/city-guide/" },
-    { label: "테마별 가이드", href: "/info/theme/" },
-    { label: "전국 관광지", href: "/places/korea/" },
-    { label: "축제·행사", href: "/info/festival/" },
+    { label: "서울 축제", href: "/seoul/festivals/" },
+    { label: "서울 가볼 만한 곳", href: "/seoul/places/" },
+    { label: "서울 야간 산책", href: "/seoul/night-walk/" },
+    { label: "서울 무료 전시", href: "/seoul/free-exhibitions/" },
     { label: "전체 글", href: "/posts/" }
   ],
   categories: [
-    { label: "생활정보", href: "/category/life/" },
-    { label: "여행", href: "/category/travel/" },
-    { label: "국내여행", href: "/category/domestic/" }
+    { label: "서울 축제", href: "/category/seoul-festival/" },
+    { label: "가볼 만한 곳", href: "/category/seoul-places/" },
+    { label: "방문 전 체크", href: "/category/before-visit/" }
   ],
   popular: [
-    { label: "도쿄 호텔", href: "#" },
-    { label: "방콕 호텔", href: "#" },
-    { label: "제주 호텔", href: "#" },
-    { label: "도쿄 액티비티", href: "#" },
-    { label: "방콕 액티비티", href: "#" }
+    { label: "광화문광장", href: "/seoul/places/gwanghwamun/" },
+    { label: "노들섬", href: "/seoul/places/nodeul-island/" },
+    { label: "남산골한옥마을", href: "/seoul/places/namsangol/" },
+    { label: "DDP", href: "/seoul/places/ddp/" },
+    { label: "서울숲", href: "/seoul/places/seoul-forest/" }
   ],
   languages: [
     { label: "한국어", href: "/" },
