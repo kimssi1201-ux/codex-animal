@@ -1,6 +1,6 @@
-const TOUR_API_BASE = "https://apis.data.go.kr/B551011/KorService2";
-const TOUR_API_LEGACY_BASE = "https://apis.data.go.kr/B551011/KorService1";
-const TOUR_API_CLASSIC_BASE = "https://apis.data.go.kr/B551011/KorService";
+const TOUR_API_BASE = "https://gwapi.visitkorea.or.kr/openapi/service/gwrest/KorService2";
+const TOUR_API_LEGACY_BASE = "https://gwapi.visitkorea.or.kr/openapi/service/gwrest/KorService1";
+const TOUR_API_CLASSIC_BASE = "https://gwapi.visitkorea.or.kr/openapi/service/gwrest/KorService";
 const AREA_CODE_JEJU = "39";
 const APP_NAME = "JejuTravelNews";
 
