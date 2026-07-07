@@ -306,7 +306,7 @@ main, .site-footer {
   font-weight: 900;
 }
 
-.mrt-section, .flight-section, .visit-check-section, .category-news-wrapper, .faq-section, .article-page {
+.mrt-section, .flight-section, .stay-section, .visit-check-section, .category-news-wrapper, .faq-section, .article-page {
   padding: 4px 12px 24px;
 }
 .mrt-section {
@@ -322,6 +322,13 @@ main, .site-footer {
   gap: 12px;
   padding-top: 8px;
   border-top: 8px solid #edf2ef;
+  border-bottom: 8px solid #edf2ef;
+  background: #fff;
+}
+.stay-section {
+  display: grid;
+  gap: 12px;
+  padding-top: 8px;
   border-bottom: 8px solid #edf2ef;
   background: #fff;
 }
@@ -446,21 +453,25 @@ main, .site-footer {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
-.flight-search-form {
+.flight-search-form,
+.stay-search-form {
   display: grid;
   gap: 10px;
 }
-.flight-search-form label {
+.flight-search-form label,
+.stay-search-form label {
   display: grid;
   gap: 6px;
   min-width: 0;
 }
-.flight-search-form label span {
+.flight-search-form label span,
+.stay-search-form label span {
   color: var(--green);
   font-size: 12px;
   font-weight: 900;
 }
-.flight-search-form input {
+.flight-search-form input,
+.stay-search-form input {
   width: 100%;
   min-height: 44px;
   padding: 0 13px;
@@ -471,7 +482,8 @@ main, .site-footer {
   font: inherit;
   font-weight: 800;
 }
-.flight-search-form button {
+.flight-search-form button,
+.stay-search-form button {
   min-height: 46px;
   border: 0;
   border-radius: 14px;
@@ -479,7 +491,8 @@ main, .site-footer {
   color: #fff;
   font-weight: 900;
 }
-.flight-status {
+.flight-status,
+.stay-status {
   padding: 14px 15px;
   border: 1px solid var(--line);
   border-radius: 16px;
@@ -488,7 +501,8 @@ main, .site-footer {
   font-size: 13px;
   font-weight: 900;
 }
-.flight-calendar-list {
+.flight-calendar-list,
+.stay-card-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
@@ -516,6 +530,51 @@ main, .site-footer {
   color: var(--muted);
   font-size: 12px;
   font-weight: 800;
+}
+.stay-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+.stay-card {
+  display: grid;
+  grid-template-rows: 118px auto;
+}
+.stay-card > img {
+  min-height: 118px;
+  background: var(--green-soft);
+}
+.stay-card span {
+  display: grid;
+  gap: 4px;
+  padding: 10px 11px 12px;
+}
+.stay-card em {
+  color: var(--green);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+}
+.stay-card strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.32;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.stay-card small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 .compact-feed .news-feed-card {
   box-shadow: none;
@@ -763,8 +822,15 @@ main, .site-footer {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 142px 128px;
     align-items: end;
   }
+  .stay-search-form {
+    grid-template-columns: minmax(0, 1.3fr) 138px 138px 88px 112px;
+    align-items: end;
+  }
   .flight-calendar-list {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .stay-card-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .top-category-bar {
     top: 82px;
@@ -918,6 +984,7 @@ main, .site-footer {
   }
   .mrt-section,
   .flight-section,
+  .stay-section,
   .visit-check-section,
   .category-news-wrapper,
   .faq-section,
@@ -941,6 +1008,20 @@ main, .site-footer {
     padding: 9px;
   }
   .mrt-card strong {
+    font-size: 14px;
+  }
+  .stay-card {
+    grid-template-rows: 96px auto;
+    border-radius: 14px;
+    box-shadow: none;
+  }
+  .stay-card > img {
+    min-height: 96px;
+  }
+  .stay-card span {
+    padding: 9px;
+  }
+  .stay-card strong {
     font-size: 14px;
   }
   .visit-check-grid {
@@ -994,5 +1075,15 @@ main, .site-footer {
   .mrt-card a,
   .mrt-card.is-disabled {
     grid-template-rows: 88px auto;
+  }
+  .stay-card-list {
+    grid-template-columns: 1fr;
+  }
+  .stay-card {
+    grid-template-columns: 106px minmax(0, 1fr);
+    grid-template-rows: auto;
+  }
+  .stay-card > img {
+    min-height: 112px;
   }
 }

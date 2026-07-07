@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://www.moneyarchive.kr/jeju-travel-news/">
   <title>제주여행뉴스 | 제주도 여행 정보 뉴스</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/styles.css?v=20260708-flight-1">
+  <link rel="stylesheet" href="assets/styles.css?v=20260708-stay-1">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
 </head>
 <body class="is-loading-news">
@@ -33,6 +33,7 @@
       <a href="#july" data-i18n="nav.news">제주 여행 뉴스</a>
       <a href="#places" data-i18n="nav.places">가볼 만한 곳</a>
       <a href="#flights">항공권</a>
+      <a href="#stays">숙소</a>
       <a href="#myrealtrip" data-i18n="nav.myrealtrip">여행 상품</a>
       <a href="#visitCheck" data-i18n="nav.check">방문 전 체크</a>
     </nav>
@@ -80,6 +81,35 @@
         <button type="submit">최저가 조회</button>
       </form>
       <div class="flight-result" id="flightResult">항공권 API 연결 전에는 입력폼만 표시됩니다.</div>
+    </section>
+
+    <section class="stay-section" id="stays" aria-labelledby="stayTitle">
+      <div class="section-heading">
+        <p class="eyebrow">Stay Search</p>
+        <h2 id="stayTitle">제주 숙소 상품 조회</h2>
+        <p>지역 자동완성으로 regionId를 먼저 찾고, 체크인 조건에 맞는 숙소 상품을 조회합니다.</p>
+      </div>
+      <form class="stay-search-form" id="staySearchForm">
+        <label>
+          <span>지역</span>
+          <input id="stayRegion" name="region" type="search" value="제주" list="stayRegionOptions" autocomplete="off" inputmode="search">
+          <datalist id="stayRegionOptions"></datalist>
+        </label>
+        <label>
+          <span>체크인</span>
+          <input id="stayCheckIn" name="checkIn" type="date">
+        </label>
+        <label>
+          <span>체크아웃</span>
+          <input id="stayCheckOut" name="checkOut" type="date">
+        </label>
+        <label>
+          <span>인원</span>
+          <input id="stayGuests" name="guests" type="number" min="1" max="8" value="2" inputmode="numeric">
+        </label>
+        <button type="submit">숙소 조회</button>
+      </form>
+      <div class="stay-result" id="stayResult">지역 자동완성과 숙소 검색 API 연결 전에는 입력폼만 표시됩니다.</div>
     </section>
 
     <section class="mrt-section" id="myrealtrip" aria-labelledby="myrealtripTitle">
@@ -131,6 +161,6 @@
   <noscript>
     <p class="noscript">제주 여행 카드를 보려면 브라우저에서 JavaScript를 켜주세요.</p>
   </noscript>
-  <script type="module" src="assets/app.js?v=20260708-flight-1"></script>
+  <script type="module" src="assets/app.js?v=20260708-stay-1"></script>
 </body>
 </html>

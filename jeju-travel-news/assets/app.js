@@ -1,12 +1,13 @@
-import { articles, categories } from "./articles.js?v=20260708-flight-1";
+import { articles, categories } from "./articles.js?v=20260708-stay-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260708-flight-1";
+const tourismDataVersion = "20260708-stay-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
+const regionCache = new Map();
 
 let activeCategory = "전체";
 let officialRequestId = 0;
@@ -178,6 +179,14 @@ function normalizeAirport(item = {}) {
   return { code, label };
 }
 
+function normalizeRegion(item = {}) {
+  const regionId = String(item.regionId || item.id || item.value || item.code || "");
+  const country = item.country || item.countryName || "";
+  const name = item.name || item.regionName || item.displayName || item.title || "";
+  const label = [country, name].filter(Boolean).join(" ") || item.label || name || regionId;
+  return { regionId, label };
+}
+
 function airportCodeFromInput(value, fallback = "") {
   const text = String(value || "");
   const match = text.match(/\(([A-Z]{3})\)/i) || text.match(/\b([A-Z]{3})\b/i);
@@ -189,10 +198,24 @@ function airportCodeFromInput(value, fallback = "") {
   return fallback;
 }
 
+function regionIdFromInput(value) {
+  const text = String(value || "");
+  const match = text.match(/\[([^\]]+)\]$/);
+  return match ? match[1] : "";
+}
+
 function flightMonthValue() {
   const now = new Date();
   const month = `${now.getMonth() + 1}`.padStart(2, "0");
   return `${now.getFullYear()}-${month}`;
+}
+
+function dateValue(offsetDays = 0) {
+  const date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
 }
 
 function priceText(value, currency = "KRW") {
@@ -531,6 +554,139 @@ function bindFlightSearch() {
   });
 }
 
+function renderStayResult(items = [], mode = "idle", message = "") {
+  const result = $("#stayResult");
+  if (!result) return;
+
+  if (mode === "ready" && items.length) {
+    result.innerHTML = `
+      <div class="stay-card-list">
+        ${items.slice(0, 6).map((item) => {
+          const url = safeExternalUrl(item.url);
+          const image = item.image || fallbackImage;
+          const tag = url ? "a" : "article";
+          const linkAttrs = url ? ` href="${escapeHtml(url)}" target="_blank" rel="sponsored nofollow noopener noreferrer"` : "";
+          return `
+            <${tag} class="stay-card"${linkAttrs}>
+              ${imageTag(image, item.title)}
+              <span>
+                <em>${escapeHtml(item.region || item.rating || "마이리얼트립 숙소")}</em>
+                <strong>${escapeHtml(item.title || "숙소 상품")}</strong>
+                <small>${escapeHtml(String(item.priceText || "가격 확인"))}</small>
+              </span>
+            </${tag}>
+          `;
+        }).join("")}
+      </div>
+    `;
+    return;
+  }
+
+  const fallbackMessage = mode === "not-configured"
+    ? "MYREALTRIP_API_BASE 또는 숙소 엔드포인트 URL과 MYREALTRIP_API_KEY가 설정되면 지역 자동완성과 숙소 검색이 동작합니다."
+    : message || "지역을 입력한 뒤 숙소를 조회하세요.";
+  result.innerHTML = `<div class="stay-status">${escapeHtml(fallbackMessage)}</div>`;
+}
+
+async function postAccommodation(action, body) {
+  const response = await fetch(`/api/myrealtrip-accommodation?action=${encodeURIComponent(action)}&v=${tourismDataVersion}`, {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "application/json" },
+    body: JSON.stringify(body)
+  });
+  const payload = await response.json();
+  if (!response.ok || payload?.ok === false) {
+    const error = new Error(payload?.message || "숙소 정보를 불러오지 못했습니다.");
+    error.payload = payload;
+    throw error;
+  }
+  return payload;
+}
+
+async function findRegion(keyword, datalist = null) {
+  const query = String(keyword || "").trim();
+  if (!query) return null;
+  if (regionCache.has(query)) {
+    const cached = regionCache.get(query);
+    if (datalist) datalist.innerHTML = cached.html;
+    return cached.items[0] || null;
+  }
+
+  const payload = await postAccommodation("region-autocomplete", { keyword: query, query });
+  const items = (payload.items || [])
+    .map(normalizeRegion)
+    .filter((item) => item.regionId || item.label)
+    .slice(0, 8);
+  const html = items
+    .map((item) => `<option value="${escapeHtml(`${item.label} [${item.regionId}]`)}"></option>`)
+    .join("");
+  regionCache.set(query, { items, html });
+  if (datalist) datalist.innerHTML = html;
+  return items[0] || null;
+}
+
+async function loadRegionOptions(keyword, datalist) {
+  try {
+    await findRegion(keyword, datalist);
+  } catch (error) {
+    if (error.payload?.configured === false) renderStayResult([], "not-configured");
+  }
+}
+
+function bindStaySearch() {
+  const form = $("#staySearchForm");
+  if (!form) return;
+
+  const regionInput = $("#stayRegion");
+  const regionOptions = $("#stayRegionOptions");
+  const checkInInput = $("#stayCheckIn");
+  const checkOutInput = $("#stayCheckOut");
+  const guestsInput = $("#stayGuests");
+  if (checkInInput && !checkInInput.value) checkInInput.value = dateValue(14);
+  if (checkOutInput && !checkOutInput.value) checkOutInput.value = dateValue(15);
+
+  if (regionInput && regionOptions) {
+    regionInput.addEventListener("input", () => {
+      if (regionInput.value.trim().length >= 2) loadRegionOptions(regionInput.value, regionOptions);
+    });
+    regionInput.addEventListener("focus", () => {
+      if (regionInput.value.trim().length >= 2) loadRegionOptions(regionInput.value, regionOptions);
+    });
+  }
+
+  renderStayResult();
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const keyword = regionInput?.value || "제주";
+    let regionId = regionIdFromInput(keyword);
+    renderStayResult([], "loading", "숙소 지역 정보와 상품을 조회하고 있습니다.");
+
+    try {
+      if (!regionId) {
+        const region = await findRegion(keyword, regionOptions);
+        regionId = region?.regionId || "";
+      }
+      if (!regionId) {
+        renderStayResult([], "idle", "지역 자동완성 결과에서 숙소 검색에 사용할 regionId를 찾지 못했습니다.");
+        return;
+      }
+
+      const payload = await postAccommodation("search", {
+        regionId,
+        checkIn: checkInInput?.value || dateValue(14),
+        checkOut: checkOutInput?.value || dateValue(15),
+        adults: Number(guestsInput?.value || 2),
+        guests: Number(guestsInput?.value || 2),
+        rooms: 1
+      });
+      renderStayResult(payload.items || [], "ready", "표시할 숙소 상품이 없습니다.");
+    } catch (error) {
+      renderStayResult([], error.payload?.configured === false ? "not-configured" : "idle", error.message);
+    }
+  });
+}
+
 function renderFooter() {
   const footer = $("#footerLinks");
   if (!footer) return;
@@ -627,6 +783,7 @@ function renderHome() {
   renderFeed([]);
   renderMyRealTrip([], "loading");
   bindFlightSearch();
+  bindStaySearch();
   renderVisitCheck();
   renderCategoryNews();
   renderFaq();
