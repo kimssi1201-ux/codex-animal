@@ -33,8 +33,28 @@ function getConfig(env = {}) {
     env.MRT_PARTNER_ID ||
     ""
   ).trim();
+  const affiliateUrl = (
+    env.MYREALTRIP_AFFILIATE_URL ||
+    env.MRT_AFFILIATE_URL ||
+    ""
+  ).trim();
+  const tourUrl = (
+    env.MYREALTRIP_TOUR_URL ||
+    env.MRT_TOUR_URL ||
+    ""
+  ).trim();
+  const ticketUrl = (
+    env.MYREALTRIP_TICKET_URL ||
+    env.MRT_TICKET_URL ||
+    ""
+  ).trim();
+  const hotelUrl = (
+    env.MYREALTRIP_HOTEL_URL ||
+    env.MRT_HOTEL_URL ||
+    ""
+  ).trim();
 
-  return { apiUrl, apiBase, apiKey, partnerId };
+  return { apiUrl, apiBase, apiKey, partnerId, affiliateUrl, tourUrl, ticketUrl, hotelUrl };
 }
 
 function buildTargetUrl(config, requestUrl) {
@@ -70,6 +90,54 @@ function normalizeUrl(value) {
 
 function normalizeImage(value) {
   return normalizeUrl(value);
+}
+
+function addKeyword(value, keyword) {
+  const normalized = normalizeUrl(value);
+  if (!normalized) return "";
+  try {
+    const url = new URL(normalized);
+    if (!url.searchParams.has("keyword") && !url.searchParams.has("q")) {
+      url.searchParams.set("keyword", keyword || "제주");
+    }
+    return url.href;
+  } catch (error) {
+    return normalized;
+  }
+}
+
+function affiliateItems(config, keyword) {
+  const fallback = config.affiliateUrl;
+  const candidates = [
+    {
+      id: "mrt-jeju-tour",
+      title: "제주 투어·티켓 보기",
+      category: "마이리얼트립",
+      priceText: "제휴 상품 확인",
+      image: "https://tong.visitkorea.or.kr/cms/resource/75/3400775_image2_1.jpg",
+      url: config.tourUrl || fallback
+    },
+    {
+      id: "mrt-jeju-activity",
+      title: "제주 액티비티 예약",
+      category: "마이리얼트립",
+      priceText: "제휴 상품 확인",
+      image: "https://tong.visitkorea.or.kr/cms/resource/81/3037781_image2_1.jpg",
+      url: config.ticketUrl || fallback
+    },
+    {
+      id: "mrt-jeju-stay",
+      title: "제주 숙소 둘러보기",
+      category: "마이리얼트립",
+      priceText: "제휴 상품 확인",
+      image: "https://tong.visitkorea.or.kr/cms/resource/36/3421436_image2_1.jpg",
+      url: config.hotelUrl || fallback
+    }
+  ];
+
+  return candidates
+    .map((item) => ({ ...item, url: addKeyword(item.url, keyword) }))
+    .filter((item) => item.url);
 }
 
 function asArray(payload) {
@@ -132,13 +200,26 @@ export async function onRequestGet(context) {
   const requestUrl = new URL(context.request.url);
   const config = getConfig(context.env || {});
   const targetUrl = buildTargetUrl(config, requestUrl);
+  const keyword = requestUrl.searchParams.get("keyword") || "제주";
+  const fallbackAffiliateItems = affiliateItems(config, keyword);
 
   if (!targetUrl || !config.apiKey) {
+    if (fallbackAffiliateItems.length) {
+      return json({
+        ok: true,
+        configured: true,
+        affiliateOnly: true,
+        items: fallbackAffiliateItems,
+        totalCount: fallbackAffiliateItems.length,
+        updatedAt: new Date().toISOString()
+      });
+    }
+
     return json({
       ok: false,
       configured: false,
       items: [],
-      message: "MYREALTRIP_API_URL 또는 MYREALTRIP_API_KEY가 설정되지 않았습니다."
+      message: "MYREALTRIP_API_URL 또는 MYREALTRIP_API_KEY, MYREALTRIP_AFFILIATE_URL이 설정되지 않았습니다."
     }, { cacheControl: "no-store" });
   }
 
@@ -167,6 +248,18 @@ export async function onRequestGet(context) {
       updatedAt: new Date().toISOString()
     });
   } catch (error) {
+    if (fallbackAffiliateItems.length) {
+      return json({
+        ok: true,
+        configured: true,
+        affiliateOnly: true,
+        items: fallbackAffiliateItems,
+        totalCount: fallbackAffiliateItems.length,
+        message: "API 응답 실패로 제휴 URL 카드를 표시합니다.",
+        updatedAt: new Date().toISOString()
+      });
+    }
+
     return json({
       ok: false,
       configured: true,

@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260708-menu-1";
+import { articles, categories } from "./articles.js?v=20260708-ads-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260708-menu-1";
+const tourismDataVersion = "20260708-ads-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 
@@ -21,7 +21,7 @@ const faqItems = [
   },
   {
     question: "상품이나 광고 영역이 있나요?",
-    answer: "이 제주 사이트에는 광고성 상품이나 구매 유도 영역을 넣지 않았습니다. 글과 장소 정보 중심으로만 구성했습니다."
+    answer: "제주 여행 정보를 해치지 않는 범위에서 애드센스 광고와 마이리얼트립 제휴 상품 영역을 함께 운영합니다. 광고성 링크는 여행 준비 흐름에 맞는 위치에만 배치합니다."
   }
 ];
 
@@ -55,19 +55,19 @@ const myrealtripFallbackItems = [
   {
     title: "제주 동쪽 투어",
     category: "투어",
-    priceText: "상품 정보를 불러오는 중",
+    priceText: "마이리얼트립 연결 대기",
     image: "https://tong.visitkorea.or.kr/cms/resource/75/3400775_image2_1.jpg"
   },
   {
     title: "제주 해변 액티비티",
     category: "티켓",
-    priceText: "상품 정보를 불러오는 중",
+    priceText: "마이리얼트립 연결 대기",
     image: "https://tong.visitkorea.or.kr/cms/resource/81/3037781_image2_1.jpg"
   },
   {
     title: "제주 숙소",
     category: "숙소",
-    priceText: "상품 정보를 불러오는 중",
+    priceText: "마이리얼트립 연결 대기",
     image: "https://tong.visitkorea.or.kr/cms/resource/36/3421436_image2_1.jpg"
   }
 ];
@@ -325,7 +325,7 @@ function myrealtripCard(product) {
   if (item.url) {
     return `
       <article class="mrt-card">
-        <a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${content}</a>
+        <a href="${escapeHtml(item.url)}" target="_blank" rel="sponsored nofollow noopener noreferrer">${content}</a>
       </article>
     `;
   }
@@ -343,13 +343,13 @@ function renderMyRealTrip(items = [], mode = "loading") {
   }
 
   const message = mode === "not-configured"
-    ? "마이리얼트립 연결 정보가 아직 설정되지 않았습니다. 키와 엔드포인트가 연결되면 이 영역에 실제 상품이 표시됩니다."
-    : "제주 여행 상품 정보를 확인하고 있습니다.";
+    ? "마이리얼트립 광고 연결 정보가 아직 설정되지 않았습니다. API 키나 제휴 URL이 연결되면 이 영역에 실제 상품 광고가 표시됩니다."
+    : "제주 여행 상품 광고 정보를 확인하고 있습니다.";
 
   grid.innerHTML = `
     <div class="mrt-status">
       <strong>${escapeHtml(message)}</strong>
-      <p>현재 화면은 모바일에서 밀리지 않도록 카드 영역만 먼저 준비했습니다.</p>
+      <p>모바일 뉴스 피드 흐름을 해치지 않도록 여행 상품 카드 영역으로 정리했습니다.</p>
     </div>
     ${myrealtripFallbackItems.map(myrealtripCard).join("")}
   `;
