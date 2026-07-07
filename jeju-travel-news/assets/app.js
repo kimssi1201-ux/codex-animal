@@ -1,9 +1,10 @@
-import { articles, categories } from "./articles.js?v=20260708-view1-2";
+import { articles, categories } from "./articles.js?v=20260708-root-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://images.unsplash.com/photo-1592828064575-70ed626d3a0e?auto=format&fit=crop&w=1200&q=82";
-const tourismDataVersion = "20260708-view1-2";
+const tourismDataVersion = "20260708-root-1";
+const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 
 let activeCategory = "전체";
@@ -60,7 +61,7 @@ function escapeHtml(value) {
 }
 
 function articleUrl(article) {
-  return `article.html?slug=${encodeURIComponent(article.slug)}`;
+  return `${detailPath}?slug=${encodeURIComponent(article.slug)}`;
 }
 
 function officialUrl(place) {
@@ -74,7 +75,7 @@ function officialUrl(place) {
     mapx: place.mapx || "",
     mapy: place.mapy || ""
   });
-  return `article.html?${query.toString()}`;
+  return `${detailPath}?${query.toString()}`;
 }
 
 function mapUrl(place) {

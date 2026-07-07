@@ -3,175 +3,100 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="서울 축제, 서울 가볼 만한 곳, 방문 전 체크 정보를 한 번에 살펴보는 서울 여행 매거진입니다.">
+  <meta name="description" content="제주여행뉴스는 제주 가볼 만한 곳, 맛집, 카페, 숙소 정보, 해변, 오름, 계절별 여행 코스를 뉴스 피드형 카드로 정리하는 제주 여행 정보 사이트입니다.">
   <meta name="theme-color" content="#ffffff">
   <meta name="naver-site-verification" content="74a2206ab416200464688bbb207be6e25e76bc7c">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="서울 축제 아카이브 - 서울 가볼 만한 곳">
-  <meta property="og:description" content="서울 축제, 야간 행사, 무료 전시, 한강과 도심 산책 코스를 카드형 매거진으로 정리합니다.">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:title" content="제주여행뉴스 | 제주도 여행 정보 뉴스">
+  <meta property="og:description" content="제주 가볼 만한 곳과 제주 여행 정보를 사진, 주소, 방문 전 체크 정보와 함께 확인하세요.">
   <meta property="og:url" content="https://www.moneyarchive.kr/">
-  <meta property="og:image" content="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=82">
   <link rel="canonical" href="https://www.moneyarchive.kr/">
   <link rel="alternate" type="application/rss+xml" title="RSS" href="https://www.moneyarchive.kr/feed.xml">
-  <title>서울 축제 아카이브 - 서울 가볼 만한 곳</title>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="assets/travel-style.css">
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "서울 축제 아카이브",
-      "url": "https://www.moneyarchive.kr/",
-      "description": "서울 축제, 서울 가볼 만한 곳, 방문 전 체크를 모아 보여주는 서울 여행 매거진"
-    }
-  </script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/jeju-travel-news/assets/styles.css?v=20260708-root-1">
+  <title>제주여행뉴스 | 제주도 여행 정보 뉴스</title>
 </head>
-<body>
-  <a class="skip-link" href="#main">본문 바로가기</a>
+<body class="is-loading-news">
   <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="/" aria-label="서울 축제 아카이브 홈">
-        <span class="brand-mark" aria-hidden="true">SF</span>
-        <span>
-          <strong>서울 축제 아카이브</strong>
-          <small>서울 가볼 만한 곳 매거진</small>
-        </span>
-      </a>
-      <button class="menu-button" type="button" aria-expanded="false" aria-controls="siteNav">
-        <span></span><span></span><span></span>
-        <span class="sr-only">메뉴 열기</span>
-      </button>
-      <nav class="site-nav" id="siteNav" aria-label="주요 메뉴">
-        <a href="#places">서울 축제</a>
-        <a href="#booking">방문 전 체크</a>
-        <a href="#travel-info">가볼 만한 곳</a>
-      </nav>
+    <a class="brand" href="#top" aria-label="제주여행뉴스 홈">
+      <span class="brand-mark" aria-hidden="true">JN</span>
+      <span>
+        <strong data-i18n="brand.name">제주여행뉴스</strong>
+        <small data-i18n="brand.tagline">제주 여행 정보 뉴스</small>
+      </span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="primaryNav">
+      <span></span>
+      <span></span>
+      <span class="sr-only" data-i18n="nav.menu">메뉴 열기</span>
+    </button>
+    <nav class="primary-nav" id="primaryNav" aria-label="주요 메뉴">
+      <a href="#july" data-i18n="nav.news">제주 여행 뉴스</a>
+      <a href="#places" data-i18n="nav.places">가볼 만한 곳</a>
+      <a href="#visitCheck" data-i18n="nav.check">방문 전 체크</a>
+      <a href="#info" data-i18n="nav.guide">방문 가이드</a>
+    </nav>
+    <div class="language-switch" id="languageSwitch" aria-label="언어 선택">
+      <button type="button" data-lang="ko">KR</button>
+      <button type="button" data-lang="en">EN</button>
+      <button type="button" data-lang="ja">JP</button>
+      <button type="button" data-lang="zh">CN</button>
     </div>
   </header>
 
-  <div class="today-strip" aria-label="오늘의 여행 키워드">
-    <div class="container today-inner">
-      <strong>TODAY</strong>
-      <div class="keyword-track" id="todayKeywords"></div>
-    </div>
-  </div>
+  <main id="top">
+    <nav class="top-category-bar" aria-label="제주 여행 카테고리">
+      <div class="category-tab-list" id="topCategoryTabs"></div>
+    </nav>
 
-  <main id="main">
-    <section class="hero-section" aria-labelledby="heroTitle">
-      <div class="container">
-        <p class="site-kicker">SEOUL FESTIVAL MAGAZINE</p>
-        <h1 id="heroTitle">서울 축제와 가볼 만한 곳을 한 화면에서</h1>
-        <div class="hero-grid">
-          <article class="hero-feature" id="featuredArticle"></article>
-          <aside class="latest-panel" aria-labelledby="latestTitle">
-            <div class="section-mini-head">
-            <p>NEW SEOUL NOTES</p>
-            <h2 id="latestTitle">최신 서울 축제 글</h2>
-            </div>
-            <div class="latest-list" id="latestArticles"></div>
-          </aside>
-        </div>
-      </div>
+    <section class="mobile-news-feed" id="july" aria-labelledby="julyTitle">
+      <h1 class="sr-only" id="julyTitle" data-i18n="july.title">오늘 볼 만한 제주 여행 뉴스</h1>
+      <div class="section-status" id="julyStatus" data-i18n="july.loading">제주 여행 정보를 불러오는 중입니다.</div>
+      <div class="recommend-news-row" id="recommendedArticles" aria-label="추천 제주 여행 기사"></div>
+      <div class="news-list-feed" id="newsFeedList"></div>
     </section>
 
-    <section class="content-section" id="places" aria-labelledby="placesTitle">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">SEOUL PLACES</p>
-            <h2 id="placesTitle">서울 축제와 가볼 만한 곳</h2>
-            <p>광화문, 한강, 노들섬, 남산골, DDP처럼 서울에서 바로 가기 좋은 축제와 명소만 모았습니다.</p>
-          </div>
-          <a class="text-button" href="/places/">더보기</a>
-        </div>
-        <div class="article-grid" id="placesGrid"></div>
+    <section class="visit-check-section" id="visitCheck" aria-labelledby="visitCheckTitle">
+      <div class="section-heading">
+        <p class="eyebrow">Travel Check</p>
+        <h2 id="visitCheckTitle">방문 전 체크</h2>
+        <p>제주 여행지를 고르기 전에 운영시간, 날씨, 이동 동선, 주차 정보를 먼저 확인하세요.</p>
       </div>
+      <div class="visit-check-grid" id="visitCheckGrid"></div>
     </section>
 
-    <section class="booking-section" id="booking" aria-labelledby="bookingTitle">
-      <div class="container booking-layout">
-        <div>
-          <p class="eyebrow">BEFORE VISIT</p>
-          <h2 id="bookingTitle">서울 축제 방문 전 체크</h2>
-          <p>행사 일정, 사전 예약, 대중교통, 우천 취소, 혼잡 시간만 미리 확인해도 서울 나들이가 훨씬 편해집니다.</p>
-          <a class="primary-link" href="#bookingCards">체크리스트 보기</a>
-        </div>
-        <div class="booking-grid" id="bookingCards"></div>
-      </div>
+    <section class="category-news-wrapper" id="categoryNews" aria-label="카테고리별 제주 여행 뉴스">
+      <div id="categoryNewsSections"></div>
     </section>
 
-    <section class="content-section" id="travel-info" aria-labelledby="curationTitle">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">SEOUL CURATION</p>
-            <h2 id="curationTitle">지금 함께 보면 좋은 서울 큐레이션</h2>
-            <p>축제 일정과 함께 보기 좋은 야간 산책, 무료 전시, 한강 코스, 가족 나들이 정보를 묶었습니다.</p>
-          </div>
-          <a class="text-button" href="/posts/">전체 글 보기</a>
-        </div>
-        <div class="curation-list" id="curationList"></div>
+    <section class="faq-section" id="info" aria-labelledby="faqTitle">
+      <div class="section-heading">
+        <p class="eyebrow">Guide</p>
+        <h2 id="faqTitle" data-i18n="faq.title">이용 가이드</h2>
       </div>
-    </section>
-
-    <section class="category-section" aria-labelledby="categoryTitle">
-      <div class="container">
-        <div class="section-head compact">
-          <div>
-            <p class="eyebrow">TOPICS</p>
-            <h2 id="categoryTitle">서울 축제 카테고리 묶음</h2>
-          </div>
-        </div>
-        <div class="category-grid" id="categoryGroups"></div>
-      </div>
-    </section>
-
-    <section class="faq-section" aria-labelledby="faqTitle">
-      <div class="container">
-        <div class="section-head compact">
-          <div>
-            <p class="eyebrow">GUIDE</p>
-            <h2 id="faqTitle">서울 축제 아카이브 이용 가이드</h2>
-          </div>
-        </div>
-        <div class="faq-list" id="faqList"></div>
-      </div>
+      <div class="faq-list" id="faqList"></div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <div class="container footer-grid">
-      <div class="footer-about">
-        <a class="footer-brand" href="/">서울 축제 아카이브</a>
-        <p>서울 축제, 서울 가볼 만한 곳, 방문 전 체크를 한 흐름으로 연결하는 서울 여행 정보 포털입니다.</p>
-      </div>
-      <nav aria-label="푸터 예약 링크">
-        <h2>방문 전 체크</h2>
-        <ul id="footerBooking"></ul>
-      </nav>
-      <nav aria-label="푸터 여행 허브 링크">
-        <h2>서울 허브</h2>
-        <ul id="footerHub"></ul>
-      </nav>
-      <nav aria-label="푸터 카테고리 링크">
-        <h2>카테고리</h2>
-        <ul id="footerCategories"></ul>
-      </nav>
-      <nav aria-label="푸터 인기 여행지 링크">
-        <h2>인기 여행지</h2>
-        <ul id="footerPopular"></ul>
-      </nav>
-      <nav aria-label="언어 선택">
-        <h2>Language</h2>
-        <ul id="footerLanguages"></ul>
-      </nav>
+    <div class="footer-intro">
+      <a class="brand footer-brand" href="#top" aria-label="제주여행뉴스 홈">
+        <span class="brand-mark" aria-hidden="true">JN</span>
+        <span>
+          <strong data-i18n="brand.name">제주여행뉴스</strong>
+          <small data-i18n="footer.tagline">제주 여행 선택을 돕는 뉴스 포털</small>
+        </span>
+      </a>
+      <p data-i18n="footer.description">제주 관광지, 해변, 오름, 맛집, 카페, 숙소 위치와 방문 준비 정보를 뉴스 피드로 정리합니다.</p>
     </div>
-    <div class="container footer-bottom">
-      <p>Copyright 2026 서울 축제 아카이브. All Rights Reserved.</p>
-      <p><a href="/privacy.html">개인정보 처리방침</a> · <a href="/sitemap.xml">Sitemap</a> · <a href="/feed.xml">RSS</a></p>
-    </div>
+    <div class="footer-grid" id="footerLinks"></div>
+    <p class="copyright">Copyright 2026 Jeju Travel News. All Rights Reserved.</p>
   </footer>
 
-  <script type="module" src="assets/travel-home.js"></script>
+  <noscript>
+    <p class="noscript">제주 여행 카드를 보려면 브라우저에서 JavaScript를 켜주세요.</p>
+  </noscript>
+  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260708-root-1"></script>
 </body>
 </html>

@@ -1,29 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>서울 축제 아카이브</title>
+    <title>제주여행뉴스</title>
     <link>https://www.moneyarchive.kr/</link>
     <atom:link href="https://www.moneyarchive.kr/feed.xml" rel="self" type="application/rss+xml" />
-    <description>서울 축제, 서울 가볼 만한 곳, 방문 전 체크 정보를 모아 보여주는 서울 여행 매거진입니다.</description>
+    <description>제주 가볼 만한 곳, 해변, 오름, 맛집, 카페, 숙소 위치 정보를 뉴스 피드로 정리합니다.</description>
     <language>ko-KR</language>
-    <lastBuildDate>Sat, 04 Jul 2026 00:00:00 +0900</lastBuildDate>
-    <pubDate>Sat, 04 Jul 2026 00:00:00 +0900</pubDate>
+    <lastBuildDate>Wed, 08 Jul 2026 00:00:00 +0900</lastBuildDate>
+    <pubDate>Wed, 08 Jul 2026 00:00:00 +0900</pubDate>
     <ttl>60</ttl>
     <item>
-      <title>이번 주 서울 축제와 가볼 만한 곳 한 번에 보기</title>
-      <link>https://www.moneyarchive.kr/seoul/festival-weekend-guide/</link>
-      <guid isPermaLink="true">https://www.moneyarchive.kr/seoul/festival-weekend-guide/</guid>
-      <description>광화문, 노들섬, 남산골한옥마을, DDP, 서울숲처럼 이동하기 쉬운 서울 명소를 축제와 전시 일정 중심으로 묶었습니다.</description>
-      <category>서울 축제</category>
-      <pubDate>Sat, 04 Jul 2026 00:00:00 +0900</pubDate>
+      <title>성산일출봉 일출 여행 코스</title>
+      <link>https://www.moneyarchive.kr/article.html?slug=seongsan-sunrise-course</link>
+      <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=seongsan-sunrise-course</guid>
+      <description>일출 명소 성산일출봉을 중심으로 광치기해변과 성산항 주변 식사까지 묶는 아침 코스입니다.</description>
+      <category>가볼 만한 곳</category>
+      <pubDate>Wed, 08 Jul 2026 00:00:00 +0900</pubDate>
     </item>
     <item>
-      <title>서울 축제 가기 전 예약, 우천, 혼잡 시간 확인 순서</title>
-      <link>https://www.moneyarchive.kr/seoul/festival-before-visit-check/</link>
-      <guid isPermaLink="true">https://www.moneyarchive.kr/seoul/festival-before-visit-check/</guid>
-      <description>서울 축제 방문 전 일정, 예약 여부, 대중교통, 우천 취소, 혼잡 시간대를 확인하는 순서입니다.</description>
-      <category>방문 전 체크</category>
-      <pubDate>Sat, 04 Jul 2026 00:00:00 +0900</pubDate>
+      <title>협재해수욕장 반나절 코스</title>
+      <link>https://www.moneyarchive.kr/article.html?slug=hyeopjae-half-day</link>
+      <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=hyeopjae-half-day</guid>
+      <description>맑은 바다와 비양도 전망을 보며 산책, 카페, 저녁 노을까지 이어가는 서쪽 반나절 코스입니다.</description>
+      <category>해변</category>
+      <pubDate>Wed, 08 Jul 2026 00:00:00 +0900</pubDate>
+    </item>
+    <item>
+      <title>섭지코지 해안 산책 가이드</title>
+      <link>https://www.moneyarchive.kr/article.html?slug=seopjikoji-coastal-walk-guide</link>
+      <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=seopjikoji-coastal-walk-guide</guid>
+      <description>성산일출봉과 함께 묶기 좋은 섭지코지의 산책 동선, 주차, 바람 대비를 정리했습니다.</description>
+      <category>가볼 만한 곳</category>
+      <pubDate>Wed, 08 Jul 2026 00:00:00 +0900</pubDate>
     </item>
   </channel>
 </rss>
