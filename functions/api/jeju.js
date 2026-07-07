@@ -1,0 +1,316 @@
+const TOUR_API_BASE = "https://apis.data.go.kr/B551011/KorService2";
+const AREA_CODE_JEJU = "39";
+const APP_NAME = "JejuTravelNews";
+
+const CONTENT_TYPE_LABELS = {
+  12: "관광지",
+  14: "문화시설",
+  15: "축제·행사",
+  25: "여행코스",
+  28: "레포츠",
+  32: "숙소",
+  38: "쇼핑",
+  39: "음식점"
+};
+
+const CATEGORY_REQUESTS = {
+  "전체": { endpoint: "areaBasedList2" },
+  "가볼 만한 곳": { endpoint: "areaBasedList2", contentTypeId: "12" },
+  "맛집": { endpoint: "areaBasedList2", contentTypeId: "39" },
+  "카페": { endpoint: "searchKeyword2", contentTypeId: "39", keyword: "카페" },
+  "숙소": { endpoint: "areaBasedList2", contentTypeId: "32" },
+  "해변": { endpoint: "searchKeyword2", contentTypeId: "12", keyword: "해변" },
+  "오름": { endpoint: "searchKeyword2", contentTypeId: "12", keyword: "오름" },
+  "계절 코스": { endpoint: "areaBasedList2", contentTypeId: "25" }
+};
+
+function json(data, init = {}) {
+  const headers = new Headers(init.headers || {});
+  headers.set("content-type", "application/json; charset=utf-8");
+  headers.set("cache-control", init.cacheControl || "public, max-age=600, s-maxage=1800");
+  return new Response(JSON.stringify(data), {
+    status: init.status || 200,
+    headers
+  });
+}
+
+function getServiceKey(env) {
+  return (
+    env.KTO_TOUR_API_KEY ||
+    env.KTO_SERVICE_KEY ||
+    env.TOUR_API_KEY ||
+    env.SERVICE_KEY ||
+    ""
+  ).trim();
+}
+
+function serviceKeyParam(serviceKey) {
+  return /%[0-9a-f]{2}/i.test(serviceKey) ? serviceKey : encodeURIComponent(serviceKey);
+}
+
+function tourUrl(endpoint, params, serviceKey) {
+  const search = new URLSearchParams({
+    MobileOS: "ETC",
+    MobileApp: APP_NAME,
+    _type: "json",
+    ...params
+  });
+  return `${TOUR_API_BASE}/${endpoint}?${search.toString()}&serviceKey=${serviceKeyParam(serviceKey)}`;
+}
+
+async function fetchTour(endpoint, params, serviceKey) {
+  const response = await fetch(tourUrl(endpoint, params, serviceKey), {
+    headers: { accept: "application/json" }
+  });
+  const text = await response.text();
+
+  let payload;
+  try {
+    payload = JSON.parse(text);
+  } catch (error) {
+    throw new Error(`관광정보 응답을 해석하지 못했습니다. HTTP ${response.status}`);
+  }
+
+  const header = payload?.response?.header;
+  if (!response.ok || (header?.resultCode && header.resultCode !== "0000")) {
+    throw new Error(header?.resultMsg || `관광정보 호출 실패: HTTP ${response.status}`);
+  }
+
+  return payload?.response?.body || {};
+}
+
+function asItems(value) {
+  if (!value) return [];
+  const item = value?.items?.item;
+  if (!item) return [];
+  return Array.isArray(item) ? item : [item];
+}
+
+function stripTags(value) {
+  return String(value || "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function contentTypeLabel(contentTypeId) {
+  return CONTENT_TYPE_LABELS[Number(contentTypeId)] || "관광정보";
+}
+
+function normalizeListItem(item) {
+  const address = [item.addr1, item.addr2].filter(Boolean).join(" ");
+  return {
+    contentId: String(item.contentid || ""),
+    contentTypeId: String(item.contenttypeid || ""),
+    title: stripTags(item.title),
+    category: contentTypeLabel(item.contenttypeid),
+    region: address || "제주",
+    address,
+    tel: stripTags(item.tel),
+    image: item.firstimage || item.firstimage2 || "",
+    mapx: item.mapx || "",
+    mapy: item.mapy || "",
+    modified: item.modifiedtime || "",
+    created: item.createdtime || ""
+  };
+}
+
+function firstAvailable(...values) {
+  return values.map(stripTags).find(Boolean) || "정보 없음";
+}
+
+function normalizeDetail(common, intro, images) {
+  const address = [common.addr1, common.addr2].filter(Boolean).join(" ");
+  const operatingHours = firstAvailable(
+    intro.usetime,
+    intro.usetimeculture,
+    intro.opentimefood,
+    intro.playtime,
+    intro.checkintime && intro.checkouttime ? `체크인 ${intro.checkintime} · 체크아웃 ${intro.checkouttime}` : "",
+    intro.usetimeleports,
+    intro.fairday,
+    intro.opentime
+  );
+  const parking = firstAvailable(
+    intro.parking,
+    intro.parkingculture,
+    intro.parkingfood,
+    intro.parkinglodging,
+    intro.parkingleports,
+    intro.parkingshopping
+  );
+  const fee = firstAvailable(
+    intro.usefee,
+    intro.usetimefestival,
+    intro.infocenterfood && intro.firstmenu ? `대표 메뉴: ${intro.firstmenu}` : "",
+    intro.roomcount ? `객실 수: ${intro.roomcount}` : "",
+    intro.taketime ? `소요 시간: ${intro.taketime}` : ""
+  );
+  const restDate = firstAvailable(
+    intro.restdate,
+    intro.restdateculture,
+    intro.restdatefood,
+    intro.restdateleports,
+    intro.restdateshopping
+  );
+  const tel = firstAvailable(
+    common.tel,
+    intro.infocenter,
+    intro.infocenterculture,
+    intro.infocenterfood,
+    intro.infocenterlodging,
+    intro.infocenterleports,
+    intro.infocentershopping,
+    intro.sponsor1tel,
+    intro.sponsor2tel
+  );
+
+  return {
+    contentId: String(common.contentid || ""),
+    contentTypeId: String(common.contenttypeid || ""),
+    title: stripTags(common.title),
+    category: contentTypeLabel(common.contenttypeid),
+    address,
+    region: address || "제주",
+    tel,
+    image: common.firstimage || common.firstimage2 || images[0]?.originimgurl || "",
+    images: images
+      .map((image) => image.originimgurl || image.smallimageurl)
+      .filter(Boolean)
+      .slice(0, 6),
+    overview: stripTags(common.overview),
+    homepage: common.homepage || "",
+    mapx: common.mapx || "",
+    mapy: common.mapy || "",
+    zipcode: common.zipcode || "",
+    operatingHours,
+    parking,
+    fee,
+    restDate,
+    checkPoint: firstAvailable(
+      intro.chkbabycarriage,
+      intro.chkpet,
+      intro.chkcreditcard,
+      intro.expguide,
+      intro.treatmenu,
+      intro.subfacility,
+      intro.infocenter
+    )
+  };
+}
+
+async function handleList(requestUrl, serviceKey) {
+  const category = requestUrl.searchParams.get("category") || "전체";
+  const pageNo = requestUrl.searchParams.get("page") || "1";
+  const config = CATEGORY_REQUESTS[category] || CATEGORY_REQUESTS["전체"];
+  const params = {
+    numOfRows: "24",
+    pageNo,
+    arrange: "Q",
+    listYN: "Y",
+    areaCode: AREA_CODE_JEJU
+  };
+
+  if (config.contentTypeId) params.contentTypeId = config.contentTypeId;
+  if (config.keyword) params.keyword = config.keyword;
+
+  const body = await fetchTour(config.endpoint, params, serviceKey);
+  const items = asItems(body).map(normalizeListItem).filter((item) => item.contentId && item.title);
+
+  return json({
+    ok: true,
+    source: "한국관광공사",
+    category,
+    totalCount: Number(body.totalCount || items.length),
+    pageNo: Number(body.pageNo || pageNo),
+    items,
+    updatedAt: new Date().toISOString()
+  });
+}
+
+async function handleDetail(requestUrl, serviceKey) {
+  const contentId = requestUrl.searchParams.get("id") || requestUrl.searchParams.get("contentId");
+  const contentTypeId = requestUrl.searchParams.get("contentTypeId") || "";
+
+  if (!contentId) {
+    return json({ ok: false, error: "contentId가 필요합니다." }, { status: 400, cacheControl: "no-store" });
+  }
+
+  const commonBody = await fetchTour("detailCommon2", {
+    contentId,
+    contentTypeId,
+    defaultYN: "Y",
+    firstImageYN: "Y",
+    areacodeYN: "Y",
+    catcodeYN: "Y",
+    addrinfoYN: "Y",
+    mapinfoYN: "Y",
+    overviewYN: "Y"
+  }, serviceKey);
+
+  const introPromise = contentTypeId
+    ? fetchTour("detailIntro2", { contentId, contentTypeId }, serviceKey)
+    : Promise.resolve({});
+  const imagePromise = fetchTour("detailImage2", {
+    contentId,
+    imageYN: "Y",
+    subImageYN: "Y",
+    numOfRows: "10",
+    pageNo: "1"
+  }, serviceKey);
+
+  const [introBody, imageBody] = await Promise.all([
+    introPromise.catch(() => ({})),
+    imagePromise.catch(() => ({}))
+  ]);
+  const common = asItems(commonBody)[0] || {};
+  const intro = asItems(introBody)[0] || {};
+  const images = asItems(imageBody);
+
+  if (!common.contentid) {
+    return json({ ok: false, error: "관광정보를 찾지 못했습니다." }, { status: 404, cacheControl: "no-store" });
+  }
+
+  return json({
+    ok: true,
+    source: "한국관광공사",
+    item: normalizeDetail(common, intro, images),
+    updatedAt: new Date().toISOString()
+  });
+}
+
+export async function onRequestOptions() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "access-control-allow-methods": "GET, OPTIONS",
+      "access-control-allow-headers": "content-type"
+    }
+  });
+}
+
+export async function onRequestGet(context) {
+  const serviceKey = getServiceKey(context.env || {});
+
+  if (!serviceKey) {
+    return json({
+      ok: false,
+      error: "Cloudflare 환경변수에 KTO_TOUR_API_KEY가 없습니다."
+    }, { status: 503, cacheControl: "no-store" });
+  }
+
+  try {
+    const requestUrl = new URL(context.request.url);
+    if (requestUrl.searchParams.has("id") || requestUrl.searchParams.has("contentId")) {
+      return await handleDetail(requestUrl, serviceKey);
+    }
+    return await handleList(requestUrl, serviceKey);
+  } catch (error) {
+    return json({
+      ok: false,
+      error: error instanceof Error ? error.message : "관광정보를 불러오지 못했습니다."
+    }, { status: 502, cacheControl: "no-store" });
+  }
+}

@@ -9,9 +9,20 @@
 - `assets/travel-home.js` - 콘텐츠 렌더링과 모바일 메뉴 동작
 - `assets/travel-style.css` - 반응형 매거진 레이아웃 스타일
 - `feed.xml`, `sitemap.xml`, `robots.txt`, `ads.txt`
+- `jeju-travel-news/` - 제주여행뉴스 정적 페이지
+- `functions/api/jeju.js` - 제주 관광정보 서버 함수
 
 ## Cloudflare Pages
 
 - Framework preset: None
 - Build command: 비워두기
 - Build output directory: `/`
+
+## 제주 관광정보 연결
+
+Cloudflare Pages 환경변수에 한국관광공사 서비스 키를 저장합니다.
+
+- 권장 변수명: `KTO_TOUR_API_KEY`
+- 함께 지원하는 이름: `KTO_SERVICE_KEY`, `TOUR_API_KEY`, `SERVICE_KEY`
+
+브라우저 JS에는 키를 넣지 않고, 제주 페이지는 `/api/jeju` 서버 함수만 호출합니다.
