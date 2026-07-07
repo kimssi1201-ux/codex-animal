@@ -1,4 +1,5 @@
 const TOUR_API_BASE = "https://apis.data.go.kr/B551011/KorService2";
+const TOUR_API_LEGACY_BASE = "https://apis.data.go.kr/B551011/KorService1";
 const AREA_CODE_JEJU = "39";
 const APP_NAME = "JejuTravelNews";
 
@@ -48,18 +49,18 @@ function serviceKeyParam(serviceKey) {
   return /%[0-9a-f]{2}/i.test(serviceKey) ? serviceKey : encodeURIComponent(serviceKey);
 }
 
-function tourUrl(endpoint, params, serviceKey) {
+function tourUrl(baseUrl, endpoint, params, serviceKey) {
   const search = new URLSearchParams({
     MobileOS: "ETC",
     MobileApp: APP_NAME,
     _type: "json",
     ...params
   });
-  return `${TOUR_API_BASE}/${endpoint}?${search.toString()}&serviceKey=${serviceKeyParam(serviceKey)}`;
+  return `${baseUrl}/${endpoint}?${search.toString()}&serviceKey=${serviceKeyParam(serviceKey)}`;
 }
 
-async function fetchTour(endpoint, params, serviceKey) {
-  const response = await fetch(tourUrl(endpoint, params, serviceKey), {
+async function fetchTour(endpoint, params, serviceKey, baseUrl = TOUR_API_BASE) {
+  const response = await fetch(tourUrl(baseUrl, endpoint, params, serviceKey), {
     headers: { accept: "application/json" }
   });
   const text = await response.text();
@@ -77,6 +78,27 @@ async function fetchTour(endpoint, params, serviceKey) {
   }
 
   return payload?.response?.body || {};
+}
+
+async function fetchTourWithFallback(endpoint, params, serviceKey) {
+  const primaryBody = await fetchTour(endpoint, params, serviceKey);
+  if (asItems(primaryBody).length || Number(primaryBody.totalCount || 0) > 0) {
+    return primaryBody;
+  }
+
+  const legacyEndpoint = endpoint.replace(/2$/, "1");
+  if (legacyEndpoint === endpoint) return primaryBody;
+
+  try {
+    const legacyBody = await fetchTour(legacyEndpoint, params, serviceKey, TOUR_API_LEGACY_BASE);
+    if (asItems(legacyBody).length || Number(legacyBody.totalCount || 0) > 0) {
+      return legacyBody;
+    }
+  } catch (error) {
+    return primaryBody;
+  }
+
+  return primaryBody;
 }
 
 function asItems(value) {
@@ -216,7 +238,7 @@ async function handleList(requestUrl, serviceKey) {
   if (config.contentTypeId) params.contentTypeId = config.contentTypeId;
   if (config.keyword) params.keyword = config.keyword;
 
-  const body = await fetchTour(config.endpoint, params, serviceKey);
+  const body = await fetchTourWithFallback(config.endpoint, params, serviceKey);
   const items = asItems(body).map(normalizeListItem).filter((item) => item.contentId && item.title);
 
   return json({
@@ -238,7 +260,7 @@ async function handleDetail(requestUrl, serviceKey) {
     return json({ ok: false, error: "contentId가 필요합니다." }, { status: 400, cacheControl: "no-store" });
   }
 
-  const commonBody = await fetchTour("detailCommon2", {
+  const commonBody = await fetchTourWithFallback("detailCommon2", {
     contentId,
     contentTypeId,
     defaultYN: "Y",
@@ -251,9 +273,9 @@ async function handleDetail(requestUrl, serviceKey) {
   }, serviceKey);
 
   const introPromise = contentTypeId
-    ? fetchTour("detailIntro2", { contentId, contentTypeId }, serviceKey)
+    ? fetchTourWithFallback("detailIntro2", { contentId, contentTypeId }, serviceKey)
     : Promise.resolve({});
-  const imagePromise = fetchTour("detailImage2", {
+  const imagePromise = fetchTourWithFallback("detailImage2", {
     contentId,
     imageYN: "Y",
     subImageYN: "Y",
