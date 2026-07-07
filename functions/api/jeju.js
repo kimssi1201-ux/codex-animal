@@ -319,8 +319,12 @@ async function handleDetail(requestUrl, serviceKey) {
 async function handleProbe(serviceKey) {
   const checks = [
     { name: "areaCode2", endpoint: "areaCode2", params: { numOfRows: "20", pageNo: "1" } },
+    { name: "ldongCode2", endpoint: "ldongCode2", params: { numOfRows: "20", pageNo: "1", lDongListYn: "Y" } },
+    { name: "areaBasedList2-min", endpoint: "areaBasedList2", params: { numOfRows: "3", pageNo: "1" } },
     { name: "areaBasedList2-all", endpoint: "areaBasedList2", params: { numOfRows: "3", pageNo: "1", arrange: "Q", listYN: "Y" } },
+    { name: "areaBasedList2-c", endpoint: "areaBasedList2", params: { numOfRows: "3", pageNo: "1", arrange: "C" } },
     { name: "areaBasedList2-ldong-jeju", endpoint: "areaBasedList2", params: { numOfRows: "3", pageNo: "1", arrange: "Q", listYN: "Y", lDongRegnCd: LDONG_REGN_JEJU } },
+    { name: "searchKeyword2-min", endpoint: "searchKeyword2", params: { numOfRows: "3", pageNo: "1", keyword: "제주" } },
     { name: "searchKeyword2-ldong-jeju", endpoint: "searchKeyword2", params: { numOfRows: "3", pageNo: "1", arrange: "Q", listYN: "Y", keyword: "제주", lDongRegnCd: LDONG_REGN_JEJU } }
   ];
 
@@ -332,7 +336,8 @@ async function handleProbe(serviceKey) {
       results.push({
         name: check.name,
         totalCount: Number(body.totalCount || 0),
-        firstTitle: stripTags(item.title),
+        firstTitle: stripTags(item.title || item.name || item.lDongRegnNm || item.lDongSignguNm),
+        firstCode: item.code || item.lDongRegnCd || item.lDongSignguCd || "",
         firstAreaCode: item.areacode || "",
         firstAddr: stripTags(item.addr1)
       });
