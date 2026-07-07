@@ -1,11 +1,12 @@
-import { articles, categories } from "./articles.js?v=20260708-ads-1";
+import { articles, categories } from "./articles.js?v=20260708-flight-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260708-ads-1";
+const tourismDataVersion = "20260708-flight-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
+const airportCache = new Map();
 
 let activeCategory = "전체";
 let officialRequestId = 0;
@@ -167,6 +168,41 @@ function normalizeProduct(product = {}) {
     image: product.image || product.imageUrl || product.thumbnail || product.thumbnailUrl || product.mainImage || "",
     url: safeExternalUrl(product.url || product.link || product.deepLink || product.webUrl)
   };
+}
+
+function normalizeAirport(item = {}) {
+  const code = String(item.code || item.iataCode || item.airportCode || item.id || "").toUpperCase();
+  const city = item.city || item.cityName || item.regionName || "";
+  const name = item.name || item.airportName || item.displayName || "";
+  const label = [city, name].filter(Boolean).join(" ") || item.label || code;
+  return { code, label };
+}
+
+function airportCodeFromInput(value, fallback = "") {
+  const text = String(value || "");
+  const match = text.match(/\(([A-Z]{3})\)/i) || text.match(/\b([A-Z]{3})\b/i);
+  if (match) return match[1].toUpperCase();
+  if (text.includes("제주")) return "CJU";
+  if (text.includes("김포")) return "GMP";
+  if (text.includes("인천")) return "ICN";
+  if (text.includes("서울")) return "SEL";
+  return fallback;
+}
+
+function flightMonthValue() {
+  const now = new Date();
+  const month = `${now.getMonth() + 1}`.padStart(2, "0");
+  return `${now.getFullYear()}-${month}`;
+}
+
+function priceText(value, currency = "KRW") {
+  const numeric = Number(String(value || "").replace(/[^\d.]/g, ""));
+  if (!Number.isFinite(numeric) || numeric <= 0) return String(value || "가격 확인");
+  return new Intl.NumberFormat("ko-KR", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0
+  }).format(numeric);
 }
 
 function visibleArticles() {
@@ -375,6 +411,126 @@ async function loadMyRealTrip() {
   }
 }
 
+function renderFlightResult(items = [], mode = "idle", message = "") {
+  const result = $("#flightResult");
+  if (!result) return;
+
+  if (mode === "ready" && items.length) {
+    result.innerHTML = `
+      <div class="flight-calendar-list">
+        ${items.slice(0, 8).map((item) => {
+          const url = safeExternalUrl(item.url);
+          const tag = url ? "a" : "article";
+          const linkAttrs = url ? ` href="${escapeHtml(url)}" target="_blank" rel="sponsored nofollow noopener noreferrer"` : "";
+          return `
+            <${tag} class="flight-price-card"${linkAttrs}>
+              <strong>${escapeHtml(item.date || "날짜 확인")}</strong>
+              <span>${escapeHtml(priceText(item.price, item.currency || "KRW"))}</span>
+              <small>${escapeHtml(item.airline || "최저가 캘린더")}</small>
+            </${tag}>
+          `;
+        }).join("")}
+      </div>
+    `;
+    return;
+  }
+
+  const fallbackMessage = mode === "not-configured"
+    ? "MYREALTRIP_API_BASE 또는 항공권 엔드포인트 URL과 MYREALTRIP_API_KEY가 설정되면 공항 자동완성과 최저가 캘린더가 동작합니다."
+    : message || "출발지와 목적지를 입력한 뒤 최저가를 조회하세요.";
+  result.innerHTML = `<div class="flight-status">${escapeHtml(fallbackMessage)}</div>`;
+}
+
+async function postFlight(action, body) {
+  const response = await fetch(`/api/myrealtrip-flight?action=${encodeURIComponent(action)}&v=${tourismDataVersion}`, {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "application/json" },
+    body: JSON.stringify(body)
+  });
+  const payload = await response.json();
+  if (!response.ok || payload?.ok === false) {
+    const error = new Error(payload?.message || "항공권 정보를 불러오지 못했습니다.");
+    error.payload = payload;
+    throw error;
+  }
+  return payload;
+}
+
+async function loadAirportOptions(keyword, datalist) {
+  const query = String(keyword || "").trim();
+  if (!query || !datalist) return;
+  if (airportCache.has(query)) {
+    datalist.innerHTML = airportCache.get(query);
+    return;
+  }
+
+  try {
+    const payload = await postFlight("airport-autocomplete", { keyword: query, query });
+    const html = (payload.items || [])
+      .map(normalizeAirport)
+      .filter((item) => item.code || item.label)
+      .slice(0, 8)
+      .map((item) => `<option value="${escapeHtml(`${item.label} (${item.code})`)}"></option>`)
+      .join("");
+    airportCache.set(query, html);
+    datalist.innerHTML = html;
+  } catch (error) {
+    if (error.payload?.configured === false) renderFlightResult([], "not-configured");
+  }
+}
+
+function bindFlightSearch() {
+  const form = $("#flightSearchForm");
+  if (!form) return;
+
+  const originInput = $("#flightOrigin");
+  const destinationInput = $("#flightDestination");
+  const monthInput = $("#flightMonth");
+  const originOptions = $("#flightOriginOptions");
+  const destinationOptions = $("#flightDestinationOptions");
+  if (monthInput && !monthInput.value) monthInput.value = flightMonthValue();
+
+  const bindAutocomplete = (input, datalist) => {
+    if (!input || !datalist) return;
+    input.addEventListener("input", () => {
+      if (input.value.trim().length >= 2) loadAirportOptions(input.value, datalist);
+    });
+    input.addEventListener("focus", () => {
+      if (input.value.trim().length >= 2) loadAirportOptions(input.value, datalist);
+    });
+  };
+
+  bindAutocomplete(originInput, originOptions);
+  bindAutocomplete(destinationInput, destinationOptions);
+  renderFlightResult();
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const originCode = airportCodeFromInput(originInput?.value, "SEL");
+    const destinationCode = airportCodeFromInput(destinationInput?.value, "CJU");
+    const month = monthInput?.value || flightMonthValue();
+    renderFlightResult([], "loading", "항공권 최저가 캘린더를 조회하고 있습니다.");
+
+    try {
+      const payload = await postFlight("lowest-price-calendar", {
+        originAirportCode: originCode,
+        destinationAirportCode: destinationCode,
+        departureAirportCode: originCode,
+        arrivalAirportCode: destinationCode,
+        origin: originCode,
+        destination: destinationCode,
+        departure: originCode,
+        arrival: destinationCode,
+        yearMonth: month,
+        month
+      });
+      renderFlightResult(payload.items || [], "ready", "표시할 최저가 데이터가 없습니다.");
+    } catch (error) {
+      renderFlightResult([], error.payload?.configured === false ? "not-configured" : "idle", error.message);
+    }
+  });
+}
+
 function renderFooter() {
   const footer = $("#footerLinks");
   if (!footer) return;
@@ -470,6 +626,7 @@ function renderHome() {
   renderRecommended();
   renderFeed([]);
   renderMyRealTrip([], "loading");
+  bindFlightSearch();
   renderVisitCheck();
   renderCategoryNews();
   renderFaq();

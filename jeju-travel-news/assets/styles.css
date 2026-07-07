@@ -306,10 +306,18 @@ main, .site-footer {
   font-weight: 900;
 }
 
-.mrt-section, .visit-check-section, .category-news-wrapper, .faq-section, .article-page {
+.mrt-section, .flight-section, .visit-check-section, .category-news-wrapper, .faq-section, .article-page {
   padding: 4px 12px 24px;
 }
 .mrt-section {
+  display: grid;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 8px solid #edf2ef;
+  border-bottom: 8px solid #edf2ef;
+  background: #fff;
+}
+.flight-section {
   display: grid;
   gap: 12px;
   padding-top: 8px;
@@ -437,6 +445,77 @@ main, .site-footer {
   font-weight: 900;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+.flight-search-form {
+  display: grid;
+  gap: 10px;
+}
+.flight-search-form label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.flight-search-form label span {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+}
+.flight-search-form input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+}
+.flight-search-form button {
+  min-height: 46px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--green);
+  color: #fff;
+  font-weight: 900;
+}
+.flight-status {
+  padding: 14px 15px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #f8faf8;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+}
+.flight-calendar-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.flight-price-card {
+  display: grid;
+  gap: 4px;
+  min-height: 102px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+.flight-price-card strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+.flight-price-card span {
+  color: var(--green);
+  font-size: 19px;
+  font-weight: 900;
+}
+.flight-price-card small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
 }
 .compact-feed .news-feed-card {
   box-shadow: none;
@@ -680,6 +759,13 @@ main, .site-footer {
   .primary-nav a {
     background: transparent;
   }
+  .flight-search-form {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 142px 128px;
+    align-items: end;
+  }
+  .flight-calendar-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
   .top-category-bar {
     top: 82px;
   }
@@ -831,6 +917,7 @@ main, .site-footer {
     display: none;
   }
   .mrt-section,
+  .flight-section,
   .visit-check-section,
   .category-news-wrapper,
   .faq-section,

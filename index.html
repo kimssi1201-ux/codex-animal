@@ -14,7 +14,7 @@
   <link rel="canonical" href="https://www.moneyarchive.kr/">
   <link rel="alternate" type="application/rss+xml" title="RSS" href="https://www.moneyarchive.kr/feed.xml">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/jeju-travel-news/assets/styles.css?v=20260708-ads-1">
+  <link rel="stylesheet" href="/jeju-travel-news/assets/styles.css?v=20260708-flight-1">
   <title>제주여행뉴스 | 제주도 여행 정보 뉴스</title>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
 </head>
@@ -35,6 +35,7 @@
     <nav class="primary-nav" id="primaryNav" aria-label="주요 메뉴">
       <a href="#july" data-i18n="nav.news">제주 여행 뉴스</a>
       <a href="#places" data-i18n="nav.places">가볼 만한 곳</a>
+      <a href="#flights">항공권</a>
       <a href="#myrealtrip" data-i18n="nav.myrealtrip">여행 상품</a>
       <a href="#visitCheck" data-i18n="nav.check">방문 전 체크</a>
     </nav>
@@ -56,6 +57,32 @@
       <div class="section-status" id="julyStatus" data-i18n="july.loading">제주 여행 정보를 불러오는 중입니다.</div>
       <div class="recommend-news-row" id="recommendedArticles" aria-label="추천 제주 여행 기사"></div>
       <div class="news-list-feed" id="newsFeedList"></div>
+    </section>
+
+    <section class="flight-section" id="flights" aria-labelledby="flightTitle">
+      <div class="section-heading">
+        <p class="eyebrow">Flight Deals</p>
+        <h2 id="flightTitle">제주 항공권 최저가 조회</h2>
+        <p>출발지와 목적지를 입력하면 공항 자동완성과 최저가 캘린더 조회를 연결합니다.</p>
+      </div>
+      <form class="flight-search-form" id="flightSearchForm">
+        <label>
+          <span>출발지</span>
+          <input id="flightOrigin" name="origin" type="search" value="서울 (SEL)" list="flightOriginOptions" autocomplete="off" inputmode="search">
+          <datalist id="flightOriginOptions"></datalist>
+        </label>
+        <label>
+          <span>목적지</span>
+          <input id="flightDestination" name="destination" type="search" value="제주 (CJU)" list="flightDestinationOptions" autocomplete="off" inputmode="search">
+          <datalist id="flightDestinationOptions"></datalist>
+        </label>
+        <label>
+          <span>출발월</span>
+          <input id="flightMonth" name="month" type="month">
+        </label>
+        <button type="submit">최저가 조회</button>
+      </form>
+      <div class="flight-result" id="flightResult">항공권 API 연결 전에는 입력폼만 표시됩니다.</div>
     </section>
 
     <section class="mrt-section" id="myrealtrip" aria-labelledby="myrealtripTitle">
@@ -107,6 +134,6 @@
   <noscript>
     <p class="noscript">제주 여행 카드를 보려면 브라우저에서 JavaScript를 켜주세요.</p>
   </noscript>
-  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260708-ads-1"></script>
+  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260708-flight-1"></script>
 </body>
 </html>
