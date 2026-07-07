@@ -14,14 +14,14 @@ const CONTENT_TYPE_LABELS = {
 };
 
 const CATEGORY_REQUESTS = {
-  "전체": { endpoint: "areaBasedList2" },
-  "가볼 만한 곳": { endpoint: "areaBasedList2", contentTypeId: "12" },
-  "맛집": { endpoint: "areaBasedList2", contentTypeId: "39" },
-  "카페": { endpoint: "searchKeyword2", contentTypeId: "39", keyword: "카페" },
-  "숙소": { endpoint: "areaBasedList2", contentTypeId: "32" },
-  "해변": { endpoint: "searchKeyword2", contentTypeId: "12", keyword: "해변" },
-  "오름": { endpoint: "searchKeyword2", contentTypeId: "12", keyword: "오름" },
-  "계절 코스": { endpoint: "areaBasedList2", contentTypeId: "25" }
+  "전체": { endpoint: "searchKeyword2", keyword: "제주", useAreaCode: false },
+  "가볼 만한 곳": { endpoint: "searchKeyword2", contentTypeId: "12", keyword: "제주", useAreaCode: false },
+  "맛집": { endpoint: "searchKeyword2", contentTypeId: "39", keyword: "제주", useAreaCode: false },
+  "카페": { endpoint: "searchKeyword2", contentTypeId: "39", keyword: "제주 카페", useAreaCode: false },
+  "숙소": { endpoint: "searchKeyword2", contentTypeId: "32", keyword: "제주", useAreaCode: false },
+  "해변": { endpoint: "searchKeyword2", contentTypeId: "12", keyword: "제주 해변", useAreaCode: false },
+  "오름": { endpoint: "searchKeyword2", contentTypeId: "12", keyword: "제주 오름", useAreaCode: false },
+  "계절 코스": { endpoint: "searchKeyword2", contentTypeId: "25", keyword: "제주", useAreaCode: false }
 };
 
 function json(data, init = {}) {
@@ -209,10 +209,10 @@ async function handleList(requestUrl, serviceKey) {
     numOfRows: "24",
     pageNo,
     arrange: "Q",
-    listYN: "Y",
-    areaCode: AREA_CODE_JEJU
+    listYN: "Y"
   };
 
+  if (config.useAreaCode !== false) params.areaCode = AREA_CODE_JEJU;
   if (config.contentTypeId) params.contentTypeId = config.contentTypeId;
   if (config.keyword) params.keyword = config.keyword;
 
