@@ -130,6 +130,18 @@ function stripTags(value) {
     .trim();
 }
 
+function normalizeImageUrl(value) {
+  const url = String(value || "").trim();
+  if (!url) return "";
+  if (url.startsWith("//")) return `https:${url}`;
+  if (url.startsWith("http://")) return url.replace(/^http:\/\//i, "https://");
+  return url;
+}
+
+function firstImage(...values) {
+  return values.map(normalizeImageUrl).find(Boolean) || "";
+}
+
 function contentTypeLabel(contentTypeId) {
   return CONTENT_TYPE_LABELS[Number(contentTypeId)] || "관광정보";
 }
@@ -144,7 +156,7 @@ function normalizeListItem(item) {
     region: address || "제주",
     address,
     tel: stripTags(item.tel),
-    image: item.firstimage || item.firstimage2 || "",
+    image: firstImage(item.firstimage, item.firstimage2),
     mapx: item.mapx || "",
     mapy: item.mapy || "",
     modified: item.modifiedtime || "",
@@ -221,9 +233,9 @@ function normalizeDetail(common, intro, images) {
     address,
     region: address || "제주",
     tel,
-    image: common.firstimage || common.firstimage2 || images[0]?.originimgurl || "",
+    image: firstImage(common.firstimage, common.firstimage2, images[0]?.originimgurl, images[0]?.smallimageurl),
     images: images
-      .map((image) => image.originimgurl || image.smallimageurl)
+      .map((image) => firstImage(image.originimgurl, image.smallimageurl))
       .filter(Boolean)
       .slice(0, 6),
     overview: stripTags(common.overview),

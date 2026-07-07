@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260708-root-1";
+import { articles, categories } from "./articles.js?v=20260708-image-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
-const fallbackImage = "https://images.unsplash.com/photo-1592828064575-70ed626d3a0e?auto=format&fit=crop&w=1200&q=82";
-const tourismDataVersion = "20260708-root-1";
+const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
+const tourismDataVersion = "20260708-image-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 
@@ -83,6 +83,28 @@ function mapUrl(place) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.mapy},${place.mapx}`)}`;
 }
 
+function normalizeImageUrl(value) {
+  const url = String(value || "").trim();
+  if (!url) return fallbackImage;
+  if (url.startsWith("//")) return `https:${url}`;
+  if (url.startsWith("http://")) return url.replace(/^http:\/\//i, "https://");
+  return url;
+}
+
+function imageTag(src, alt, className = "") {
+  const classAttribute = className ? ` class="${escapeHtml(className)}"` : "";
+  return `<img${classAttribute} src="${escapeHtml(normalizeImageUrl(src))}" alt="${escapeHtml(alt)}" loading="lazy">`;
+}
+
+function bindImageFallbacks() {
+  document.addEventListener("error", (event) => {
+    const image = event.target;
+    if (!(image instanceof HTMLImageElement) || image.dataset.fallbackApplied) return;
+    image.dataset.fallbackApplied = "true";
+    image.src = fallbackImage;
+  }, true);
+}
+
 function visibleArticles() {
   return activeCategory === "전체" ? articles : articles.filter((article) => article.category === activeCategory);
 }
@@ -98,7 +120,7 @@ function recommendedCard(article) {
   return `
     <article class="recommend-card">
       <a href="${articleUrl(article)}">
-        <img src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" loading="lazy">
+        ${imageTag(article.image, article.title)}
         <span>${escapeHtml(article.category)}</span>
         <strong>${escapeHtml(article.title)}</strong>
       </a>
@@ -110,7 +132,7 @@ function newsCard(article) {
   return `
     <article class="news-feed-card">
       <a class="news-thumb" href="${articleUrl(article)}">
-        <img src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" loading="lazy">
+        ${imageTag(article.image, article.title)}
       </a>
       <div class="news-copy">
         <div class="meta">${metaLine(["장소 포스팅", article.category, article.region, article.date])}</div>
@@ -122,11 +144,10 @@ function newsCard(article) {
 }
 
 function placeCard(place) {
-  const image = place.image || fallbackImage;
   return `
     <article class="news-feed-card place-feed-card">
       <a class="news-thumb" href="${officialUrl(place)}">
-        <img src="${escapeHtml(image)}" alt="${escapeHtml(place.title)}" loading="lazy">
+        ${imageTag(place.image, place.title)}
       </a>
       <div class="news-copy">
         <div class="meta">${metaLine(["공식 장소정보", place.category])}</div>
@@ -357,7 +378,7 @@ function renderStaticDetail(detail) {
   const article = articles.find((item) => item.slug === slug) || articles[0];
   updateMeta(article.title, article.summary);
   detail.innerHTML = `
-    <img class="detail-hero" src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}">
+    ${imageTag(article.image, article.title, "detail-hero")}
     <div class="detail-body">
       <div class="meta">${metaLine([article.category, article.region, article.date])}</div>
       <h1>${escapeHtml(article.title)}</h1>
@@ -421,9 +442,8 @@ function renderMapLink(place) {
 }
 
 function renderPlaceDetailHtml(place, sourceLabel, overview = "") {
-  const image = place.image || fallbackImage;
   return `
-    <img class="detail-hero" src="${escapeHtml(image)}" alt="${escapeHtml(place.title)}">
+    ${imageTag(place.image, place.title, "detail-hero")}
     <div class="detail-body">
       <div class="meta">${metaLine([sourceLabel, place.category])}</div>
       <h1>${escapeHtml(place.title)}</h1>
@@ -483,6 +503,7 @@ function renderDetail() {
   renderStaticDetail(detail);
 }
 
+bindImageFallbacks();
 bindHeader();
 renderHome();
 renderDetail();
