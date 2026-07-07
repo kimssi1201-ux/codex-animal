@@ -1,5 +1,6 @@
 const TOUR_API_BASE = "https://apis.data.go.kr/B551011/KorService2";
 const TOUR_API_LEGACY_BASE = "https://apis.data.go.kr/B551011/KorService1";
+const TOUR_API_CLASSIC_BASE = "https://apis.data.go.kr/B551011/KorService";
 const AREA_CODE_JEJU = "39";
 const APP_NAME = "JejuTravelNews";
 
@@ -49,18 +50,18 @@ function serviceKeyParam(serviceKey) {
   return /%[0-9a-f]{2}/i.test(serviceKey) ? serviceKey : encodeURIComponent(serviceKey);
 }
 
-function tourUrl(baseUrl, endpoint, params, serviceKey) {
+function tourUrl(baseUrl, endpoint, params, serviceKey, keyName = "serviceKey") {
   const search = new URLSearchParams({
     MobileOS: "ETC",
     MobileApp: APP_NAME,
     _type: "json",
     ...params
   });
-  return `${baseUrl}/${endpoint}?${search.toString()}&serviceKey=${serviceKeyParam(serviceKey)}`;
+  return `${baseUrl}/${endpoint}?${search.toString()}&${keyName}=${serviceKeyParam(serviceKey)}`;
 }
 
-async function fetchTour(endpoint, params, serviceKey, baseUrl = TOUR_API_BASE) {
-  const response = await fetch(tourUrl(baseUrl, endpoint, params, serviceKey), {
+async function fetchTour(endpoint, params, serviceKey, baseUrl = TOUR_API_BASE, keyName = "serviceKey") {
+  const response = await fetch(tourUrl(baseUrl, endpoint, params, serviceKey, keyName), {
     headers: { accept: "application/json" }
   });
   const text = await response.text();
@@ -95,7 +96,19 @@ async function fetchTourWithFallback(endpoint, params, serviceKey) {
       return legacyBody;
     }
   } catch (error) {
-    return primaryBody;
+    // Continue to the classic TourAPI route below.
+  }
+
+  const classicEndpoint = endpoint.replace(/[12]$/, "");
+  if (classicEndpoint !== endpoint) {
+    try {
+      const classicBody = await fetchTour(classicEndpoint, params, serviceKey, TOUR_API_CLASSIC_BASE, "ServiceKey");
+      if (asItems(classicBody).length || Number(classicBody.totalCount || 0) > 0) {
+        return classicBody;
+      }
+    } catch (error) {
+      // Keep the empty primary response when all known routes fail.
+    }
   }
 
   return primaryBody;
