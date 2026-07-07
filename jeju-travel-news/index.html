@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="제주여행뉴스는 제주 가볼 만한 곳, 맛집, 카페, 숙소 정보, 해변, 오름, 계절별 여행 코스를 정리하는 모바일 중심 제주 여행 매거진입니다.">
+  <meta name="theme-color" content="#f4f8f5">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="제주여행뉴스">
+  <meta property="og:description" content="제주 가볼 만한 곳과 여행 코스를 뉴스 피드형 카드로 정리합니다.">
+  <meta property="og:url" content="https://www.moneyarchive.kr/jeju-travel-news/">
+  <title>제주여행뉴스 | 제주도 여행 정보 매거진</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">본문 바로가기</a>
+  <header class="magazine-header">
+    <div class="masthead-row">
+      <a class="brand" href="./" aria-label="제주여행뉴스 홈">
+        <span class="brand-mark" aria-hidden="true">J</span>
+        <span>제주여행뉴스</span>
+      </a>
+      <button class="icon-button" id="menuButton" type="button" aria-expanded="false" aria-controls="mainNav">
+        <span></span><span></span><span></span>
+        <span class="sr-only">메뉴 열기</span>
+      </button>
+      <button class="lang-button" id="langButton" type="button" aria-expanded="false" aria-controls="languageMenu">KR</button>
+      <div class="language-menu" id="languageMenu">
+        <a href="./" lang="ko">한국어</a>
+        <a href="./" lang="en">English</a>
+        <a href="./" lang="ja">日本語</a>
+        <a href="./" lang="zh-Hans">中文</a>
+      </div>
+    </div>
+    <div class="masthead">
+      <strong>Jeju Travel News</strong>
+      <span>오늘 읽고 바로 떠나는 제주 여행 정보 저널</span>
+    </div>
+    <nav class="main-nav" id="mainNav" aria-label="주요 메뉴">
+      <a href="#featured">추천</a>
+      <a href="#news">뉴스 피드</a>
+      <a href="#sections">카테고리</a>
+      <a href="#guide">방문 전 체크</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="cover" id="featured">
+      <article class="cover-story">
+        <p class="issue-label">Cover Story</p>
+        <h1>제주 동쪽부터 서쪽까지, 오늘 고르기 쉬운 여행 코스</h1>
+        <p class="lead">성산일출봉, 협재해수욕장, 함덕 카페 거리, 우도, 애월 해안도로처럼 처음 제주를 찾는 사람도 이해하기 쉬운 코스를 뉴스 피드처럼 정리했습니다.</p>
+        <div class="cover-actions">
+          <a class="primary-link" href="#news">기사 읽기</a>
+          <a class="secondary-link" href="#tabs">카테고리 보기</a>
+        </div>
+      </article>
+      <figure class="cover-photo">
+        <img src="https://images.unsplash.com/photo-1592828064575-70ed626d3a0e?auto=format&fit=crop&w=1000&q=82" alt="제주 해안과 푸른 바다">
+        <figcaption>이번 호 주제: 제주 반나절 코스와 당일치기 여행</figcaption>
+      </figure>
+    </section>
+
+    <section class="tabs-wrap" id="tabs" aria-label="카테고리 필터">
+      <div class="category-tabs" id="categoryTabs"></div>
+    </section>
+
+    <section class="issue-index" aria-label="제주 여행 핵심 분류">
+      <article><span>01</span><strong>가볼 만한 곳</strong><p>성산, 협재, 함덕, 애월처럼 대표 동선을 빠르게 비교</p></article>
+      <article><span>02</span><strong>맛집·카페</strong><p>시장, 해변 카페, 드라이브 중 쉬어갈 곳</p></article>
+      <article><span>03</span><strong>숙소 정보</strong><p>숙소 예약이 아닌 위치와 동선 중심의 정보</p></article>
+      <article><span>04</span><strong>계절 코스</strong><p>억새, 비 오는 날, 가족 여행, 초보 등산 코스</p></article>
+    </section>
+
+    <section class="featured-grid" aria-labelledby="recommendedTitle">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Editor's Pick</p>
+          <h2 id="recommendedTitle">추천 기사</h2>
+        </div>
+      </div>
+      <div class="top-stories" id="topStories"></div>
+    </section>
+
+    <section class="news-layout" id="news">
+      <aside class="side-menu" aria-label="빠른 링크">
+        <strong>제주여행뉴스</strong>
+        <a href="#tabs">카테고리 필터</a>
+        <a href="#news">최신 글</a>
+        <a href="#sections">카테고리별 기사</a>
+        <a href="#guide">방문 전 체크</a>
+      </aside>
+      <div class="news-panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">News Feed</p>
+            <h2>세로형 제주 여행 뉴스</h2>
+          </div>
+          <p class="feed-count" id="feedCount"></p>
+        </div>
+        <div class="news-list" id="newsList"></div>
+      </div>
+    </section>
+
+    <section class="category-sections" id="sections" aria-labelledby="categorySectionTitle">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">By Category</p>
+          <h2 id="categorySectionTitle">카테고리별 기사</h2>
+        </div>
+      </div>
+      <div id="categorySections"></div>
+    </section>
+
+    <section class="visit-guide" id="guide" aria-labelledby="guideTitle">
+      <div>
+        <p class="eyebrow">Before Visit</p>
+        <h2 id="guideTitle">방문 전 체크</h2>
+        <p>제주 여행 정보는 계절, 날씨, 교통 상황에 따라 달라집니다. 운영시간과 입장료, 주차 가능 여부는 방문 직전 공식 안내를 다시 확인하세요.</p>
+      </div>
+      <ul>
+        <li>오름과 해안 산책은 바람과 비 예보를 먼저 확인</li>
+        <li>우도와 섬 코스는 선박 운항 여부 확인</li>
+        <li>시장과 맛집은 휴무일과 브레이크타임 확인</li>
+        <li>한라산 코스는 탐방 가능 구간과 통제 안내 확인</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <strong>제주여행뉴스</strong>
+    <p>수익화 영역 없이 제주 여행 정보를 읽기 좋게 정리하는 모바일 뉴스형 매거진입니다.</p>
+    <nav aria-label="푸터 링크">
+      <a href="./">홈</a>
+      <a href="#tabs">카테고리</a>
+      <a href="#guide">방문 전 체크</a>
+      <a href="https://www.visitjeju.net/kr/" target="_blank" rel="noreferrer">비짓제주</a>
+    </nav>
+  </footer>
+
+  <script type="module" src="assets/app.js"></script>
+</body>
+</html>
