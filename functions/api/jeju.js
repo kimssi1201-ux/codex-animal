@@ -261,6 +261,7 @@ function normalizeDetail(common, intro, images) {
 
 async function handleList(requestUrl, serviceKey) {
   const category = requestUrl.searchParams.get("category") || "전체";
+  const keyword = stripTags(requestUrl.searchParams.get("keyword") || "");
   const pageNo = requestUrl.searchParams.get("page") || "1";
   const config = CATEGORY_REQUESTS[category] || CATEGORY_REQUESTS["전체"];
   const params = {
@@ -269,7 +270,11 @@ async function handleList(requestUrl, serviceKey) {
   };
 
   if (config.contentTypeId) params.contentTypeId = config.contentTypeId;
-  if (config.keyword) params.keyword = config.keyword;
+  if (keyword) {
+    params.keyword = keyword;
+  } else if (config.keyword) {
+    params.keyword = config.keyword;
+  }
 
   const body = await fetchTourWithFallback(config.endpoint, params, serviceKey);
   const items = asItems(body)
@@ -283,6 +288,7 @@ async function handleList(requestUrl, serviceKey) {
     ok: true,
     source: "한국관광공사",
     category,
+    keyword,
     totalCount: items.length,
     pageNo: Number(body.pageNo || pageNo),
     items,

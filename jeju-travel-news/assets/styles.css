@@ -560,6 +560,9 @@ main, .site-footer {
 .detail-body p {
   margin: 0;
 }
+.detail-body section p + p {
+  margin-top: 12px;
+}
 .course-list, .check-list {
   display: grid;
   gap: 8px;
@@ -571,13 +574,17 @@ main, .site-footer {
   flex-wrap: wrap;
   gap: 8px;
 }
-.spot-tags span {
+.spot-tags a {
   padding: 8px 11px;
   border-radius: 999px;
   background: var(--green-soft);
   color: var(--green);
   font-size: 13px;
   font-weight: 900;
+}
+.spot-tags a:hover {
+  background: var(--green);
+  color: #fff;
 }
 .map-card {
   display: grid;

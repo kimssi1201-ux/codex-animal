@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260708-mobile-mrt-1";
+import { articles, categories } from "./articles.js?v=20260708-detail-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260708-mobile-mrt-1";
+const tourismDataVersion = "20260708-detail-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 
@@ -99,9 +99,30 @@ function officialUrl(place) {
   return `${detailPath}?${query.toString()}`;
 }
 
+function spotUrl(spot, currentSlug = "") {
+  const normalizedSpot = normalizeText(spot);
+  const match = articles.find((article) => {
+    if (article.slug === currentSlug) return false;
+    const title = normalizeText(article.title);
+    const region = normalizeText(article.region);
+    const course = normalizeText((article.course || []).join(" "));
+    return title.includes(normalizedSpot) || normalizedSpot.includes(title) || region.includes(normalizedSpot) || course.includes(normalizedSpot);
+  });
+
+  if (match) return articleUrl(match);
+  return `${detailPath}?spot=${encodeURIComponent(spot)}`;
+}
+
 function mapUrl(place) {
   if (!place.mapx || !place.mapy) return "";
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.mapy},${place.mapx}`)}`;
+}
+
+function normalizeText(value) {
+  return String(value || "")
+    .replace(/\s+/g, "")
+    .replace(/[·ㆍ\-_/]/g, "")
+    .toLowerCase();
 }
 
 function normalizeImageUrl(value) {
@@ -455,6 +476,25 @@ function staticInfoRows(article) {
   ]);
 }
 
+function extendedArticleParagraphs(article) {
+  const course = (article.course || []).filter(Boolean);
+  const nearby = (article.nearbySpots || []).filter(Boolean);
+  const firstCourse = course[0] || article.title;
+  const lastCourse = course[course.length - 1] || nearby[0] || article.region;
+  const nearbyText = nearby.length ? nearby.slice(0, 4).join(", ") : "주변 관광지";
+
+  return [
+    `${article.title}을 일정에 넣을 때는 ${firstCourse}에서 시작해 ${lastCourse}까지 이어지는 흐름으로 잡으면 이동이 자연스럽습니다. 사진을 찍는 시간, 식사 시간, 주차장에서 목적지까지 걷는 시간을 함께 계산하면 실제 체류 시간이 부족하지 않습니다.`,
+    `초행이라면 장소를 많이 넣기보다 핵심 포인트를 두세 곳으로 줄이는 편이 좋습니다. ${article.region} 권역은 날씨와 도로 상황에 따라 체감 이동 시간이 달라질 수 있으니, 오전에는 야외 코스, 오후에는 카페나 시장처럼 쉬어갈 수 있는 곳을 섞어 두면 일정이 안정적입니다.`,
+    `방문 전에는 운영시간, 입장료, 주차 가능 여부를 다시 확인하세요. ${article.parking} ${article.operatingHours} 현장 상황이 바뀌면 가까운 대체 코스로 ${nearbyText} 중 한두 곳을 준비해 두는 것도 좋습니다.`,
+    `가족 여행이나 렌터카 여행이라면 화장실, 그늘, 편의점, 식사 장소 위치를 먼저 보는 편이 편합니다. 도보 이동이 긴 날에는 얇은 겉옷과 물을 준비하고, 바람이 강한 해안이나 오름은 사진보다 안전한 이동 동선을 우선하세요.`
+  ];
+}
+
+function articleBodyParagraphs(article) {
+  return [...(article.content || []), ...extendedArticleParagraphs(article)];
+}
+
 function placeInfoRows(place) {
   return rowsFromPairs([
     ["분류", place.category],
@@ -495,7 +535,7 @@ function renderStaticDetail(detail) {
       <table class="info-table"><tbody>${staticInfoRows(article)}</tbody></table>
       <section>
         <h2>본문 정보</h2>
-        ${article.content.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+        ${articleBodyParagraphs(article).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
       </section>
       <section>
         <h2>여행 코스 요약</h2>
@@ -511,11 +551,53 @@ function renderStaticDetail(detail) {
       </section>
       <section>
         <h2>주변 추천</h2>
-        <div class="spot-tags">${article.nearbySpots.map((spot) => `<span>${escapeHtml(spot)}</span>`).join("")}</div>
+        <div class="spot-tags">${(article.nearbySpots || []).map((spot) => `<a href="${escapeHtml(spotUrl(spot, article.slug))}">${escapeHtml(spot)}</a>`).join("")}</div>
       </section>
     </div>
   `;
   renderRelated(article);
+}
+
+async function renderSpotDetail(detail, spot) {
+  const title = `${spot} 여행 정보`;
+  updateMeta(title, `${spot}의 제주 여행 정보를 정리했습니다.`);
+  detail.innerHTML = `<div class="detail-loading">${escapeHtml(spot)} 정보를 불러오고 있습니다.</div>`;
+
+  try {
+    const query = new URLSearchParams({ keyword: spot, category: "전체", v: tourismDataVersion });
+    const response = await fetch(`/api/jeju?${query.toString()}`, { headers: { accept: "application/json" } });
+    const payload = await response.json();
+    const first = payload?.items?.[0];
+    if (!response.ok || !payload.ok || !first) throw new Error("장소 정보를 찾지 못했습니다.");
+    await renderOfficialDetail(detail, first.contentId, first.contentTypeId || "", {
+      ...fallbackPlace(first.contentId, first.contentTypeId || ""),
+      ...first,
+      restDate: "정보 없음",
+      operatingHours: "방문 전 최신 안내 확인",
+      parking: "주변 주차장과 도보 이동 동선을 함께 확인하세요.",
+      fee: "장소별 상이",
+      checkPoint: "지도에서 정확한 위치와 운영 정보를 확인한 뒤 이동하세요."
+    });
+  } catch (error) {
+    const fallback = {
+      contentId: "",
+      contentTypeId: "",
+      title,
+      category: "주변 추천",
+      address: `제주 ${spot}`,
+      region: `제주 ${spot}`,
+      tel: "정보 없음",
+      image: fallbackImage,
+      mapx: "",
+      mapy: "",
+      restDate: "정보 없음",
+      operatingHours: "방문 전 최신 안내 확인",
+      parking: "주변 주차장과 도보 이동 동선을 함께 확인하세요.",
+      fee: "장소별 상이",
+      checkPoint: "지도에서 정확한 위치와 운영 정보를 확인한 뒤 이동하세요."
+    };
+    detail.innerHTML = renderPlaceDetailHtml(fallback, "주변 추천", `${spot}은 제주 여행 중 함께 묶어 보기 좋은 주변 장소입니다. 정확한 운영 정보가 필요한 경우 지도와 공식 안내를 함께 확인하세요.`);
+  }
 }
 
 function fallbackPlace(contentId, contentTypeId) {
@@ -576,8 +658,8 @@ function renderPlaceDetailHtml(place, sourceLabel, overview = "") {
   `;
 }
 
-async function renderOfficialDetail(detail, contentId, contentTypeId) {
-  const fallback = fallbackPlace(contentId, contentTypeId);
+async function renderOfficialDetail(detail, contentId, contentTypeId, fallbackOverride = null) {
+  const fallback = fallbackOverride || fallbackPlace(contentId, contentTypeId);
   detail.innerHTML = `<div class="detail-loading">관광정보를 불러오고 있습니다.</div>`;
 
   try {
@@ -604,6 +686,12 @@ function renderDetail() {
   if (!detail) return;
 
   const contentId = params.get("contentId") || params.get("id");
+  const spot = params.get("spot");
+  if (spot) {
+    renderSpotDetail(detail, spot);
+    return;
+  }
+
   if (contentId) {
     renderOfficialDetail(detail, contentId, params.get("contentTypeId") || "");
     return;
