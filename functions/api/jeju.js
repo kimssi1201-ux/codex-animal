@@ -16,14 +16,14 @@ const CONTENT_TYPE_LABELS = {
 };
 
 const CATEGORY_REQUESTS = {
-  "전체": { endpoint: "areaBasedList2" },
-  "가볼 만한 곳": { endpoint: "areaBasedList2", contentTypeId: "12" },
-  "맛집": { endpoint: "areaBasedList2", contentTypeId: "39" },
+  "전체": { endpoint: "searchKeyword2", keyword: "제주" },
+  "가볼 만한 곳": { endpoint: "searchKeyword2", contentTypeId: "12", keyword: "제주" },
+  "맛집": { endpoint: "searchKeyword2", contentTypeId: "39", keyword: "제주" },
   "카페": { endpoint: "searchKeyword2", contentTypeId: "39", keyword: "카페" },
-  "숙소": { endpoint: "areaBasedList2", contentTypeId: "32" },
+  "숙소": { endpoint: "searchKeyword2", contentTypeId: "32", keyword: "제주" },
   "해변": { endpoint: "searchKeyword2", contentTypeId: "12", keyword: "해변" },
   "오름": { endpoint: "searchKeyword2", contentTypeId: "12", keyword: "오름" },
-  "계절 코스": { endpoint: "areaBasedList2", contentTypeId: "25" }
+  "계절 코스": { endpoint: "searchKeyword2", contentTypeId: "25", keyword: "제주" }
 };
 
 function json(data, init = {}) {
@@ -152,6 +152,15 @@ function normalizeListItem(item) {
   };
 }
 
+function isJejuItem(item) {
+  const address = [item.addr1, item.addr2].filter(Boolean).join(" ");
+  return (
+    /제주/.test(address) ||
+    String(item.lDongRegnCd || "") === LDONG_REGN_JEJU ||
+    String(item.areacode || "") === "39"
+  );
+}
+
 function firstAvailable(...values) {
   return values.map(stripTags).find(Boolean) || "정보 없음";
 }
@@ -241,24 +250,25 @@ async function handleList(requestUrl, serviceKey) {
   const pageNo = requestUrl.searchParams.get("page") || "1";
   const config = CATEGORY_REQUESTS[category] || CATEGORY_REQUESTS["전체"];
   const params = {
-    numOfRows: "24",
-    pageNo,
-    arrange: "Q",
-    listYN: "Y",
-    lDongRegnCd: LDONG_REGN_JEJU
+    numOfRows: "100",
+    pageNo
   };
 
   if (config.contentTypeId) params.contentTypeId = config.contentTypeId;
   if (config.keyword) params.keyword = config.keyword;
 
   const body = await fetchTourWithFallback(config.endpoint, params, serviceKey);
-  const items = asItems(body).map(normalizeListItem).filter((item) => item.contentId && item.title);
+  const items = asItems(body)
+    .filter(isJejuItem)
+    .map(normalizeListItem)
+    .filter((item) => item.contentId && item.title)
+    .slice(0, 24);
 
   return json({
     ok: true,
     source: "한국관광공사",
     category,
-    totalCount: Number(body.totalCount || items.length),
+    totalCount: items.length,
     pageNo: Number(body.pageNo || pageNo),
     items,
     updatedAt: new Date().toISOString()
