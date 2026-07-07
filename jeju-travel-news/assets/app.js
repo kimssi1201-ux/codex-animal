@@ -4,7 +4,7 @@ const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const officialCache = new Map();
 const fallbackImage = "https://images.unsplash.com/photo-1592828064575-70ed626d3a0e?auto=format&fit=crop&w=1200&q=82";
-const tourismDataVersion = "20260708-kto-2";
+const tourismDataVersion = "20260708-kto-3";
 
 let activeCategory = "전체";
 let officialRequestId = 0;
@@ -25,7 +25,13 @@ function articleUrl(article) {
 function officialUrl(place) {
   const query = new URLSearchParams({
     contentId: place.contentId,
-    contentTypeId: place.contentTypeId || ""
+    contentTypeId: place.contentTypeId || "",
+    title: place.title || "",
+    category: place.category || "",
+    address: place.address || place.region || "",
+    image: place.image || "",
+    mapx: place.mapx || "",
+    mapy: place.mapy || ""
   });
   return `article.html?${query.toString()}`;
 }
@@ -346,6 +352,24 @@ function renderOfficialRelated(place) {
 
 async function renderOfficialDetail(detail, contentId, contentTypeId) {
   detail.innerHTML = `<div class="detail-loading">관광정보를 불러오고 있습니다.</div>`;
+  const fallbackPlace = {
+    contentId,
+    contentTypeId,
+    title: params.get("title") || "제주 관광정보",
+    category: params.get("category") || "관광정보",
+    address: params.get("address") || "",
+    region: params.get("address") || "제주",
+    tel: "정보 없음",
+    image: params.get("image") || fallbackImage,
+    mapx: params.get("mapx") || "",
+    mapy: params.get("mapy") || "",
+    restDate: "정보 없음",
+    operatingHours: "정보 없음",
+    parking: "정보 없음",
+    fee: "정보 없음",
+    zipcode: "",
+    checkPoint: "방문 전 운영시간, 휴무일, 요금 안내를 다시 확인하세요."
+  };
 
   try {
     const query = new URLSearchParams({ contentId, contentTypeId, v: tourismDataVersion });
@@ -388,12 +412,29 @@ async function renderOfficialDetail(detail, contentId, contentTypeId) {
     renderOfficialRelated(place);
   } catch (error) {
     detail.innerHTML = `
+      <img class="detail-hero" src="${escapeHtml(fallbackPlace.image)}" alt="${escapeHtml(fallbackPlace.title)}">
       <div class="detail-body">
-        <h1>관광정보를 불러오지 못했습니다</h1>
-        <p class="summary">${escapeHtml(error.message)}</p>
-        <a class="primary-link" href="./">목록으로 돌아가기</a>
+        <div class="meta"><span>공식 관광정보</span><span>${escapeHtml(fallbackPlace.category)}</span></div>
+        <h1>${escapeHtml(fallbackPlace.title)}</h1>
+        <p class="summary">${escapeHtml(fallbackPlace.address || fallbackPlace.region)}</p>
+        <table class="info-table"><tbody>${officialInfoRows(fallbackPlace)}</tbody></table>
+        <section>
+          <h2>장소 소개</h2>
+          <p>상세 소개 정보는 준비 중이며, 목록에서 확인한 주소와 위치 정보를 먼저 표시합니다.</p>
+        </section>
+        <section>
+          <h2>방문 전 체크포인트</h2>
+          <ul class="check-list">
+            <li>운영시간, 휴무일, 요금은 현장 사정에 따라 달라질 수 있습니다.</li>
+            <li>${escapeHtml(fallbackPlace.checkPoint)}</li>
+            <li>주소와 주차 정보를 확인한 뒤 주변 대체 코스도 함께 준비하세요.</li>
+          </ul>
+        </section>
+        ${renderOfficialMap(fallbackPlace)}
+        <p class="source-note">자료 출처: 한국관광공사 관광정보 목록</p>
       </div>
     `;
+    renderOfficialRelated(fallbackPlace);
   }
 }
 

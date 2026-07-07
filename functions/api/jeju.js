@@ -167,6 +167,8 @@ function firstAvailable(...values) {
 
 function normalizeDetail(common, intro, images) {
   const address = [common.addr1, common.addr2].filter(Boolean).join(" ");
+  const contentId = common.contentid || common.contentId || "";
+  const contentTypeId = common.contenttypeid || common.contentTypeId || "";
   const operatingHours = firstAvailable(
     intro.usetime,
     intro.usetimeculture,
@@ -212,8 +214,8 @@ function normalizeDetail(common, intro, images) {
   );
 
   return {
-    contentId: String(common.contentid || ""),
-    contentTypeId: String(common.contenttypeid || ""),
+    contentId: String(contentId),
+    contentTypeId: String(contentTypeId),
     title: stripTags(common.title),
     category: contentTypeLabel(common.contenttypeid),
     address,
@@ -315,7 +317,7 @@ async function handleDetail(requestUrl, serviceKey) {
   const intro = asItems(introBody)[0] || {};
   const images = asItems(imageBody);
 
-  if (!common.contentid) {
+  if (!common.contentid && !common.contentId && !common.title) {
     return json({ ok: false, error: "관광정보를 찾지 못했습니다." }, { status: 404, cacheControl: "no-store" });
   }
 
