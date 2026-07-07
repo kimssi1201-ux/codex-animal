@@ -316,6 +316,37 @@ async function handleDetail(requestUrl, serviceKey) {
   });
 }
 
+async function handleProbe(serviceKey) {
+  const checks = [
+    { name: "areaCode2", endpoint: "areaCode2", params: { numOfRows: "20", pageNo: "1" } },
+    { name: "areaBasedList2-all", endpoint: "areaBasedList2", params: { numOfRows: "3", pageNo: "1", arrange: "Q", listYN: "Y" } },
+    { name: "areaBasedList2-jeju", endpoint: "areaBasedList2", params: { numOfRows: "3", pageNo: "1", arrange: "Q", listYN: "Y", areaCode: AREA_CODE_JEJU } },
+    { name: "searchKeyword2-jeju", endpoint: "searchKeyword2", params: { numOfRows: "3", pageNo: "1", arrange: "Q", listYN: "Y", keyword: "제주" } }
+  ];
+
+  const results = [];
+  for (const check of checks) {
+    try {
+      const body = await fetchTour(check.endpoint, check.params, serviceKey);
+      const item = asItems(body)[0] || {};
+      results.push({
+        name: check.name,
+        totalCount: Number(body.totalCount || 0),
+        firstTitle: stripTags(item.title),
+        firstAreaCode: item.areacode || "",
+        firstAddr: stripTags(item.addr1)
+      });
+    } catch (error) {
+      results.push({
+        name: check.name,
+        error: error instanceof Error ? error.message : "failed"
+      });
+    }
+  }
+
+  return json({ ok: true, results }, { cacheControl: "no-store" });
+}
+
 export async function onRequestOptions() {
   return new Response(null, {
     status: 204,
@@ -338,6 +369,9 @@ export async function onRequestGet(context) {
 
   try {
     const requestUrl = new URL(context.request.url);
+    if (requestUrl.searchParams.get("probe") === "1") {
+      return await handleProbe(serviceKey);
+    }
     if (requestUrl.searchParams.has("id") || requestUrl.searchParams.has("contentId")) {
       return await handleDetail(requestUrl, serviceKey);
     }
