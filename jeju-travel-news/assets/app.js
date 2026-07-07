@@ -4,6 +4,7 @@ const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const officialCache = new Map();
 const fallbackImage = "https://images.unsplash.com/photo-1592828064575-70ed626d3a0e?auto=format&fit=crop&w=1200&q=82";
+const tourismDataVersion = "20260708-kto-2";
 
 let activeCategory = "전체";
 let officialRequestId = 0;
@@ -174,7 +175,7 @@ async function loadOfficialPlaces() {
   renderOfficialPlaces();
 
   try {
-    const response = await fetch(`/api/jeju?category=${encodeURIComponent(requestCategory)}`, {
+    const response = await fetch(`/api/jeju?category=${encodeURIComponent(requestCategory)}&v=${tourismDataVersion}`, {
       headers: { accept: "application/json" }
     });
     const payload = await response.json();
@@ -347,7 +348,7 @@ async function renderOfficialDetail(detail, contentId, contentTypeId) {
   detail.innerHTML = `<div class="detail-loading">관광정보를 불러오고 있습니다.</div>`;
 
   try {
-    const query = new URLSearchParams({ contentId, contentTypeId });
+    const query = new URLSearchParams({ contentId, contentTypeId, v: tourismDataVersion });
     const response = await fetch(`/api/jeju?${query.toString()}`, {
       headers: { accept: "application/json" }
     });

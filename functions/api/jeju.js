@@ -16,7 +16,7 @@ const CONTENT_TYPE_LABELS = {
 };
 
 const CATEGORY_REQUESTS = {
-  "전체": { endpoint: "searchKeyword2", keyword: "제주" },
+  "전체": { endpoint: "searchKeyword2", keyword: "제주", allowedTypes: ["12", "14", "15", "25", "32", "39"] },
   "가볼 만한 곳": { endpoint: "searchKeyword2", contentTypeId: "12", keyword: "제주" },
   "맛집": { endpoint: "searchKeyword2", contentTypeId: "39", keyword: "제주" },
   "카페": { endpoint: "searchKeyword2", contentTypeId: "39", keyword: "카페" },
@@ -260,6 +260,7 @@ async function handleList(requestUrl, serviceKey) {
   const body = await fetchTourWithFallback(config.endpoint, params, serviceKey);
   const items = asItems(body)
     .filter(isJejuItem)
+    .filter((item) => !config.allowedTypes || config.allowedTypes.includes(String(item.contenttypeid || "")))
     .map(normalizeListItem)
     .filter((item) => item.contentId && item.title)
     .slice(0, 24);
@@ -326,42 +327,6 @@ async function handleDetail(requestUrl, serviceKey) {
   });
 }
 
-async function handleProbe(serviceKey) {
-  const checks = [
-    { name: "areaCode2", endpoint: "areaCode2", params: { numOfRows: "20", pageNo: "1" } },
-    { name: "ldongCode2", endpoint: "ldongCode2", params: { numOfRows: "20", pageNo: "1", lDongListYn: "Y" } },
-    { name: "areaBasedList2-min", endpoint: "areaBasedList2", params: { numOfRows: "3", pageNo: "1" } },
-    { name: "areaBasedList2-all", endpoint: "areaBasedList2", params: { numOfRows: "3", pageNo: "1", arrange: "Q", listYN: "Y" } },
-    { name: "areaBasedList2-c", endpoint: "areaBasedList2", params: { numOfRows: "3", pageNo: "1", arrange: "C" } },
-    { name: "areaBasedList2-ldong-jeju", endpoint: "areaBasedList2", params: { numOfRows: "3", pageNo: "1", arrange: "Q", listYN: "Y", lDongRegnCd: LDONG_REGN_JEJU } },
-    { name: "searchKeyword2-min", endpoint: "searchKeyword2", params: { numOfRows: "3", pageNo: "1", keyword: "제주" } },
-    { name: "searchKeyword2-ldong-jeju", endpoint: "searchKeyword2", params: { numOfRows: "3", pageNo: "1", arrange: "Q", listYN: "Y", keyword: "제주", lDongRegnCd: LDONG_REGN_JEJU } }
-  ];
-
-  const results = [];
-  for (const check of checks) {
-    try {
-      const body = await fetchTour(check.endpoint, check.params, serviceKey);
-      const item = asItems(body)[0] || {};
-      results.push({
-        name: check.name,
-        totalCount: Number(body.totalCount || 0),
-        firstTitle: stripTags(item.title || item.name || item.lDongRegnNm || item.lDongSignguNm),
-        firstCode: item.code || item.lDongRegnCd || item.lDongSignguCd || "",
-        firstAreaCode: item.areacode || "",
-        firstAddr: stripTags(item.addr1)
-      });
-    } catch (error) {
-      results.push({
-        name: check.name,
-        error: error instanceof Error ? error.message : "failed"
-      });
-    }
-  }
-
-  return json({ ok: true, results }, { cacheControl: "no-store" });
-}
-
 export async function onRequestOptions() {
   return new Response(null, {
     status: 204,
@@ -384,9 +349,6 @@ export async function onRequestGet(context) {
 
   try {
     const requestUrl = new URL(context.request.url);
-    if (requestUrl.searchParams.get("probe") === "1") {
-      return await handleProbe(serviceKey);
-    }
     if (requestUrl.searchParams.has("id") || requestUrl.searchParams.has("contentId")) {
       return await handleDetail(requestUrl, serviceKey);
     }
