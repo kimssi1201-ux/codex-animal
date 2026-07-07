@@ -1,13 +1,14 @@
-import { articles, categories } from "./articles.js?v=20260708-stay-1";
+import { articles, categories } from "./articles.js?v=20260708-tna-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260708-stay-1";
+const tourismDataVersion = "20260708-tna-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
 const regionCache = new Map();
+const tnaCategoryCache = new Map();
 
 let activeCategory = "전체";
 let officialRequestId = 0;
@@ -185,6 +186,23 @@ function normalizeRegion(item = {}) {
   const name = item.name || item.regionName || item.displayName || item.title || "";
   const label = [country, name].filter(Boolean).join(" ") || item.label || name || regionId;
   return { regionId, label };
+}
+
+function normalizeTnaCategory(item = {}) {
+  const value = String(item.value || item.category || item.id || item.code || "");
+  const label = String(item.label || item.name || item.title || item.displayName || value || "카테고리");
+  return { value, label };
+}
+
+function normalizeTnaProduct(product = {}) {
+  return {
+    title: product.title || product.name || product.productName || product.displayName || "투어·티켓 상품",
+    category: product.categoryName || product.category || product.type || "투어·티켓",
+    region: product.region || product.regionName || product.cityName || product.location || "",
+    priceText: product.priceText || product.displayPrice || product.priceLabel || product.price || product.salePrice || "가격 확인",
+    image: product.image || product.imageUrl || product.thumbnail || product.thumbnailUrl || product.mainImage || "",
+    url: safeExternalUrl(product.url || product.link || product.deepLink || product.webUrl)
+  };
 }
 
 function airportCodeFromInput(value, fallback = "") {
@@ -687,6 +705,116 @@ function bindStaySearch() {
   });
 }
 
+function renderTnaResult(items = [], mode = "idle", message = "") {
+  const result = $("#tnaResult");
+  if (!result) return;
+
+  if (mode === "ready" && items.length) {
+    result.innerHTML = `
+      <div class="tna-card-list">
+        ${items.slice(0, 6).map((product) => {
+          const item = normalizeTnaProduct(product);
+          const tag = item.url ? "a" : "article";
+          const linkAttrs = item.url ? ` href="${escapeHtml(item.url)}" target="_blank" rel="sponsored nofollow noopener noreferrer"` : "";
+          return `
+            <${tag} class="tna-card"${linkAttrs}>
+              ${imageTag(item.image || fallbackImage, item.title)}
+              <span>
+                <em>${escapeHtml(item.category || item.region || "투어·티켓")}</em>
+                <strong>${escapeHtml(item.title)}</strong>
+                <small>${escapeHtml(String(item.priceText))}</small>
+              </span>
+            </${tag}>
+          `;
+        }).join("")}
+      </div>
+    `;
+    return;
+  }
+
+  const fallbackMessage = mode === "not-configured"
+    ? "MYREALTRIP_API_BASE 또는 투어티켓 엔드포인트 URL과 MYREALTRIP_API_KEY가 설정되면 카테고리와 상품 검색이 동작합니다."
+    : message || "도시와 검색어를 입력한 뒤 투어·티켓 상품을 조회하세요.";
+  result.innerHTML = `<div class="tna-status">${escapeHtml(fallbackMessage)}</div>`;
+}
+
+async function postTna(action, body) {
+  const response = await fetch(`/api/myrealtrip-tna?action=${encodeURIComponent(action)}&v=${tourismDataVersion}`, {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "application/json" },
+    body: JSON.stringify(body)
+  });
+  const payload = await response.json();
+  if (!response.ok || payload?.ok === false) {
+    const error = new Error(payload?.message || "투어·티켓 정보를 불러오지 못했습니다.");
+    error.payload = payload;
+    throw error;
+  }
+  return payload;
+}
+
+async function loadTnaCategories(city, select) {
+  const query = String(city || "").trim() || "제주";
+  if (!select) return;
+  if (tnaCategoryCache.has(query)) {
+    select.innerHTML = tnaCategoryCache.get(query);
+    return;
+  }
+
+  try {
+    const payload = await postTna("categories", { city: query, cityName: query, keyword: query, query });
+    const options = (payload.items || [])
+      .map(normalizeTnaCategory)
+      .filter((item) => item.value || item.label)
+      .slice(0, 40)
+      .map((item) => `<option value="${escapeHtml(item.value)}">${escapeHtml(item.label)}</option>`)
+      .join("");
+    const html = `<option value="">전체</option>${options}`;
+    tnaCategoryCache.set(query, html);
+    select.innerHTML = html;
+  } catch (error) {
+    if (error.payload?.configured === false) renderTnaResult([], "not-configured");
+  }
+}
+
+function bindTnaSearch() {
+  const form = $("#tnaSearchForm");
+  if (!form) return;
+
+  const cityInput = $("#tnaCity");
+  const categorySelect = $("#tnaCategory");
+  const keywordInput = $("#tnaKeyword");
+  renderTnaResult();
+  loadTnaCategories(cityInput?.value || "제주", categorySelect);
+
+  cityInput?.addEventListener("change", () => {
+    loadTnaCategories(cityInput.value, categorySelect);
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const city = cityInput?.value || "제주";
+    const keyword = keywordInput?.value || "";
+    const category = categorySelect?.value || "";
+    renderTnaResult([], "loading", "투어·티켓 상품을 조회하고 있습니다.");
+
+    try {
+      const payload = await postTna("search", {
+        city,
+        cityName: city,
+        keyword,
+        query: keyword,
+        category,
+        page: 1,
+        limit: 12
+      });
+      renderTnaResult(payload.items || [], "ready", "표시할 투어·티켓 상품이 없습니다.");
+    } catch (error) {
+      renderTnaResult([], error.payload?.configured === false ? "not-configured" : "idle", error.message);
+    }
+  });
+}
+
 function renderFooter() {
   const footer = $("#footerLinks");
   if (!footer) return;
@@ -784,6 +912,7 @@ function renderHome() {
   renderMyRealTrip([], "loading");
   bindFlightSearch();
   bindStaySearch();
+  bindTnaSearch();
   renderVisitCheck();
   renderCategoryNews();
   renderFaq();

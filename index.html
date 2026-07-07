@@ -14,7 +14,7 @@
   <link rel="canonical" href="https://www.moneyarchive.kr/">
   <link rel="alternate" type="application/rss+xml" title="RSS" href="https://www.moneyarchive.kr/feed.xml">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/jeju-travel-news/assets/styles.css?v=20260708-stay-1">
+  <link rel="stylesheet" href="/jeju-travel-news/assets/styles.css?v=20260708-tna-1">
   <title>제주여행뉴스 | 제주도 여행 정보 뉴스</title>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
 </head>
@@ -37,6 +37,7 @@
       <a href="#places" data-i18n="nav.places">가볼 만한 곳</a>
       <a href="#flights">항공권</a>
       <a href="#stays">숙소</a>
+      <a href="#tourTickets">투어·티켓</a>
       <a href="#myrealtrip" data-i18n="nav.myrealtrip">여행 상품</a>
       <a href="#visitCheck" data-i18n="nav.check">방문 전 체크</a>
     </nav>
@@ -115,6 +116,32 @@
       <div class="stay-result" id="stayResult">지역 자동완성과 숙소 검색 API 연결 전에는 입력폼만 표시됩니다.</div>
     </section>
 
+    <section class="tna-section" id="tourTickets" aria-labelledby="tnaTitle">
+      <div class="section-heading">
+        <p class="eyebrow">Tours & Tickets</p>
+        <h2 id="tnaTitle">제주 투어·티켓 상품 조회</h2>
+        <p>도시별 카테고리를 불러오고, 선택한 category 값으로 투어·액티비티 상품을 검색합니다.</p>
+      </div>
+      <form class="tna-search-form" id="tnaSearchForm">
+        <label>
+          <span>도시</span>
+          <input id="tnaCity" name="city" type="search" value="제주" autocomplete="off" inputmode="search">
+        </label>
+        <label>
+          <span>카테고리</span>
+          <select id="tnaCategory" name="category">
+            <option value="">전체</option>
+          </select>
+        </label>
+        <label>
+          <span>검색어</span>
+          <input id="tnaKeyword" name="keyword" type="search" value="액티비티" autocomplete="off" inputmode="search">
+        </label>
+        <button type="submit">상품 조회</button>
+      </form>
+      <div class="tna-result" id="tnaResult">투어티켓 API 연결 전에는 입력폼만 표시됩니다.</div>
+    </section>
+
     <section class="mrt-section" id="myrealtrip" aria-labelledby="myrealtripTitle">
       <div class="section-heading">
         <p class="eyebrow">Travel Picks</p>
@@ -164,6 +191,6 @@
   <noscript>
     <p class="noscript">제주 여행 카드를 보려면 브라우저에서 JavaScript를 켜주세요.</p>
   </noscript>
-  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260708-stay-1"></script>
+  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260708-tna-1"></script>
 </body>
 </html>

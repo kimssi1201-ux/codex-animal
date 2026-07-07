@@ -306,7 +306,7 @@ main, .site-footer {
   font-weight: 900;
 }
 
-.mrt-section, .flight-section, .stay-section, .visit-check-section, .category-news-wrapper, .faq-section, .article-page {
+.mrt-section, .flight-section, .stay-section, .tna-section, .visit-check-section, .category-news-wrapper, .faq-section, .article-page {
   padding: 4px 12px 24px;
 }
 .mrt-section {
@@ -326,6 +326,13 @@ main, .site-footer {
   background: #fff;
 }
 .stay-section {
+  display: grid;
+  gap: 12px;
+  padding-top: 8px;
+  border-bottom: 8px solid #edf2ef;
+  background: #fff;
+}
+.tna-section {
   display: grid;
   gap: 12px;
   padding-top: 8px;
@@ -454,24 +461,29 @@ main, .site-footer {
   -webkit-line-clamp: 2;
 }
 .flight-search-form,
-.stay-search-form {
+.stay-search-form,
+.tna-search-form {
   display: grid;
   gap: 10px;
 }
 .flight-search-form label,
-.stay-search-form label {
+.stay-search-form label,
+.tna-search-form label {
   display: grid;
   gap: 6px;
   min-width: 0;
 }
 .flight-search-form label span,
-.stay-search-form label span {
+.stay-search-form label span,
+.tna-search-form label span {
   color: var(--green);
   font-size: 12px;
   font-weight: 900;
 }
 .flight-search-form input,
-.stay-search-form input {
+.stay-search-form input,
+.tna-search-form input,
+.tna-search-form select {
   width: 100%;
   min-height: 44px;
   padding: 0 13px;
@@ -483,7 +495,8 @@ main, .site-footer {
   font-weight: 800;
 }
 .flight-search-form button,
-.stay-search-form button {
+.stay-search-form button,
+.tna-search-form button {
   min-height: 46px;
   border: 0;
   border-radius: 14px;
@@ -492,7 +505,8 @@ main, .site-footer {
   font-weight: 900;
 }
 .flight-status,
-.stay-status {
+.stay-status,
+.tna-status {
   padding: 14px 15px;
   border: 1px solid var(--line);
   border-radius: 16px;
@@ -502,7 +516,8 @@ main, .site-footer {
   font-weight: 900;
 }
 .flight-calendar-list,
-.stay-card-list {
+.stay-card-list,
+.tna-card-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
@@ -531,7 +546,8 @@ main, .site-footer {
   font-size: 12px;
   font-weight: 800;
 }
-.stay-card {
+.stay-card,
+.tna-card {
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--line);
@@ -539,26 +555,31 @@ main, .site-footer {
   background: #fff;
   box-shadow: var(--shadow);
 }
-.stay-card {
+.stay-card,
+.tna-card {
   display: grid;
   grid-template-rows: 118px auto;
 }
-.stay-card > img {
+.stay-card > img,
+.tna-card > img {
   min-height: 118px;
   background: var(--green-soft);
 }
-.stay-card span {
+.stay-card span,
+.tna-card span {
   display: grid;
   gap: 4px;
   padding: 10px 11px 12px;
 }
-.stay-card em {
+.stay-card em,
+.tna-card em {
   color: var(--green);
   font-size: 11px;
   font-style: normal;
   font-weight: 900;
 }
-.stay-card strong {
+.stay-card strong,
+.tna-card strong {
   display: -webkit-box;
   overflow: hidden;
   color: var(--ink);
@@ -567,7 +588,8 @@ main, .site-footer {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
-.stay-card small {
+.stay-card small,
+.tna-card small {
   display: -webkit-box;
   overflow: hidden;
   color: var(--muted);
@@ -826,10 +848,17 @@ main, .site-footer {
     grid-template-columns: minmax(0, 1.3fr) 138px 138px 88px 112px;
     align-items: end;
   }
+  .tna-search-form {
+    grid-template-columns: minmax(0, 1fr) 168px minmax(0, 1.2fr) 112px;
+    align-items: end;
+  }
   .flight-calendar-list {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   .stay-card-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .tna-card-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .top-category-bar {
@@ -985,6 +1014,7 @@ main, .site-footer {
   .mrt-section,
   .flight-section,
   .stay-section,
+  .tna-section,
   .visit-check-section,
   .category-news-wrapper,
   .faq-section,
@@ -1010,18 +1040,22 @@ main, .site-footer {
   .mrt-card strong {
     font-size: 14px;
   }
-  .stay-card {
+  .stay-card,
+  .tna-card {
     grid-template-rows: 96px auto;
     border-radius: 14px;
     box-shadow: none;
   }
-  .stay-card > img {
+  .stay-card > img,
+  .tna-card > img {
     min-height: 96px;
   }
-  .stay-card span {
+  .stay-card span,
+  .tna-card span {
     padding: 9px;
   }
-  .stay-card strong {
+  .stay-card strong,
+  .tna-card strong {
     font-size: 14px;
   }
   .visit-check-grid {
@@ -1079,11 +1113,16 @@ main, .site-footer {
   .stay-card-list {
     grid-template-columns: 1fr;
   }
-  .stay-card {
+  .tna-card-list {
+    grid-template-columns: 1fr;
+  }
+  .stay-card,
+  .tna-card {
     grid-template-columns: 106px minmax(0, 1fr);
     grid-template-rows: auto;
   }
-  .stay-card > img {
+  .stay-card > img,
+  .tna-card > img {
     min-height: 112px;
   }
 }
