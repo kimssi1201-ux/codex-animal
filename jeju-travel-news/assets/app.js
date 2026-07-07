@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260708-detail-1";
+import { articles, categories } from "./articles.js?v=20260708-menu-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260708-detail-1";
+const tourismDataVersion = "20260708-menu-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 
@@ -427,10 +427,29 @@ function bindHeader() {
   const menuButton = $("#menuToggle") || $("#menuButton");
   const nav = $("#primaryNav");
   if (menuButton && nav) {
+    const setOpen = (open) => {
+      menuButton.setAttribute("aria-expanded", String(open));
+      nav.classList.toggle("is-open", open);
+      document.body.classList.toggle("menu-open", open);
+    };
+
     menuButton.addEventListener("click", () => {
       const open = menuButton.getAttribute("aria-expanded") === "true";
-      menuButton.setAttribute("aria-expanded", String(!open));
-      nav.classList.toggle("is-open", !open);
+      setOpen(!open);
+    });
+
+    nav.addEventListener("click", (event) => {
+      if (event.target.closest("a")) setOpen(false);
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!document.body.classList.contains("menu-open")) return;
+      if (nav.contains(event.target) || menuButton.contains(event.target)) return;
+      setOpen(false);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setOpen(false);
     });
   }
 }
