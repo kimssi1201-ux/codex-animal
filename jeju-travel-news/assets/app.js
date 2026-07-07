@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260708-image-1";
+import { articles, categories } from "./articles.js?v=20260708-mobile-mrt-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260708-image-1";
+const tourismDataVersion = "20260708-mobile-mrt-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 
@@ -51,6 +51,27 @@ const visitCheckItems = [
   }
 ];
 
+const myrealtripFallbackItems = [
+  {
+    title: "제주 동쪽 투어",
+    category: "투어",
+    priceText: "상품 정보를 불러오는 중",
+    image: "https://tong.visitkorea.or.kr/cms/resource/75/3400775_image2_1.jpg"
+  },
+  {
+    title: "제주 해변 액티비티",
+    category: "티켓",
+    priceText: "상품 정보를 불러오는 중",
+    image: "https://tong.visitkorea.or.kr/cms/resource/81/3037781_image2_1.jpg"
+  },
+  {
+    title: "제주 숙소",
+    category: "숙소",
+    priceText: "상품 정보를 불러오는 중",
+    image: "https://tong.visitkorea.or.kr/cms/resource/36/3421436_image2_1.jpg"
+  }
+];
+
 function escapeHtml(value) {
   return String(value || "")
     .replaceAll("&", "&amp;")
@@ -91,6 +112,18 @@ function normalizeImageUrl(value) {
   return url;
 }
 
+function safeExternalUrl(value) {
+  const url = String(value || "").trim();
+  if (!url) return "";
+  const normalized = url.startsWith("//") ? `https:${url}` : url;
+  if (!/^https:\/\//i.test(normalized)) return "";
+  try {
+    return new URL(normalized).href;
+  } catch (error) {
+    return "";
+  }
+}
+
 function imageTag(src, alt, className = "") {
   const classAttribute = className ? ` class="${escapeHtml(className)}"` : "";
   return `<img${classAttribute} src="${escapeHtml(normalizeImageUrl(src))}" alt="${escapeHtml(alt)}" loading="lazy">`;
@@ -103,6 +136,16 @@ function bindImageFallbacks() {
     image.dataset.fallbackApplied = "true";
     image.src = fallbackImage;
   }, true);
+}
+
+function normalizeProduct(product = {}) {
+  return {
+    title: product.title || product.name || product.productName || "제주 여행 상품",
+    category: product.category || product.type || product.productType || "여행 상품",
+    priceText: product.priceText || product.displayPrice || product.price || product.salePrice || "가격 확인",
+    image: product.image || product.imageUrl || product.thumbnail || product.thumbnailUrl || product.mainImage || "",
+    url: safeExternalUrl(product.url || product.link || product.deepLink || product.webUrl)
+  };
 }
 
 function visibleArticles() {
@@ -247,6 +290,70 @@ function renderVisitCheck() {
     .join("");
 }
 
+function myrealtripCard(product) {
+  const item = normalizeProduct(product);
+  const content = `
+    ${imageTag(item.image, item.title)}
+    <span>
+      <em>${escapeHtml(item.category)}</em>
+      <strong>${escapeHtml(item.title)}</strong>
+      <small>${escapeHtml(String(item.priceText))}</small>
+    </span>
+  `;
+
+  if (item.url) {
+    return `
+      <article class="mrt-card">
+        <a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${content}</a>
+      </article>
+    `;
+  }
+
+  return `<article class="mrt-card is-disabled">${content}</article>`;
+}
+
+function renderMyRealTrip(items = [], mode = "loading") {
+  const grid = $("#myrealtripGrid");
+  if (!grid) return;
+
+  if (mode === "ready" && items.length) {
+    grid.innerHTML = items.slice(0, 6).map(myrealtripCard).join("");
+    return;
+  }
+
+  const message = mode === "not-configured"
+    ? "마이리얼트립 연결 정보가 아직 설정되지 않았습니다. 키와 엔드포인트가 연결되면 이 영역에 실제 상품이 표시됩니다."
+    : "제주 여행 상품 정보를 확인하고 있습니다.";
+
+  grid.innerHTML = `
+    <div class="mrt-status">
+      <strong>${escapeHtml(message)}</strong>
+      <p>현재 화면은 모바일에서 밀리지 않도록 카드 영역만 먼저 준비했습니다.</p>
+    </div>
+    ${myrealtripFallbackItems.map(myrealtripCard).join("")}
+  `;
+}
+
+async function loadMyRealTrip() {
+  const grid = $("#myrealtripGrid");
+  if (!grid) return;
+  renderMyRealTrip([], "loading");
+
+  try {
+    const response = await fetch(`/api/myrealtrip?keyword=${encodeURIComponent("제주")}&type=tour&v=${tourismDataVersion}`, {
+      headers: { accept: "application/json" }
+    });
+    const payload = await response.json();
+    if (!response.ok || payload?.ok === false) {
+      renderMyRealTrip([], payload?.configured === false ? "not-configured" : "loading");
+      return;
+    }
+    renderMyRealTrip(payload.items || [], "ready");
+  } catch (error) {
+    renderMyRealTrip([], "not-configured");
+  }
+}
+
 function renderFooter() {
   const footer = $("#footerLinks");
   if (!footer) return;
@@ -322,12 +429,14 @@ function renderHome() {
   renderTabs();
   renderRecommended();
   renderFeed([]);
+  renderMyRealTrip([], "loading");
   renderVisitCheck();
   renderCategoryNews();
   renderFaq();
   renderFooter();
   bindHome();
   loadOfficialPlaces();
+  loadMyRealTrip();
 }
 
 function rowsFromPairs(pairs) {

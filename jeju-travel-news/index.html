@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://www.moneyarchive.kr/jeju-travel-news/">
   <title>제주여행뉴스 | 제주도 여행 정보 뉴스</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/styles.css?v=20260708-image-1">
+  <link rel="stylesheet" href="assets/styles.css?v=20260708-mobile-mrt-1">
 </head>
 <body class="is-loading-news">
   <header class="site-header">
@@ -31,8 +31,8 @@
     <nav class="primary-nav" id="primaryNav" aria-label="주요 메뉴">
       <a href="#july" data-i18n="nav.news">제주 여행 뉴스</a>
       <a href="#places" data-i18n="nav.places">가볼 만한 곳</a>
+      <a href="#myrealtrip" data-i18n="nav.myrealtrip">여행 상품</a>
       <a href="#visitCheck" data-i18n="nav.check">방문 전 체크</a>
-      <a href="#info" data-i18n="nav.guide">방문 가이드</a>
     </nav>
     <div class="language-switch" id="languageSwitch" aria-label="언어 선택">
       <button type="button" data-lang="ko">KR</button>
@@ -52,6 +52,15 @@
       <div class="section-status" id="julyStatus" data-i18n="july.loading">제주 여행 정보를 불러오는 중입니다.</div>
       <div class="recommend-news-row" id="recommendedArticles" aria-label="추천 제주 여행 기사"></div>
       <div class="news-list-feed" id="newsFeedList"></div>
+    </section>
+
+    <section class="mrt-section" id="myrealtrip" aria-labelledby="myrealtripTitle">
+      <div class="section-heading">
+        <p class="eyebrow">Travel Picks</p>
+        <h2 id="myrealtripTitle">제주 여행 상품 확인</h2>
+        <p>투어, 티켓, 숙소처럼 여행 전 비교가 필요한 정보를 한곳에 모아 보여줍니다.</p>
+      </div>
+      <div class="mrt-grid" id="myrealtripGrid"></div>
     </section>
 
     <section class="visit-check-section" id="visitCheck" aria-labelledby="visitCheckTitle">
@@ -94,6 +103,6 @@
   <noscript>
     <p class="noscript">제주 여행 카드를 보려면 브라우저에서 JavaScript를 켜주세요.</p>
   </noscript>
-  <script type="module" src="assets/app.js?v=20260708-image-1"></script>
+  <script type="module" src="assets/app.js?v=20260708-mobile-mrt-1"></script>
 </body>
 </html>
