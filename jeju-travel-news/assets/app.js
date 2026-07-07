@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js";
+import { articles, categories } from "./articles.js?v=20260708-posts-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://images.unsplash.com/photo-1592828064575-70ed626d3a0e?auto=format&fit=crop&w=1200&q=82";
-const tourismDataVersion = "20260708-view1-1";
+const tourismDataVersion = "20260708-posts-1";
 const officialCache = new Map();
 
 let activeCategory = "전체";
@@ -93,7 +93,7 @@ function newsCard(article) {
         <img src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" loading="lazy">
       </a>
       <div class="news-copy">
-        <div class="meta">${metaLine([article.category, article.region, article.date])}</div>
+        <div class="meta">${metaLine(["장소 포스팅", article.category, article.region, article.date])}</div>
         <h2><a href="${articleUrl(article)}">${escapeHtml(article.title)}</a></h2>
         <p>${escapeHtml(article.summary)}</p>
       </div>
@@ -109,7 +109,7 @@ function placeCard(place) {
         <img src="${escapeHtml(image)}" alt="${escapeHtml(place.title)}" loading="lazy">
       </a>
       <div class="news-copy">
-        <div class="meta">${metaLine(["관광정보", place.category])}</div>
+        <div class="meta">${metaLine(["공식 장소정보", place.category])}</div>
         <h2><a href="${officialUrl(place)}">${escapeHtml(place.title)}</a></h2>
         <p>${escapeHtml(place.address || place.region || "제주")}</p>
         <dl class="mini-info">
@@ -141,16 +141,15 @@ function renderFeed(places = null) {
   const localItems = visibleArticles();
   const placeItems = Array.isArray(places) ? places : [];
   const feedHtml = [
-    ...placeItems.slice(0, 10).map(placeCard),
-    ...localItems.map(newsCard)
+    ...localItems.map(newsCard),
+    ...placeItems.slice(0, 8).map(placeCard)
   ].join("");
 
   feed.innerHTML = feedHtml || `<p class="empty-state">현재 선택한 카테고리의 제주 여행 정보가 없습니다.</p>`;
   if (status) {
-    const count = placeItems.length + localItems.length;
     status.textContent = activeCategory === "전체"
-      ? `오늘 확인할 제주 여행 뉴스 ${count}건`
-      : `${activeCategory} 관련 제주 여행 뉴스 ${count}건`;
+      ? `장소 가이드 ${localItems.length}건 · 공식 관광정보 ${placeItems.length}건`
+      : `${activeCategory} 가이드 ${localItems.length}건 · 공식 관광정보 ${placeItems.length}건`;
   }
 }
 
