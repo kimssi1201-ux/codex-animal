@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260708-posts-1";
+import { articles, categories } from "./articles.js?v=20260708-view1-2";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://images.unsplash.com/photo-1592828064575-70ed626d3a0e?auto=format&fit=crop&w=1200&q=82";
-const tourismDataVersion = "20260708-posts-1";
+const tourismDataVersion = "20260708-view1-2";
 const officialCache = new Map();
 
 let activeCategory = "전체";
@@ -19,7 +19,7 @@ const faqItems = [
     answer: "뉴스 피드 안의 장소 카드를 열면 주소, 분류, 위치 확인 링크를 볼 수 있습니다. 운영시간과 요금은 방문 직전 공식 안내를 다시 확인하세요."
   },
   {
-    question: "예약이나 광고 영역이 있나요?",
+    question: "상품이나 광고 영역이 있나요?",
     answer: "이 제주 사이트에는 광고성 상품이나 구매 유도 영역을 넣지 않았습니다. 글과 장소 정보 중심으로만 구성했습니다."
   }
 ];
@@ -29,6 +29,25 @@ const footerGroups = [
   { title: "여행 준비", links: ["방문 전 체크", "숙소 위치", "비 오는 날", "가족 여행"] },
   { title: "지역", links: ["제주시", "서귀포", "성산", "애월"] },
   { title: "언어", links: ["한국어", "English", "日本語", "中文"] }
+];
+
+const visitCheckItems = [
+  {
+    title: "운영시간",
+    text: "폭포, 박물관, 유료 관광지는 입장 마감 시간이 다를 수 있습니다."
+  },
+  {
+    title: "날씨",
+    text: "오름과 해변은 바람, 안개, 우천 예보에 따라 체감 난이도가 달라집니다."
+  },
+  {
+    title: "주차",
+    text: "성수기에는 목적지 바로 앞보다 주변 공영 주차장과 도보 이동을 함께 보세요."
+  },
+  {
+    title: "동선",
+    text: "동쪽, 서쪽, 서귀포권을 하루에 모두 묶기보다 한 권역 중심으로 잡는 편이 편합니다."
+  }
 ];
 
 function escapeHtml(value) {
@@ -135,7 +154,7 @@ function renderTabs() {
 
 function renderFeed(places = null) {
   const feed = $("#newsFeedList");
-  const status = $("#feedStatus");
+  const status = $("#julyStatus") || $("#feedStatus");
   if (!feed) return;
 
   const localItems = visibleArticles();
@@ -193,6 +212,19 @@ function renderFaq() {
     .join("");
 }
 
+function renderVisitCheck() {
+  const grid = $("#visitCheckGrid");
+  if (!grid) return;
+  grid.innerHTML = visitCheckItems
+    .map((item) => `
+      <article class="visit-check-card">
+        <strong>${escapeHtml(item.title)}</strong>
+        <p>${escapeHtml(item.text)}</p>
+      </article>
+    `)
+    .join("");
+}
+
 function renderFooter() {
   const footer = $("#footerLinks");
   if (!footer) return;
@@ -242,7 +274,7 @@ function setActiveCategory(category) {
 }
 
 function bindHeader() {
-  const menuButton = $("#menuButton");
+  const menuButton = $("#menuToggle") || $("#menuButton");
   const nav = $("#primaryNav");
   if (menuButton && nav) {
     menuButton.addEventListener("click", () => {
@@ -268,6 +300,7 @@ function renderHome() {
   renderTabs();
   renderRecommended();
   renderFeed([]);
+  renderVisitCheck();
   renderCategoryNews();
   renderFaq();
   renderFooter();

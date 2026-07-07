@@ -11,27 +11,28 @@
   <meta property="og:description" content="제주 가볼 만한 곳과 제주 여행 정보를 사진, 주소, 방문 전 체크 정보와 함께 확인하세요.">
   <meta property="og:url" content="https://www.moneyarchive.kr/jeju-travel-news/">
   <title>제주여행뉴스 | 제주도 여행 정보 뉴스</title>
-  <link rel="stylesheet" href="assets/styles.css?v=20260708-posts-1">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="assets/styles.css?v=20260708-view1-2">
 </head>
 <body class="is-loading-news">
   <header class="site-header">
-    <a class="brand" href="./" aria-label="제주여행뉴스 홈">
+    <a class="brand" href="#top" aria-label="제주여행뉴스 홈">
       <span class="brand-mark" aria-hidden="true">JN</span>
       <span>
-        <strong>제주여행뉴스</strong>
-        <small>제주 여행 정보 뉴스</small>
+        <strong data-i18n="brand.name">제주여행뉴스</strong>
+        <small data-i18n="brand.tagline">제주 여행 정보 뉴스</small>
       </span>
     </a>
-    <button class="menu-toggle" id="menuButton" type="button" aria-expanded="false" aria-controls="primaryNav">
+    <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="primaryNav">
       <span></span>
       <span></span>
-      <span class="sr-only">메뉴 열기</span>
+      <span class="sr-only" data-i18n="nav.menu">메뉴 열기</span>
     </button>
     <nav class="primary-nav" id="primaryNav" aria-label="주요 메뉴">
-      <a href="#feed">제주 여행 뉴스</a>
-      <a href="#places">가볼 만한 곳</a>
-      <a href="#guide">방문 전 체크</a>
-      <a href="#categoryNews">카테고리</a>
+      <a href="#july" data-i18n="nav.news">제주 여행 뉴스</a>
+      <a href="#places" data-i18n="nav.places">가볼 만한 곳</a>
+      <a href="#visitCheck" data-i18n="nav.check">방문 전 체크</a>
+      <a href="#info" data-i18n="nav.guide">방문 가이드</a>
     </nav>
     <div class="language-switch" id="languageSwitch" aria-label="언어 선택">
       <button type="button" data-lang="ko">KR</button>
@@ -46,21 +47,30 @@
       <div class="category-tab-list" id="topCategoryTabs"></div>
     </nav>
 
-    <section class="mobile-news-feed" id="feed" aria-labelledby="feedTitle">
-      <h1 class="sr-only" id="feedTitle">오늘 볼 만한 제주 여행 뉴스</h1>
-      <div class="section-status" id="feedStatus">제주 여행 정보를 불러오는 중입니다.</div>
+    <section class="mobile-news-feed" id="july" aria-labelledby="julyTitle">
+      <h1 class="sr-only" id="julyTitle" data-i18n="july.title">오늘 볼 만한 제주 여행 뉴스</h1>
+      <div class="section-status" id="julyStatus" data-i18n="july.loading">제주 여행 정보를 불러오는 중입니다.</div>
       <div class="recommend-news-row" id="recommendedArticles" aria-label="추천 제주 여행 기사"></div>
       <div class="news-list-feed" id="newsFeedList"></div>
+    </section>
+
+    <section class="visit-check-section" id="visitCheck" aria-labelledby="visitCheckTitle">
+      <div class="section-heading">
+        <p class="eyebrow">Travel Check</p>
+        <h2 id="visitCheckTitle">방문 전 체크</h2>
+        <p>제주 여행지를 고르기 전에 운영시간, 날씨, 이동 동선, 주차 정보를 먼저 확인하세요.</p>
+      </div>
+      <div class="visit-check-grid" id="visitCheckGrid"></div>
     </section>
 
     <section class="category-news-wrapper" id="categoryNews" aria-label="카테고리별 제주 여행 뉴스">
       <div id="categoryNewsSections"></div>
     </section>
 
-    <section class="faq-section" id="guide" aria-labelledby="faqTitle">
+    <section class="faq-section" id="info" aria-labelledby="faqTitle">
       <div class="section-heading">
         <p class="eyebrow">Guide</p>
-        <h2 id="faqTitle">이용 가이드</h2>
+        <h2 id="faqTitle" data-i18n="faq.title">이용 가이드</h2>
       </div>
       <div class="faq-list" id="faqList"></div>
     </section>
@@ -68,14 +78,14 @@
 
   <footer class="site-footer">
     <div class="footer-intro">
-      <a class="brand footer-brand" href="./" aria-label="제주여행뉴스 홈">
+      <a class="brand footer-brand" href="#top" aria-label="제주여행뉴스 홈">
         <span class="brand-mark" aria-hidden="true">JN</span>
         <span>
-          <strong>제주여행뉴스</strong>
-          <small>제주 여행 선택을 돕는 뉴스 포털</small>
+          <strong data-i18n="brand.name">제주여행뉴스</strong>
+          <small data-i18n="footer.tagline">제주 여행 선택을 돕는 뉴스 포털</small>
         </span>
       </a>
-      <p>제주 관광지, 해변, 오름, 맛집, 카페, 숙소 위치와 방문 준비 정보를 뉴스 피드로 정리합니다.</p>
+      <p data-i18n="footer.description">제주 관광지, 해변, 오름, 맛집, 카페, 숙소 위치와 방문 준비 정보를 뉴스 피드로 정리합니다.</p>
     </div>
     <div class="footer-grid" id="footerLinks"></div>
     <p class="copyright">Copyright 2026 Jeju Travel News. All Rights Reserved.</p>
@@ -84,6 +94,6 @@
   <noscript>
     <p class="noscript">제주 여행 카드를 보려면 브라우저에서 JavaScript를 켜주세요.</p>
   </noscript>
-  <script type="module" src="assets/app.js?v=20260708-posts-1"></script>
+  <script type="module" src="assets/app.js?v=20260708-view1-2"></script>
 </body>
 </html>

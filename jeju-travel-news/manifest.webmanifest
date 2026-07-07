@@ -1,0 +1,11 @@
+{
+  "name": "제주여행뉴스",
+  "short_name": "제주여행뉴스",
+  "description": "제주 여행지, 해변, 오름, 맛집, 카페, 숙소 위치 정보를 뉴스 피드로 정리합니다.",
+  "start_url": "/jeju-travel-news/",
+  "scope": "/jeju-travel-news/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0a5b43",
+  "lang": "ko-KR"
+}
