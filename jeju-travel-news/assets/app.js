@@ -2,12 +2,34 @@ import { articles, categories } from "./articles.js";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
-const officialCache = new Map();
 const fallbackImage = "https://images.unsplash.com/photo-1592828064575-70ed626d3a0e?auto=format&fit=crop&w=1200&q=82";
-const tourismDataVersion = "20260708-kto-3";
+const tourismDataVersion = "20260708-view1-1";
+const officialCache = new Map();
 
 let activeCategory = "전체";
 let officialRequestId = 0;
+
+const faqItems = [
+  {
+    question: "제주여행뉴스에서는 무엇을 먼저 보면 좋나요?",
+    answer: "상단 카테고리를 고른 뒤 추천 기사와 세로형 뉴스 피드를 보면 됩니다. 처음 방문이라면 전체, 해변, 가볼 만한 곳 순서로 보는 편이 쉽습니다."
+  },
+  {
+    question: "관광지 정보는 어디에서 확인하나요?",
+    answer: "뉴스 피드 안의 장소 카드를 열면 주소, 분류, 위치 확인 링크를 볼 수 있습니다. 운영시간과 요금은 방문 직전 공식 안내를 다시 확인하세요."
+  },
+  {
+    question: "예약이나 광고 영역이 있나요?",
+    answer: "이 제주 사이트에는 광고성 상품이나 구매 유도 영역을 넣지 않았습니다. 글과 장소 정보 중심으로만 구성했습니다."
+  }
+];
+
+const footerGroups = [
+  { title: "제주 여행", links: ["가볼 만한 곳", "해변", "오름", "계절 코스"] },
+  { title: "여행 준비", links: ["방문 전 체크", "숙소 위치", "비 오는 날", "가족 여행"] },
+  { title: "지역", links: ["제주시", "서귀포", "성산", "애월"] },
+  { title: "언어", links: ["한국어", "English", "日本語", "中文"] }
+];
 
 function escapeHtml(value) {
   return String(value || "")
@@ -41,212 +63,217 @@ function mapUrl(place) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.mapy},${place.mapx}`)}`;
 }
 
-function meta(article) {
-  return `<span>${escapeHtml(article.category)}</span><span>${escapeHtml(article.region)}</span><span>${escapeHtml(article.date)}</span>`;
+function visibleArticles() {
+  return activeCategory === "전체" ? articles : articles.filter((article) => article.category === activeCategory);
 }
 
-function card(article, className = "") {
+function metaLine(parts) {
+  return parts
+    .filter(Boolean)
+    .map((part) => `<span>${escapeHtml(part)}</span>`)
+    .join("");
+}
+
+function recommendedCard(article) {
   return `
-    <article class="news-card ${className}">
-      <a class="thumb" href="${articleUrl(article)}">
+    <article class="recommend-card">
+      <a href="${articleUrl(article)}">
+        <img src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" loading="lazy">
+        <span>${escapeHtml(article.category)}</span>
+        <strong>${escapeHtml(article.title)}</strong>
+      </a>
+    </article>
+  `;
+}
+
+function newsCard(article) {
+  return `
+    <article class="news-feed-card">
+      <a class="news-thumb" href="${articleUrl(article)}">
         <img src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" loading="lazy">
       </a>
-      <div class="card-copy">
-        <div class="meta">${meta(article)}</div>
-        <h3><a href="${articleUrl(article)}">${escapeHtml(article.title)}</a></h3>
+      <div class="news-copy">
+        <div class="meta">${metaLine([article.category, article.region, article.date])}</div>
+        <h2><a href="${articleUrl(article)}">${escapeHtml(article.title)}</a></h2>
         <p>${escapeHtml(article.summary)}</p>
       </div>
     </article>
   `;
 }
 
-function officialCard(place) {
+function placeCard(place) {
   const image = place.image || fallbackImage;
-  const facts = [
-    ["분류", place.category],
-    ["주소", place.address || place.region],
-    ["연락처", place.tel || "정보 없음"]
-  ];
-
   return `
-    <article class="official-card">
-      <a class="thumb" href="${officialUrl(place)}">
+    <article class="news-feed-card place-feed-card">
+      <a class="news-thumb" href="${officialUrl(place)}">
         <img src="${escapeHtml(image)}" alt="${escapeHtml(place.title)}" loading="lazy">
       </a>
-      <div class="card-copy">
-        <div class="meta"><span>공식 관광정보</span><span>${escapeHtml(place.category)}</span></div>
-        <h3><a href="${officialUrl(place)}">${escapeHtml(place.title)}</a></h3>
-        <dl class="place-facts">
-          ${facts.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
+      <div class="news-copy">
+        <div class="meta">${metaLine(["관광정보", place.category])}</div>
+        <h2><a href="${officialUrl(place)}">${escapeHtml(place.title)}</a></h2>
+        <p>${escapeHtml(place.address || place.region || "제주")}</p>
+        <dl class="mini-info">
+          <div><dt>분류</dt><dd>${escapeHtml(place.category)}</dd></div>
+          <div><dt>연락처</dt><dd>${escapeHtml(place.tel || "정보 없음")}</dd></div>
         </dl>
       </div>
     </article>
   `;
 }
 
-function setActiveCategory(category) {
-  activeCategory = category;
-  renderHome();
-  loadOfficialPlaces();
-}
-
 function renderTabs() {
-  const tabs = $("#categoryTabs");
+  const tabs = $("#topCategoryTabs");
   if (!tabs) return;
   tabs.innerHTML = categories
-    .map((category) => `<button type="button" class="${category === activeCategory ? "active" : ""}" data-category="${escapeHtml(category)}">${escapeHtml(category)}</button>`)
+    .map((category) => `
+      <button type="button" class="${category === activeCategory ? "is-active" : ""}" data-category="${escapeHtml(category)}">
+        ${escapeHtml(category)}
+      </button>
+    `)
     .join("");
 }
 
-function visibleArticles() {
-  return activeCategory === "전체" ? articles : articles.filter((article) => article.category === activeCategory);
+function renderFeed(places = null) {
+  const feed = $("#newsFeedList");
+  const status = $("#feedStatus");
+  if (!feed) return;
+
+  const localItems = visibleArticles();
+  const placeItems = Array.isArray(places) ? places : [];
+  const feedHtml = [
+    ...placeItems.slice(0, 10).map(placeCard),
+    ...localItems.map(newsCard)
+  ].join("");
+
+  feed.innerHTML = feedHtml || `<p class="empty-state">현재 선택한 카테고리의 제주 여행 정보가 없습니다.</p>`;
+  if (status) {
+    const count = placeItems.length + localItems.length;
+    status.textContent = activeCategory === "전체"
+      ? `오늘 확인할 제주 여행 뉴스 ${count}건`
+      : `${activeCategory} 관련 제주 여행 뉴스 ${count}건`;
+  }
 }
 
-function renderTopStories() {
-  const topStories = $("#topStories");
-  if (!topStories) return;
-  topStories.innerHTML = articles.slice(0, 3).map((article) => card(article, "top-card")).join("");
+function renderRecommended() {
+  const row = $("#recommendedArticles");
+  if (!row) return;
+  row.innerHTML = articles.slice(0, 3).map(recommendedCard).join("");
 }
 
-function renderNewsList() {
-  const newsList = $("#newsList");
-  if (!newsList) return;
-  const list = visibleArticles();
-  $("#feedCount").textContent = `${list.length}개 기사`;
-  newsList.innerHTML = list.map((article) => card(article, "list-card")).join("");
-}
-
-function renderCategorySections() {
-  const categorySections = $("#categorySections");
-  if (!categorySections) return;
-  const groups = categories.filter((category) => category !== "전체");
-  categorySections.innerHTML = groups
+function renderCategoryNews() {
+  const wrapper = $("#categoryNewsSections");
+  if (!wrapper) return;
+  wrapper.innerHTML = categories
+    .filter((category) => category !== "전체")
     .map((category) => {
       const items = articles.filter((article) => article.category === category).slice(0, 3);
       if (!items.length) return "";
       return `
-        <section class="category-block">
-          <div class="category-title">
-            <span>${escapeHtml(category)}</span>
-            <a href="#tabs" data-jump-category="${escapeHtml(category)}">더 보기</a>
+        <section class="category-news-section" id="${category === "가볼 만한 곳" ? "places" : ""}">
+          <div class="section-heading">
+            <p class="eyebrow">Category</p>
+            <h2>${escapeHtml(category)}</h2>
           </div>
-          <div class="mini-grid">${items.map((article) => card(article, "mini-card")).join("")}</div>
+          <div class="news-list-feed compact-feed">${items.map(newsCard).join("")}</div>
         </section>
       `;
     })
     .join("");
 }
 
-function renderOfficialPlaces() {
-  const container = $("#officialPlaces");
-  if (!container) return;
-  const status = $("#officialStatus");
-  const cached = officialCache.get(activeCategory);
+function renderFaq() {
+  const list = $("#faqList");
+  if (!list) return;
+  list.innerHTML = faqItems
+    .map((item) => `
+      <details class="faq-item">
+        <summary>${escapeHtml(item.question)}</summary>
+        <p>${escapeHtml(item.answer)}</p>
+      </details>
+    `)
+    .join("");
+}
 
-  if (!cached) {
-    if (status) status.textContent = "불러오는 중";
-    container.innerHTML = `
-      <article class="official-card placeholder-card"><div class="card-copy"><h3>제주 관광정보를 불러오고 있습니다.</h3><p>잠시 후 주소와 기본 정보를 표시합니다.</p></div></article>
-      <article class="official-card placeholder-card"><div class="card-copy"><h3>공식 정보 확인 중</h3><p>관광지, 음식점, 숙소 정보를 정리합니다.</p></div></article>
-    `;
-    return;
-  }
-
-  if (cached.error) {
-    if (status) status.textContent = "기본 기사 표시 중";
-    container.innerHTML = `<p class="notice">공식 관광정보를 잠시 불러오지 못해 기본 기사만 표시합니다.</p>`;
-    return;
-  }
-
-  const items = cached.items || [];
-  if (status) status.textContent = `${items.length}곳`;
-  if (!items.length) {
-    container.innerHTML = `<p class="notice">현재 선택한 분류의 공식 관광정보가 없습니다.</p>`;
-    return;
-  }
-
-  container.innerHTML = items.slice(0, 12).map(officialCard).join("");
+function renderFooter() {
+  const footer = $("#footerLinks");
+  if (!footer) return;
+  footer.innerHTML = footerGroups
+    .map((group) => `
+      <nav aria-label="${escapeHtml(group.title)}">
+        <h2>${escapeHtml(group.title)}</h2>
+        <ul>
+          ${group.links.map((link) => `<li><a href="#top">${escapeHtml(link)}</a></li>`).join("")}
+        </ul>
+      </nav>
+    `)
+    .join("");
 }
 
 async function loadOfficialPlaces() {
-  const container = $("#officialPlaces");
-  if (!container) return;
-  if (officialCache.has(activeCategory)) {
-    renderOfficialPlaces();
+  const requestCategory = activeCategory;
+  const requestId = ++officialRequestId;
+
+  if (officialCache.has(requestCategory)) {
+    renderFeed(officialCache.get(requestCategory));
     return;
   }
 
-  const requestCategory = activeCategory;
-  const requestId = ++officialRequestId;
-  renderOfficialPlaces();
+  renderFeed([]);
 
   try {
     const response = await fetch(`/api/jeju?category=${encodeURIComponent(requestCategory)}&v=${tourismDataVersion}`, {
       headers: { accept: "application/json" }
     });
     const payload = await response.json();
-    if (!response.ok || !payload.ok) {
-      throw new Error(payload.error || "관광정보를 불러오지 못했습니다.");
-    }
-    officialCache.set(requestCategory, { items: payload.items || [], updatedAt: payload.updatedAt });
+    if (!response.ok || !payload.ok) throw new Error(payload.error || "관광정보를 불러오지 못했습니다.");
+    officialCache.set(requestCategory, payload.items || []);
   } catch (error) {
-    officialCache.set(requestCategory, { error: true, message: error.message });
+    officialCache.set(requestCategory, []);
   }
 
   if (requestId === officialRequestId && requestCategory === activeCategory) {
-    renderOfficialPlaces();
+    renderFeed(officialCache.get(requestCategory));
   }
+}
+
+function setActiveCategory(category) {
+  activeCategory = category;
+  renderTabs();
+  loadOfficialPlaces();
 }
 
 function bindHeader() {
   const menuButton = $("#menuButton");
-  const nav = $("#mainNav");
-  const langButton = $("#langButton");
-  const languageMenu = $("#languageMenu");
+  const nav = $("#primaryNav");
   if (menuButton && nav) {
     menuButton.addEventListener("click", () => {
       const open = menuButton.getAttribute("aria-expanded") === "true";
       menuButton.setAttribute("aria-expanded", String(!open));
-      nav.classList.toggle("open", !open);
-    });
-  }
-  if (langButton && languageMenu) {
-    langButton.addEventListener("click", () => {
-      const open = langButton.getAttribute("aria-expanded") === "true";
-      langButton.setAttribute("aria-expanded", String(!open));
-      languageMenu.classList.toggle("open", !open);
+      nav.classList.toggle("is-open", !open);
     });
   }
 }
 
-function bindHomeControls() {
-  const tabs = $("#categoryTabs");
-  const categorySections = $("#categorySections");
-
-  if (tabs) {
-    tabs.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-category]");
-      if (!button) return;
-      setActiveCategory(button.dataset.category);
-    });
-  }
-
-  if (categorySections) {
-    categorySections.addEventListener("click", (event) => {
-      const link = event.target.closest("[data-jump-category]");
-      if (!link) return;
-      setActiveCategory(link.dataset.jumpCategory);
-    });
-  }
+function bindHome() {
+  const tabs = $("#topCategoryTabs");
+  if (!tabs) return;
+  tabs.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-category]");
+    if (!button) return;
+    setActiveCategory(button.dataset.category);
+  });
 }
 
 function renderHome() {
-  if (!$("#newsList")) return;
+  if (!$("#newsFeedList")) return;
   renderTabs();
-  renderTopStories();
-  renderNewsList();
-  renderCategorySections();
-  renderOfficialPlaces();
+  renderRecommended();
+  renderFeed([]);
+  renderCategoryNews();
+  renderFaq();
+  renderFooter();
+  bindHome();
+  loadOfficialPlaces();
 }
 
 function rowsFromPairs(pairs) {
@@ -255,13 +282,25 @@ function rowsFromPairs(pairs) {
     .join("");
 }
 
-function infoRows(article) {
+function staticInfoRows(article) {
   return rowsFromPairs([
     ["지역", article.region],
     ["주소", article.address],
     ["주차", article.parking],
     ["운영시간", article.operatingHours],
     ["입장료", article.fee]
+  ]);
+}
+
+function placeInfoRows(place) {
+  return rowsFromPairs([
+    ["분류", place.category],
+    ["주소", place.address],
+    ["연락처", place.tel],
+    ["휴무일", place.restDate],
+    ["운영시간", place.operatingHours],
+    ["주차", place.parking],
+    ["입장료", place.fee]
   ]);
 }
 
@@ -277,7 +316,7 @@ function renderRelated(article) {
   const related = articles
     .filter((item) => item.slug !== article.slug && (item.category === article.category || item.region === article.region))
     .slice(0, 4);
-  relatedBox.innerHTML = related.map((item) => card(item, "related-card")).join("");
+  relatedBox.innerHTML = related.map(newsCard).join("");
 }
 
 function renderStaticDetail(detail) {
@@ -287,10 +326,10 @@ function renderStaticDetail(detail) {
   detail.innerHTML = `
     <img class="detail-hero" src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}">
     <div class="detail-body">
-      <div class="meta">${meta(article)}</div>
+      <div class="meta">${metaLine([article.category, article.region, article.date])}</div>
       <h1>${escapeHtml(article.title)}</h1>
       <p class="summary">${escapeHtml(article.summary)}</p>
-      <table class="info-table"><tbody>${infoRows(article)}</tbody></table>
+      <table class="info-table"><tbody>${staticInfoRows(article)}</tbody></table>
       <section>
         <h2>본문 정보</h2>
         ${article.content.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
@@ -302,13 +341,13 @@ function renderStaticDetail(detail) {
       <section>
         <h2>방문 전 체크포인트</h2>
         <ul class="check-list">
-          <li>운영시간과 입장료는 계절과 현장 사정에 따라 달라질 수 있습니다.</li>
+          <li>운영시간과 입장료는 현장 사정에 따라 달라질 수 있습니다.</li>
           <li>해변과 오름은 바람, 비, 안개 예보를 먼저 확인하세요.</li>
           <li>주차장이 혼잡하면 가까운 대체 코스를 준비하는 편이 좋습니다.</li>
         </ul>
       </section>
       <section>
-        <h2>주변 맛집·카페 추천</h2>
+        <h2>주변 추천</h2>
         <div class="spot-tags">${article.nearbySpots.map((spot) => `<span>${escapeHtml(spot)}</span>`).join("")}</div>
       </section>
     </div>
@@ -316,43 +355,8 @@ function renderStaticDetail(detail) {
   renderRelated(article);
 }
 
-function officialInfoRows(place) {
-  return rowsFromPairs([
-    ["분류", place.category],
-    ["주소", place.address],
-    ["연락처", place.tel],
-    ["휴무일", place.restDate],
-    ["운영시간", place.operatingHours],
-    ["주차", place.parking],
-    ["입장료", place.fee],
-    ["우편번호", place.zipcode]
-  ]);
-}
-
-function renderOfficialMap(place) {
-  const url = mapUrl(place);
-  if (!url) return "";
-  return `
-    <section class="map-card">
-      <h2>위치 확인</h2>
-      <p>${escapeHtml(place.title)}의 좌표를 기준으로 지도를 열 수 있습니다.</p>
-      <a class="primary-link" href="${url}" target="_blank" rel="noreferrer">지도에서 보기</a>
-    </section>
-  `;
-}
-
-function renderOfficialRelated(place) {
-  const relatedBox = $("#relatedArticles");
-  if (!relatedBox) return;
-  const related = articles
-    .filter((item) => item.category === "가볼 만한 곳" || item.category === "계절 코스")
-    .slice(0, 4);
-  relatedBox.innerHTML = related.map((item) => card(item, "related-card")).join("");
-}
-
-async function renderOfficialDetail(detail, contentId, contentTypeId) {
-  detail.innerHTML = `<div class="detail-loading">관광정보를 불러오고 있습니다.</div>`;
-  const fallbackPlace = {
+function fallbackPlace(contentId, contentTypeId) {
+  return {
     contentId,
     contentTypeId,
     title: params.get("title") || "제주 관광정보",
@@ -367,74 +371,69 @@ async function renderOfficialDetail(detail, contentId, contentTypeId) {
     operatingHours: "정보 없음",
     parking: "정보 없음",
     fee: "정보 없음",
-    zipcode: "",
     checkPoint: "방문 전 운영시간, 휴무일, 요금 안내를 다시 확인하세요."
   };
+}
+
+function renderMapLink(place) {
+  const url = mapUrl(place);
+  if (!url) return "";
+  return `
+    <section class="map-card">
+      <h2>위치 확인</h2>
+      <p>${escapeHtml(place.title)}의 좌표 기준으로 지도를 열 수 있습니다.</p>
+      <a class="primary-link" href="${url}" target="_blank" rel="noreferrer">지도에서 보기</a>
+    </section>
+  `;
+}
+
+function renderPlaceDetailHtml(place, sourceLabel, overview = "") {
+  const image = place.image || fallbackImage;
+  return `
+    <img class="detail-hero" src="${escapeHtml(image)}" alt="${escapeHtml(place.title)}">
+    <div class="detail-body">
+      <div class="meta">${metaLine([sourceLabel, place.category])}</div>
+      <h1>${escapeHtml(place.title)}</h1>
+      <p class="summary">${escapeHtml(place.address || place.region || "제주")}</p>
+      <table class="info-table"><tbody>${placeInfoRows(place)}</tbody></table>
+      <section>
+        <h2>장소 소개</h2>
+        <p>${escapeHtml(overview || "목록에서 확인한 주소와 위치 정보를 먼저 표시합니다.")}</p>
+      </section>
+      <section>
+        <h2>방문 전 체크포인트</h2>
+        <ul class="check-list">
+          <li>운영시간, 휴무일, 요금은 현장 사정에 따라 달라질 수 있습니다.</li>
+          <li>${escapeHtml(place.checkPoint || "방문 전 최신 안내를 다시 확인하세요.")}</li>
+          <li>주소와 주차 정보를 확인한 뒤 주변 대체 코스도 함께 준비하세요.</li>
+        </ul>
+      </section>
+      ${renderMapLink(place)}
+      <p class="source-note">자료 출처: 한국관광공사 관광정보</p>
+    </div>
+  `;
+}
+
+async function renderOfficialDetail(detail, contentId, contentTypeId) {
+  const fallback = fallbackPlace(contentId, contentTypeId);
+  detail.innerHTML = `<div class="detail-loading">관광정보를 불러오고 있습니다.</div>`;
 
   try {
     const query = new URLSearchParams({ contentId, contentTypeId, v: tourismDataVersion });
-    const response = await fetch(`/api/jeju?${query.toString()}`, {
-      headers: { accept: "application/json" }
-    });
+    const response = await fetch(`/api/jeju?${query.toString()}`, { headers: { accept: "application/json" } });
     const payload = await response.json();
-    if (!response.ok || !payload.ok) {
-      throw new Error(payload.error || "관광정보를 불러오지 못했습니다.");
-    }
-
-    const place = payload.item;
-    const image = place.image || fallbackImage;
-    const overview = place.overview || `${place.title}의 주소, 운영시간, 주차 정보를 정리했습니다. 방문 전 최신 안내를 한 번 더 확인하세요.`;
-    updateMeta(place.title, `${place.title}의 주소, 운영시간, 주차, 입장료 정보를 정리했습니다.`);
-
-    detail.innerHTML = `
-      <img class="detail-hero" src="${escapeHtml(image)}" alt="${escapeHtml(place.title)}">
-      <div class="detail-body">
-        <div class="meta"><span>공식 관광정보</span><span>${escapeHtml(place.category)}</span></div>
-        <h1>${escapeHtml(place.title)}</h1>
-        <p class="summary">${escapeHtml(place.address || place.region)}</p>
-        <table class="info-table"><tbody>${officialInfoRows(place)}</tbody></table>
-        <section>
-          <h2>장소 소개</h2>
-          <p>${escapeHtml(overview)}</p>
-        </section>
-        <section>
-          <h2>방문 전 체크포인트</h2>
-          <ul class="check-list">
-            <li>운영시간, 휴무일, 요금은 현장 사정에 따라 달라질 수 있습니다.</li>
-            <li>${escapeHtml(place.checkPoint || "비가 오거나 바람이 강한 날은 이동 시간을 여유 있게 잡으세요.")}</li>
-            <li>주소와 주차 정보를 확인한 뒤 주변 대체 코스도 함께 준비하세요.</li>
-          </ul>
-        </section>
-        ${renderOfficialMap(place)}
-        <p class="source-note">자료 출처: 한국관광공사 관광정보</p>
-      </div>
-    `;
-    renderOfficialRelated(place);
+    if (!response.ok || !payload.ok) throw new Error(payload.error || "관광정보를 불러오지 못했습니다.");
+    const place = { ...fallback, ...payload.item };
+    updateMeta(place.title, `${place.title}의 주소와 방문 정보를 정리했습니다.`);
+    detail.innerHTML = renderPlaceDetailHtml(place, "관광정보", place.overview);
   } catch (error) {
-    detail.innerHTML = `
-      <img class="detail-hero" src="${escapeHtml(fallbackPlace.image)}" alt="${escapeHtml(fallbackPlace.title)}">
-      <div class="detail-body">
-        <div class="meta"><span>공식 관광정보</span><span>${escapeHtml(fallbackPlace.category)}</span></div>
-        <h1>${escapeHtml(fallbackPlace.title)}</h1>
-        <p class="summary">${escapeHtml(fallbackPlace.address || fallbackPlace.region)}</p>
-        <table class="info-table"><tbody>${officialInfoRows(fallbackPlace)}</tbody></table>
-        <section>
-          <h2>장소 소개</h2>
-          <p>상세 소개 정보는 준비 중이며, 목록에서 확인한 주소와 위치 정보를 먼저 표시합니다.</p>
-        </section>
-        <section>
-          <h2>방문 전 체크포인트</h2>
-          <ul class="check-list">
-            <li>운영시간, 휴무일, 요금은 현장 사정에 따라 달라질 수 있습니다.</li>
-            <li>${escapeHtml(fallbackPlace.checkPoint)}</li>
-            <li>주소와 주차 정보를 확인한 뒤 주변 대체 코스도 함께 준비하세요.</li>
-          </ul>
-        </section>
-        ${renderOfficialMap(fallbackPlace)}
-        <p class="source-note">자료 출처: 한국관광공사 관광정보 목록</p>
-      </div>
-    `;
-    renderOfficialRelated(fallbackPlace);
+    updateMeta(fallback.title, `${fallback.title}의 주소와 위치 정보를 정리했습니다.`);
+    detail.innerHTML = renderPlaceDetailHtml(fallback, "관광정보 목록");
+  }
+
+  const relatedBox = $("#relatedArticles");
+  if (relatedBox) {
+    relatedBox.innerHTML = articles.slice(0, 4).map(newsCard).join("");
   }
 }
 
@@ -452,7 +451,5 @@ function renderDetail() {
 }
 
 bindHeader();
-bindHomeControls();
 renderHome();
-loadOfficialPlaces();
 renderDetail();
