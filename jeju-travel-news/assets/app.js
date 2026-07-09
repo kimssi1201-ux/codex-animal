@@ -1,17 +1,21 @@
-import { articles, categories } from "./articles.js?v=20260710-tools-compact-1";
+import { articles, categories } from "./articles.js?v=20260710-api-thumbs-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-tools-compact-1";
+const tourismDataVersion = "20260710-api-thumbs-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
 const regionCache = new Map();
 const tnaCategoryCache = new Map();
+const articleThumbnailCache = new Map();
+const articleThumbnailRequests = new Map();
 
 let activeCategory = "전체";
 let officialRequestId = 0;
+let articleThumbnailObserver = null;
+const observedArticleThumbs = new WeakSet();
 
 const faqItems = [
   {
@@ -154,9 +158,10 @@ function safeExternalUrl(value) {
   }
 }
 
-function imageTag(src, alt, className = "") {
+function imageTag(src, alt, className = "", attrs = "") {
   const classAttribute = className ? ` class="${escapeHtml(className)}"` : "";
-  return `<img${classAttribute} src="${escapeHtml(normalizeImageUrl(src))}" alt="${escapeHtml(alt)}" loading="lazy">`;
+  const extraAttributes = attrs ? ` ${attrs}` : "";
+  return `<img${classAttribute}${extraAttributes} src="${escapeHtml(normalizeImageUrl(src))}" alt="${escapeHtml(alt)}" loading="lazy">`;
 }
 
 function bindImageFallbacks() {
@@ -263,11 +268,24 @@ function metaLine(parts) {
     .join("");
 }
 
+function thumbnailForArticle(article) {
+  return articleThumbnailCache.get(article.slug) || article.image;
+}
+
+function articleImageTag(article, className = "") {
+  return imageTag(
+    thumbnailForArticle(article),
+    article.title,
+    className,
+    `data-article-thumb="${escapeHtml(article.slug)}"`
+  );
+}
+
 function recommendedCard(article) {
   return `
     <article class="recommend-card">
       <a href="${articleUrl(article)}">
-        ${imageTag(article.image, article.title)}
+        ${articleImageTag(article)}
         <span>${escapeHtml(article.category)}</span>
         <strong>${escapeHtml(article.title)}</strong>
       </a>
@@ -279,7 +297,7 @@ function newsCard(article) {
   return `
     <article class="news-feed-card">
       <a class="news-thumb" href="${articleUrl(article)}">
-        ${imageTag(article.image, article.title)}
+        ${articleImageTag(article)}
       </a>
       <div class="news-copy">
         <div class="meta">${metaLine(["장소 포스팅", article.category, article.region, article.date])}</div>
@@ -463,12 +481,117 @@ function renderFeed(places = null) {
       ? `장소 가이드 ${localItems.length}건 · 공식 관광정보 ${placeItems.length}건`
       : `${activeCategory} 가이드 ${localItems.length}건 · 공식 관광정보 ${placeItems.length}건`;
   }
+  hydrateArticleThumbnails();
 }
 
 function renderRecommended() {
   const row = $("#recommendedArticles");
   if (!row) return;
   row.innerHTML = articles.slice(0, 3).map(recommendedCard).join("");
+  hydrateArticleThumbnails();
+}
+
+function articleImageKeywords(article) {
+  return [
+    articleOfficialKeyword(article),
+    ...(article.course || []),
+    ...(article.nearbySpots || []),
+    article.title
+  ]
+    .map((keyword) => String(keyword || "").trim())
+    .filter(Boolean)
+    .filter((keyword, index, list) => list.findIndex((item) => normalizeText(item) === normalizeText(keyword)) === index);
+}
+
+function matchArticleImagePlace(article, places = []) {
+  const keywords = articleImageKeywords(article).map(normalizeText).filter(Boolean);
+  return places.find((place) => {
+    if (!place?.image) return false;
+    const title = normalizeText(place.title);
+    if (!title) return false;
+    return keywords.some((keyword) => title.includes(keyword) || keyword.includes(title));
+  });
+}
+
+function applyOfficialImagesToArticles(places = []) {
+  let didUpdate = false;
+  articles.forEach((article) => {
+    if (articleThumbnailCache.has(article.slug)) return;
+    const match = matchArticleImagePlace(article, places);
+    if (!match?.image) return;
+    articleThumbnailCache.set(article.slug, match.image);
+    didUpdate = true;
+  });
+  return didUpdate;
+}
+
+function updateArticleThumbnailElements(article, image) {
+  document
+    .querySelectorAll(`img[data-article-thumb="${article.slug}"]`)
+    .forEach((img) => {
+      img.src = normalizeImageUrl(image);
+    });
+}
+
+async function fetchArticleThumbnail(article) {
+  if (articleThumbnailCache.has(article.slug)) return articleThumbnailCache.get(article.slug);
+  if (articleThumbnailRequests.has(article.slug)) return articleThumbnailRequests.get(article.slug);
+
+  const keyword = articleOfficialKeyword(article);
+  const request = (async () => {
+    try {
+      const query = new URLSearchParams({ keyword, category: "전체", v: tourismDataVersion });
+      const response = await fetch(`/api/jeju?${query.toString()}`, { headers: { accept: "application/json" } });
+      const payload = await response.json();
+      const match = response.ok && payload.ok ? matchArticleImagePlace(article, payload.items || []) : null;
+      if (!match?.image) return "";
+      articleThumbnailCache.set(article.slug, match.image);
+      updateArticleThumbnailElements(article, match.image);
+      return match.image;
+    } catch (error) {
+      return "";
+    }
+  })();
+
+  articleThumbnailRequests.set(article.slug, request);
+  return request;
+}
+
+function hydrateArticleThumbnails() {
+  const images = [...document.querySelectorAll("img[data-article-thumb]")];
+  if (!images.length) return;
+
+  const loadImage = (img) => {
+    const article = articles.find((item) => item.slug === img.dataset.articleThumb);
+    if (!article) return;
+    const cached = articleThumbnailCache.get(article.slug);
+    if (cached) {
+      img.src = normalizeImageUrl(cached);
+      return;
+    }
+    fetchArticleThumbnail(article);
+  };
+
+  if (!("IntersectionObserver" in window)) {
+    images.forEach(loadImage);
+    return;
+  }
+
+  if (!articleThumbnailObserver) {
+    articleThumbnailObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        articleThumbnailObserver.unobserve(entry.target);
+        loadImage(entry.target);
+      });
+    }, { rootMargin: "360px 0px" });
+  }
+
+  images.forEach((img) => {
+    if (observedArticleThumbs.has(img)) return;
+    observedArticleThumbs.add(img);
+    articleThumbnailObserver.observe(img);
+  });
 }
 
 function renderCategoryNews() {
@@ -965,7 +1088,9 @@ async function loadOfficialPlaces() {
   const requestId = ++officialRequestId;
 
   if (officialCache.has(requestCategory)) {
-    renderFeed(officialCache.get(requestCategory));
+    const places = officialCache.get(requestCategory);
+    if (applyOfficialImagesToArticles(places)) renderRecommended();
+    renderFeed(places);
     return;
   }
 
@@ -977,12 +1102,15 @@ async function loadOfficialPlaces() {
     });
     const payload = await response.json();
     if (!response.ok || !payload.ok) throw new Error(payload.error || "관광정보를 불러오지 못했습니다.");
-    officialCache.set(requestCategory, payload.items || []);
+    const places = payload.items || [];
+    applyOfficialImagesToArticles(places);
+    officialCache.set(requestCategory, places);
   } catch (error) {
     officialCache.set(requestCategory, []);
   }
 
   if (requestId === officialRequestId && requestCategory === activeCategory) {
+    renderRecommended();
     renderFeed(officialCache.get(requestCategory));
   }
 }
@@ -1219,7 +1347,7 @@ function renderStaticDetail(detail) {
   const article = articles.find((item) => item.slug === slug) || articles[0];
   updateMeta(article.title, article.summary);
   detail.innerHTML = `
-    ${imageTag(article.image, article.title, "detail-hero")}
+    ${imageTag(thumbnailForArticle(article), article.title, "detail-hero", `data-article-thumb="${escapeHtml(article.slug)}"`)}
     <div class="detail-body">
       <div class="meta">${metaLine([article.category, article.region, article.date])}</div>
       <h1>${escapeHtml(article.title)}</h1>
