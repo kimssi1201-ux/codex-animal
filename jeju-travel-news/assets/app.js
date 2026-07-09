@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-official-info-2";
+import { articles, categories } from "./articles.js?v=20260710-official-info-3";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-official-info-2";
+const tourismDataVersion = "20260710-official-info-3";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -119,6 +119,12 @@ function spotUrl(spot, currentSlug = "") {
 function mapUrl(place) {
   if (!place.mapx || !place.mapy) return "";
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.mapy},${place.mapx}`)}`;
+}
+
+function mapSearchUrl(value) {
+  const keyword = String(value || "").trim();
+  if (!keyword) return "";
+  return `https://map.naver.com/p/search/${encodeURIComponent(keyword)}`;
 }
 
 function normalizeText(value) {
@@ -938,6 +944,15 @@ function staticInfoRows(article) {
   ]);
 }
 
+function articleOfficialKeyword(article) {
+  const spot = ((article.course || []).find(Boolean) || article.title || "").trim();
+  return spot
+    .replace(/^\d일차\s*/g, "")
+    .replace(/\s*(입구|매표소|전망대|전망|산책로|탐방로|안내소|주변)$/g, "")
+    .split(/[·ㆍ]/)[0]
+    .trim() || article.title;
+}
+
 function extendedArticleParagraphs(article) {
   const course = (article.course || []).filter(Boolean);
   const nearby = (article.nearbySpots || []).filter(Boolean);
@@ -984,18 +999,93 @@ function renderRelated(article) {
   relatedBox.innerHTML = related.map(newsCard).join("");
 }
 
-function renderStaticOfficialCheck(article) {
-  const spot = (article.course || []).find(Boolean) || article.title;
-  if (!spot) return "";
+function renderInlineOfficialShell(article) {
+  const spot = articleOfficialKeyword(article);
   return `
-    <section class="map-card">
-      <h2>공식 정보 확인</h2>
-      <p>운영시간, 입장료, 주차 정보는 현장 사정에 따라 바뀔 수 있습니다. 관광정보 상세에서 최신 안내와 지도 링크를 함께 확인하세요.</p>
-      <div class="detail-link-row">
-        <a class="primary-link" href="${escapeHtml(spotUrl(spot, article.slug))}">운영시간·입장료 확인</a>
-      </div>
+    <section class="map-card official-inline-card" id="articleOfficialInfo" aria-live="polite">
+      <h2>공식 확인 정보</h2>
+      <p>${escapeHtml(spot)}의 운영시간, 주차, 요금 정보를 본문에서 바로 확인합니다.</p>
+      <div class="official-inline-status">공식 관광정보를 불러오는 중입니다.</div>
     </section>
   `;
+}
+
+function officialActionButtons(place, fallbackKeyword = "") {
+  const homepage = safeExternalUrl(place.homepageUrl || place.homepage);
+  const map = mapUrl(place) || mapSearchUrl(place.title || place.address || fallbackKeyword);
+  const phone = phoneUrl(place.tel);
+  return [
+    homepage ? `<a class="primary-link" href="${escapeHtml(homepage)}" target="_blank" rel="noreferrer">공식 안내</a>` : "",
+    map ? `<a class="primary-link" href="${escapeHtml(map)}" target="_blank" rel="noreferrer">지도에서 보기</a>` : "",
+    phone ? `<a class="primary-link is-secondary" href="${escapeHtml(phone)}">전화하기</a>` : ""
+  ].filter(Boolean).join("");
+}
+
+function officialInlineRows(place) {
+  return rowsFromPairs([
+    ["장소", place.title],
+    ["주소", place.address || place.region],
+    ["연락처", place.tel],
+    ["휴무일", place.restDate],
+    ["운영시간", place.operatingHours],
+    ["주차", place.parking],
+    ["입장료", place.fee]
+  ]);
+}
+
+function renderOfficialInlineContent(place, keyword) {
+  const buttons = officialActionButtons(place, keyword);
+  return `
+    <h2>공식 확인 정보</h2>
+    <p>한국관광공사에서 확인되는 ${escapeHtml(place.title || keyword)}의 방문 정보를 바로 정리했습니다.</p>
+    <table class="info-table official-inline-table"><tbody>${officialInlineRows(place)}</tbody></table>
+    ${buttons ? `<div class="detail-link-row">${buttons}</div>` : ""}
+    <p class="source-note">자료 출처: 한국관광공사 관광정보. 운영시간과 요금은 현장 사정에 따라 달라질 수 있습니다.</p>
+  `;
+}
+
+function renderOfficialInlineFallback(article, keyword) {
+  const map = mapSearchUrl(`${keyword || article.title} ${article.address || "제주"}`);
+  return `
+    <h2>방문 전 빠른 확인</h2>
+    <p>공식 상세값이 비어 있어 기사 기준 정보와 지도 검색을 먼저 제공합니다. 출발 전 운영시간과 요금은 현장 안내를 한 번 더 확인하세요.</p>
+    <table class="info-table official-inline-table"><tbody>${staticInfoRows(article)}</tbody></table>
+    <div class="detail-link-row">
+      <a class="primary-link" href="${escapeHtml(map)}" target="_blank" rel="noreferrer">지도에서 보기</a>
+    </div>
+  `;
+}
+
+async function hydrateStaticOfficialInfo(article) {
+  const container = $("#articleOfficialInfo");
+  if (!container) return;
+  const keyword = articleOfficialKeyword(article);
+
+  try {
+    const listQuery = new URLSearchParams({ keyword, category: "전체", v: tourismDataVersion });
+    const listResponse = await fetch(`/api/jeju?${listQuery.toString()}`, { headers: { accept: "application/json" } });
+    const listPayload = await listResponse.json();
+    const placeFromList = listPayload?.items?.find((item) => normalizeText(item.title).includes(normalizeText(keyword))) || listPayload?.items?.[0];
+    if (!listResponse.ok || !listPayload.ok || !placeFromList) throw new Error("공식 관광정보를 찾지 못했습니다.");
+
+    const detailQuery = new URLSearchParams({
+      contentId: placeFromList.contentId,
+      v: tourismDataVersion,
+      title: placeFromList.title || keyword
+    });
+    if (placeFromList.contentTypeId) detailQuery.set("contentTypeId", placeFromList.contentTypeId);
+    const detailResponse = await fetch(`/api/jeju?${detailQuery.toString()}`, { headers: { accept: "application/json" } });
+    const detailPayload = await detailResponse.json();
+    const detailItem = detailResponse.ok && detailPayload.ok ? detailPayload.item || {} : {};
+    const place = {
+      ...fallbackPlace(placeFromList.contentId, placeFromList.contentTypeId || ""),
+      ...placeFromList,
+      ...detailItem
+    };
+    container.innerHTML = renderOfficialInlineContent(place, keyword);
+  } catch (error) {
+    container.innerHTML = renderOfficialInlineFallback(article, keyword);
+  }
 }
 
 function renderStaticDetail(detail) {
@@ -1009,7 +1099,7 @@ function renderStaticDetail(detail) {
       <h1>${escapeHtml(article.title)}</h1>
       <p class="summary">${escapeHtml(article.summary)}</p>
       <table class="info-table"><tbody>${staticInfoRows(article)}</tbody></table>
-      ${renderStaticOfficialCheck(article)}
+      ${renderInlineOfficialShell(article)}
       <section>
         <h2>본문 정보</h2>
         ${articleBodyParagraphs(article).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
@@ -1032,6 +1122,7 @@ function renderStaticDetail(detail) {
       </section>
     </div>
   `;
+  hydrateStaticOfficialInfo(article);
   renderRelated(article);
 }
 
@@ -1106,21 +1197,14 @@ function phoneUrl(value) {
 }
 
 function renderOfficialLinks(place) {
-  const homepage = safeExternalUrl(place.homepageUrl || place.homepage);
-  const map = mapUrl(place);
-  const phone = phoneUrl(place.tel);
-  const links = [
-    homepage ? `<a class="primary-link" href="${escapeHtml(homepage)}" target="_blank" rel="noreferrer">공식 안내 보기</a>` : "",
-    map ? `<a class="primary-link" href="${escapeHtml(map)}" target="_blank" rel="noreferrer">지도에서 보기</a>` : "",
-    phone ? `<a class="primary-link is-secondary" href="${escapeHtml(phone)}">전화하기</a>` : ""
-  ].filter(Boolean);
+  const links = officialActionButtons(place);
 
-  if (!links.length) return "";
+  if (!links) return "";
   return `
     <section class="map-card">
       <h2>공식 확인 링크</h2>
       <p>운영시간, 입장료, 휴무일은 변경될 수 있으니 출발 전 공식 안내를 한 번 더 확인하세요.</p>
-      <div class="detail-link-row">${links.join("")}</div>
+      <div class="detail-link-row">${links}</div>
     </section>
   `;
 }

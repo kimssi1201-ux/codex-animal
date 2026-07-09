@@ -754,6 +754,20 @@ main, .site-footer {
   border-radius: 14px;
   background: #f8faf8;
 }
+.official-inline-card {
+  background: #fff;
+}
+.official-inline-status {
+  padding: 12px;
+  border-radius: 12px;
+  background: #f8faf8;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+.official-inline-table {
+  background: #fff;
+}
 .primary-link {
   justify-self: start;
   display: inline-flex;
