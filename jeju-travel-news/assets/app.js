@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260708-tna-1";
+import { articles, categories } from "./articles.js?v=20260710-official-info-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260708-tna-1";
+const tourismDataVersion = "20260710-official-info-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -924,7 +924,7 @@ function renderHome() {
 
 function rowsFromPairs(pairs) {
   return pairs
-    .map(([label, value]) => `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(value || "정보 없음")}</td></tr>`)
+    .map(([label, value]) => `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(value || "공식 안내 확인 필요")}</td></tr>`)
     .join("");
 }
 
@@ -984,6 +984,20 @@ function renderRelated(article) {
   relatedBox.innerHTML = related.map(newsCard).join("");
 }
 
+function renderStaticOfficialCheck(article) {
+  const spot = (article.course || []).find(Boolean) || article.title;
+  if (!spot) return "";
+  return `
+    <section class="map-card">
+      <h2>공식 정보 확인</h2>
+      <p>운영시간, 입장료, 주차 정보는 현장 사정에 따라 바뀔 수 있습니다. 관광정보 상세에서 최신 안내와 지도 링크를 함께 확인하세요.</p>
+      <div class="detail-link-row">
+        <a class="primary-link" href="${escapeHtml(spotUrl(spot, article.slug))}">운영시간·입장료 확인</a>
+      </div>
+    </section>
+  `;
+}
+
 function renderStaticDetail(detail) {
   const slug = params.get("slug") || articles[0].slug;
   const article = articles.find((item) => item.slug === slug) || articles[0];
@@ -995,6 +1009,7 @@ function renderStaticDetail(detail) {
       <h1>${escapeHtml(article.title)}</h1>
       <p class="summary">${escapeHtml(article.summary)}</p>
       <table class="info-table"><tbody>${staticInfoRows(article)}</tbody></table>
+      ${renderStaticOfficialCheck(article)}
       <section>
         <h2>본문 정보</h2>
         ${articleBodyParagraphs(article).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
@@ -1034,11 +1049,11 @@ async function renderSpotDetail(detail, spot) {
     await renderOfficialDetail(detail, first.contentId, first.contentTypeId || "", {
       ...fallbackPlace(first.contentId, first.contentTypeId || ""),
       ...first,
-      restDate: "정보 없음",
-      operatingHours: "방문 전 최신 안내 확인",
-      parking: "주변 주차장과 도보 이동 동선을 함께 확인하세요.",
-      fee: "장소별 상이",
-      checkPoint: "지도에서 정확한 위치와 운영 정보를 확인한 뒤 이동하세요."
+      restDate: "공식 안내 확인 필요",
+      operatingHours: "공식 안내 확인 필요",
+      parking: "공식 안내 확인 필요",
+      fee: "공식 안내 확인 필요",
+      checkPoint: "운영시간, 입장료, 주차 정보는 공식 안내와 현장 공지를 함께 확인하세요."
     });
   } catch (error) {
     const fallback = {
@@ -1052,11 +1067,12 @@ async function renderSpotDetail(detail, spot) {
       image: fallbackImage,
       mapx: "",
       mapy: "",
-      restDate: "정보 없음",
-      operatingHours: "방문 전 최신 안내 확인",
-      parking: "주변 주차장과 도보 이동 동선을 함께 확인하세요.",
-      fee: "장소별 상이",
-      checkPoint: "지도에서 정확한 위치와 운영 정보를 확인한 뒤 이동하세요."
+      homepageUrl: "",
+      restDate: "공식 안내 확인 필요",
+      operatingHours: "공식 안내 확인 필요",
+      parking: "공식 안내 확인 필요",
+      fee: "공식 안내 확인 필요",
+      checkPoint: "운영시간, 입장료, 주차 정보는 공식 안내와 현장 공지를 함께 확인하세요."
     };
     detail.innerHTML = renderPlaceDetailHtml(fallback, "주변 추천", `${spot}은 제주 여행 중 함께 묶어 보기 좋은 주변 장소입니다. 정확한 운영 정보가 필요한 경우 지도와 공식 안내를 함께 확인하세요.`);
   }
@@ -1074,22 +1090,37 @@ function fallbackPlace(contentId, contentTypeId) {
     image: params.get("image") || fallbackImage,
     mapx: params.get("mapx") || "",
     mapy: params.get("mapy") || "",
-    restDate: "정보 없음",
-    operatingHours: "정보 없음",
-    parking: "정보 없음",
-    fee: "정보 없음",
+    homepageUrl: "",
+    restDate: "공식 안내 확인 필요",
+    operatingHours: "공식 안내 확인 필요",
+    parking: "공식 안내 확인 필요",
+    fee: "공식 안내 확인 필요",
     checkPoint: "방문 전 운영시간, 휴무일, 요금 안내를 다시 확인하세요."
   };
 }
 
-function renderMapLink(place) {
-  const url = mapUrl(place);
-  if (!url) return "";
+function phoneUrl(value) {
+  const digits = String(value || "").replace(/[^\d+]/g, "");
+  if (digits.replace(/\D/g, "").length < 7) return "";
+  return `tel:${digits}`;
+}
+
+function renderOfficialLinks(place) {
+  const homepage = safeExternalUrl(place.homepageUrl || place.homepage);
+  const map = mapUrl(place);
+  const phone = phoneUrl(place.tel);
+  const links = [
+    homepage ? `<a class="primary-link" href="${escapeHtml(homepage)}" target="_blank" rel="noreferrer">공식 안내 보기</a>` : "",
+    map ? `<a class="primary-link" href="${escapeHtml(map)}" target="_blank" rel="noreferrer">지도에서 보기</a>` : "",
+    phone ? `<a class="primary-link is-secondary" href="${escapeHtml(phone)}">전화하기</a>` : ""
+  ].filter(Boolean);
+
+  if (!links.length) return "";
   return `
     <section class="map-card">
-      <h2>위치 확인</h2>
-      <p>${escapeHtml(place.title)}의 좌표 기준으로 지도를 열 수 있습니다.</p>
-      <a class="primary-link" href="${url}" target="_blank" rel="noreferrer">지도에서 보기</a>
+      <h2>공식 확인 링크</h2>
+      <p>운영시간, 입장료, 휴무일은 변경될 수 있으니 출발 전 공식 안내를 한 번 더 확인하세요.</p>
+      <div class="detail-link-row">${links.join("")}</div>
     </section>
   `;
 }
@@ -1114,7 +1145,7 @@ function renderPlaceDetailHtml(place, sourceLabel, overview = "") {
           <li>주소와 주차 정보를 확인한 뒤 주변 대체 코스도 함께 준비하세요.</li>
         </ul>
       </section>
-      ${renderMapLink(place)}
+      ${renderOfficialLinks(place)}
       <p class="source-note">자료 출처: 한국관광공사 관광정보</p>
     </div>
   `;

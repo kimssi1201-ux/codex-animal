@@ -758,12 +758,22 @@ main, .site-footer {
   justify-self: start;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 40px;
   padding: 0 14px;
   border-radius: 999px;
   background: var(--green);
   color: #fff;
   font-weight: 900;
+}
+.primary-link.is-secondary {
+  background: #eef7f2;
+  color: var(--green);
+}
+.detail-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .source-note, .detail-loading {
   color: var(--muted);

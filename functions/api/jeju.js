@@ -3,6 +3,7 @@ const TOUR_API_LEGACY_BASE = "https://apis.data.go.kr/B551011/KorService1";
 const TOUR_API_CLASSIC_BASE = "https://apis.data.go.kr/B551011/KorService";
 const LDONG_REGN_JEJU = "50";
 const APP_NAME = "JejuTravelNews";
+const OFFICIAL_CHECK_REQUIRED = "공식 안내 확인 필요";
 
 const CONTENT_TYPE_LABELS = {
   12: "관광지",
@@ -174,7 +175,33 @@ function isJejuItem(item) {
 }
 
 function firstAvailable(...values) {
-  return values.map(stripTags).find(Boolean) || "정보 없음";
+  return values.map(stripTags).find(Boolean) || OFFICIAL_CHECK_REQUIRED;
+}
+
+function compactJoin(...values) {
+  return values.map(stripTags).filter(Boolean).join(" · ");
+}
+
+function dateRange(start, end) {
+  const startText = stripTags(start);
+  const endText = stripTags(end);
+  if (startText && endText) return `${startText} ~ ${endText}`;
+  return startText || endText || "";
+}
+
+function normalizeExternalUrl(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const href = text.match(/href=["']([^"']+)["']/i)?.[1] || "";
+  const raw = href || text.match(/https?:\/\/[^\s"'<>]+/i)?.[0] || "";
+  if (!raw) return "";
+  const normalized = raw.startsWith("//") ? `https:${raw}` : raw.replace(/^http:\/\//i, "https://");
+  if (!/^https:\/\//i.test(normalized)) return "";
+  try {
+    return new URL(normalized).href;
+  } catch (error) {
+    return "";
+  }
 }
 
 function normalizeDetail(common, intro, images) {
@@ -182,6 +209,8 @@ function normalizeDetail(common, intro, images) {
   const contentId = common.contentid || common.contentId || "";
   const contentTypeId = common.contenttypeid || common.contentTypeId || "";
   const operatingHours = firstAvailable(
+    compactJoin(dateRange(intro.eventstartdate, intro.eventenddate), intro.playtime),
+    dateRange(intro.openperiod, intro.usetimeleports),
     intro.usetime,
     intro.usetimeculture,
     intro.opentimefood,
@@ -189,7 +218,10 @@ function normalizeDetail(common, intro, images) {
     intro.checkintime && intro.checkouttime ? `체크인 ${intro.checkintime} · 체크아웃 ${intro.checkouttime}` : "",
     intro.usetimeleports,
     intro.fairday,
-    intro.opentime
+    intro.opentime,
+    intro.opentimefood,
+    intro.opentimeculture,
+    intro.opentimeshopping
   );
   const parking = firstAvailable(
     intro.parking,
@@ -197,11 +229,16 @@ function normalizeDetail(common, intro, images) {
     intro.parkingfood,
     intro.parkinglodging,
     intro.parkingleports,
-    intro.parkingshopping
+    intro.parkingshopping,
+    intro.parkingfee ? `주차요금: ${intro.parkingfee}` : "",
+    intro.parkingfeeleports ? `주차요금: ${intro.parkingfeeleports}` : ""
   );
   const fee = firstAvailable(
     intro.usefee,
+    intro.usefeeleports,
     intro.usetimefestival,
+    intro.discountinfofestival ? `할인 정보: ${intro.discountinfofestival}` : "",
+    intro.saleitemcost ? `판매 가격: ${intro.saleitemcost}` : "",
     intro.infocenterfood && intro.firstmenu ? `대표 메뉴: ${intro.firstmenu}` : "",
     intro.roomcount ? `객실 수: ${intro.roomcount}` : "",
     intro.taketime ? `소요 시간: ${intro.taketime}` : ""
@@ -217,6 +254,7 @@ function normalizeDetail(common, intro, images) {
     common.tel,
     intro.infocenter,
     intro.infocenterculture,
+    intro.infocentertourcourse,
     intro.infocenterfood,
     intro.infocenterlodging,
     intro.infocenterleports,
@@ -239,7 +277,8 @@ function normalizeDetail(common, intro, images) {
       .filter(Boolean)
       .slice(0, 6),
     overview: stripTags(common.overview),
-    homepage: common.homepage || "",
+    homepage: stripTags(common.homepage),
+    homepageUrl: normalizeExternalUrl(common.homepage),
     mapx: common.mapx || "",
     mapy: common.mapy || "",
     zipcode: common.zipcode || "",
@@ -252,8 +291,16 @@ function normalizeDetail(common, intro, images) {
       intro.chkpet,
       intro.chkcreditcard,
       intro.expguide,
+      intro.expagerange,
+      intro.expagerangeleports,
       intro.treatmenu,
       intro.subfacility,
+      intro.program,
+      intro.subevent,
+      intro.reservation,
+      intro.reservationfood,
+      intro.reservationlodging,
+      intro.reservationurl,
       intro.infocenter
     )
   };
