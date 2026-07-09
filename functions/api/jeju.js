@@ -343,9 +343,27 @@ async function handleList(requestUrl, serviceKey) {
   });
 }
 
+async function findDetailFallbackByKeyword(keyword, contentId, contentTypeId, serviceKey) {
+  const cleanKeyword = stripTags(keyword);
+  if (!cleanKeyword) return {};
+
+  const params = {
+    keyword: cleanKeyword,
+    numOfRows: "20",
+    pageNo: "1"
+  };
+  if (contentTypeId) params.contentTypeId = contentTypeId;
+
+  const body = await fetchTourWithFallback("searchKeyword2", params, serviceKey);
+  return asItems(body)
+    .filter(isJejuItem)
+    .find((item) => String(item.contentid || item.contentId || "") === String(contentId)) || {};
+}
+
 async function handleDetail(requestUrl, serviceKey) {
   const contentId = requestUrl.searchParams.get("id") || requestUrl.searchParams.get("contentId");
   const contentTypeId = requestUrl.searchParams.get("contentTypeId") || "";
+  const fallbackKeyword = requestUrl.searchParams.get("title") || requestUrl.searchParams.get("keyword") || "";
 
   if (!contentId) {
     return json({ ok: false, error: "contentId가 필요합니다." }, { status: 400, cacheControl: "no-store" });
@@ -361,7 +379,11 @@ async function handleDetail(requestUrl, serviceKey) {
     mapinfoYN: "Y",
     overviewYN: "Y"
   }, serviceKey);
-  const common = asItems(commonBody)[0] || {};
+  let common = asItems(commonBody)[0] || {};
+
+  if (!common.contentid && !common.contentId && !common.title) {
+    common = await findDetailFallbackByKeyword(fallbackKeyword, contentId, contentTypeId, serviceKey).catch(() => ({}));
+  }
 
   if (!common.contentid && !common.contentId && !common.title) {
     return json({ ok: false, error: "관광정보를 찾지 못했습니다." }, { status: 404, cacheControl: "no-store" });

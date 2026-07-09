@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-official-info-1";
+import { articles, categories } from "./articles.js?v=20260710-official-info-2";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-official-info-1";
+const tourismDataVersion = "20260710-official-info-2";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -1156,7 +1156,9 @@ async function renderOfficialDetail(detail, contentId, contentTypeId, fallbackOv
   detail.innerHTML = `<div class="detail-loading">관광정보를 불러오고 있습니다.</div>`;
 
   try {
-    const query = new URLSearchParams({ contentId, contentTypeId, v: tourismDataVersion });
+    const query = new URLSearchParams({ contentId, v: tourismDataVersion });
+    if (contentTypeId) query.set("contentTypeId", contentTypeId);
+    if (fallback.title) query.set("title", fallback.title);
     const response = await fetch(`/api/jeju?${query.toString()}`, { headers: { accept: "application/json" } });
     const payload = await response.json();
     if (!response.ok || !payload.ok) throw new Error(payload.error || "관광정보를 불러오지 못했습니다.");
