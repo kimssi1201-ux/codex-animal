@@ -1188,14 +1188,30 @@ function rowsFromPairs(pairs) {
     .join("");
 }
 
-function staticInfoRows(article) {
+function usefulInfoValue(value) {
+  const text = String(value || "").trim();
+  if (!text || text === "정보 없음" || text.includes("공식 안내 확인 필요")) return "";
+  return text;
+}
+
+function articleInfoRows(article, place = {}) {
   return rowsFromPairs([
     ["지역", article.region],
-    ["주소", article.address],
-    ["주차", article.parking],
-    ["운영시간", article.operatingHours],
-    ["입장료", article.fee]
+    ["주소", usefulInfoValue(place.address) || article.address],
+    ["주차", usefulInfoValue(place.parking) || article.parking],
+    ["운영시간", usefulInfoValue(place.operatingHours) || article.operatingHours],
+    ["입장료", usefulInfoValue(place.fee) || article.fee]
   ]);
+}
+
+function staticInfoRows(article) {
+  return articleInfoRows(article);
+}
+
+function updateArticleInfoTable(article, place) {
+  const tableBody = $("#articleInfoRows");
+  if (!tableBody) return;
+  tableBody.innerHTML = articleInfoRows(article, place);
 }
 
 function articleOfficialKeyword(article) {
@@ -1275,24 +1291,30 @@ function officialActionButtons(place, fallbackKeyword = "") {
   ].filter(Boolean).join("");
 }
 
-function officialInlineRows(place) {
-  return rowsFromPairs([
-    ["장소", place.title],
-    ["주소", place.address || place.region],
-    ["연락처", place.tel],
-    ["휴무일", place.restDate],
-    ["운영시간", place.operatingHours],
-    ["주차", place.parking],
-    ["입장료", place.fee]
-  ]);
+function officialInlineFacts(place, keyword) {
+  const facts = [
+    ["공식 명칭", normalizeText(place.title) !== normalizeText(keyword) ? place.title : ""],
+    ["분류", place.category],
+    ["문의", usefulInfoValue(place.tel)],
+    ["휴무일", usefulInfoValue(place.restDate)]
+  ].filter(([, value]) => usefulInfoValue(value));
+
+  if (!facts.length) return "";
+
+  return `
+    <dl class="official-facts">
+      ${facts.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
+    </dl>
+  `;
 }
 
 function renderOfficialInlineContent(place, keyword) {
   const buttons = officialActionButtons(place, keyword);
+  const facts = officialInlineFacts(place, keyword);
   return `
-    <h2>공식 확인 정보</h2>
-    <p>한국관광공사에서 확인되는 ${escapeHtml(place.title || keyword)}의 방문 정보를 바로 정리했습니다.</p>
-    <table class="info-table official-inline-table"><tbody>${officialInlineRows(place)}</tbody></table>
+    <h2>방문 전 확인</h2>
+    <p>상단 기본 정보에 공식 관광정보를 반영했습니다. 출발 전에는 최신 공지와 지도 위치만 한 번 더 확인하세요.</p>
+    ${facts}
     ${buttons ? `<div class="detail-link-row">${buttons}</div>` : ""}
     <p class="source-note">자료 출처: 한국관광공사 관광정보. 운영시간과 요금은 현장 사정에 따라 달라질 수 있습니다.</p>
   `;
@@ -1301,9 +1323,8 @@ function renderOfficialInlineContent(place, keyword) {
 function renderOfficialInlineFallback(article, keyword) {
   const map = mapSearchUrl(`${keyword || article.title} ${article.address || "제주"}`);
   return `
-    <h2>방문 전 빠른 확인</h2>
-    <p>공식 상세값이 비어 있어 기사 기준 정보와 지도 검색을 먼저 제공합니다. 출발 전 운영시간과 요금은 현장 안내를 한 번 더 확인하세요.</p>
-    <table class="info-table official-inline-table"><tbody>${staticInfoRows(article)}</tbody></table>
+    <h2>방문 전 확인</h2>
+    <p>공식 상세값을 불러오지 못했습니다. 상단 기본 정보를 기준으로 보고, 출발 전 지도 위치와 현장 안내를 확인하세요.</p>
     <div class="detail-link-row">
       <a class="primary-link" href="${escapeHtml(map)}" target="_blank" rel="noreferrer">지도에서 보기</a>
     </div>
@@ -1336,6 +1357,7 @@ async function hydrateStaticOfficialInfo(article) {
       ...placeFromList,
       ...detailItem
     };
+    updateArticleInfoTable(article, place);
     container.innerHTML = renderOfficialInlineContent(place, keyword);
   } catch (error) {
     container.innerHTML = renderOfficialInlineFallback(article, keyword);
@@ -1352,7 +1374,7 @@ function renderStaticDetail(detail) {
       <div class="meta">${metaLine([article.category, article.region, article.date])}</div>
       <h1>${escapeHtml(article.title)}</h1>
       <p class="summary">${escapeHtml(article.summary)}</p>
-      <table class="info-table"><tbody>${staticInfoRows(article)}</tbody></table>
+      <table class="info-table article-info-table"><tbody id="articleInfoRows">${staticInfoRows(article)}</tbody></table>
       ${renderInlineOfficialShell(article)}
       <section>
         <h2>본문 정보</h2>

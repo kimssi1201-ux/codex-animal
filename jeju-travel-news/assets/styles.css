@@ -860,8 +860,35 @@ main, .site-footer {
   font-size: 13px;
   font-weight: 800;
 }
-.official-inline-table {
-  background: #fff;
+.official-facts {
+  display: grid;
+  gap: 8px;
+  margin: 2px 0;
+}
+.official-facts div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+.official-facts div:last-child {
+  border-bottom: 0;
+}
+.official-facts dt {
+  flex: 0 0 auto;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 900;
+}
+.official-facts dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.55;
+  text-align: right;
 }
 .primary-link {
   justify-self: start;
