@@ -353,7 +353,6 @@ async function handleDetail(requestUrl, serviceKey) {
 
   const commonBody = await fetchTourWithFallback("detailCommon2", {
     contentId,
-    contentTypeId,
     defaultYN: "Y",
     firstImageYN: "Y",
     areacodeYN: "Y",
@@ -362,9 +361,16 @@ async function handleDetail(requestUrl, serviceKey) {
     mapinfoYN: "Y",
     overviewYN: "Y"
   }, serviceKey);
+  const common = asItems(commonBody)[0] || {};
 
-  const introPromise = contentTypeId
-    ? fetchTourWithFallback("detailIntro2", { contentId, contentTypeId }, serviceKey)
+  if (!common.contentid && !common.contentId && !common.title) {
+    return json({ ok: false, error: "관광정보를 찾지 못했습니다." }, { status: 404, cacheControl: "no-store" });
+  }
+
+  const resolvedContentTypeId = contentTypeId || common.contenttypeid || common.contentTypeId || "";
+
+  const introPromise = resolvedContentTypeId
+    ? fetchTourWithFallback("detailIntro2", { contentId, contentTypeId: resolvedContentTypeId }, serviceKey)
     : Promise.resolve({});
   const imagePromise = fetchTourWithFallback("detailImage2", {
     contentId,
@@ -378,18 +384,17 @@ async function handleDetail(requestUrl, serviceKey) {
     introPromise.catch(() => ({})),
     imagePromise.catch(() => ({}))
   ]);
-  const common = asItems(commonBody)[0] || {};
   const intro = asItems(introBody)[0] || {};
   const images = asItems(imageBody);
-
-  if (!common.contentid && !common.contentId && !common.title) {
-    return json({ ok: false, error: "관광정보를 찾지 못했습니다." }, { status: 404, cacheControl: "no-store" });
-  }
+  const detailCommon = {
+    ...common,
+    contenttypeid: common.contenttypeid || resolvedContentTypeId
+  };
 
   return json({
     ok: true,
     source: "한국관광공사",
-    item: normalizeDetail(common, intro, images),
+    item: normalizeDetail(detailCommon, intro, images),
     updatedAt: new Date().toISOString()
   });
 }
