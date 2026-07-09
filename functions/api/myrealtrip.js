@@ -143,7 +143,7 @@ function productsFromWidget(widget = {}) {
     .map((item) => {
       const texts = textValues(item);
       const price = texts.find((value) => /[\d,]+원|₩\s*[\d,]+|price/i.test(value)) || "";
-      const rating = texts.find((value) => /★|⭐|\d+\.\d/.test(value)) || "";
+      const rating = texts.find((value) => /^[\u2605\u2b50]\s*\d/.test(value) || /^\d(?:\.\d)?\s*\(\d+\)$/.test(value)) || "";
       const title = texts.find((value) => value && value !== price && value !== rating) || "제주 여행 상품";
       return {
         id: "",
