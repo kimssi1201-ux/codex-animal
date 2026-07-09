@@ -240,8 +240,15 @@ main, .site-footer {
   border-color: #bfd0c8;
 }
 .news-thumb {
+  display: grid;
+  place-items: center;
   min-height: 136px;
-  background: var(--green-soft);
+  background: #f3f6f4;
+}
+.news-thumb img {
+  padding: 4px;
+  object-fit: contain;
+  background: #f3f6f4;
 }
 .news-copy {
   display: grid;
@@ -1084,7 +1091,7 @@ main, .site-footer {
     gap: 10px;
   }
   .news-feed-card {
-    grid-template-columns: 96px minmax(0, 1fr);
+    grid-template-columns: 106px minmax(0, 1fr);
     min-height: 112px;
     border-radius: 15px;
     box-shadow: none;
@@ -1224,7 +1231,7 @@ main, .site-footer {
 
 @media (max-width: 420px) {
   .news-feed-card {
-    grid-template-columns: 92px minmax(0, 1fr);
+    grid-template-columns: 102px minmax(0, 1fr);
   }
   .news-feed-card h2 {
     font-size: 15px;
