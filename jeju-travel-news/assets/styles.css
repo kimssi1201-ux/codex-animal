@@ -306,7 +306,7 @@ main, .site-footer {
   font-weight: 900;
 }
 
-.mrt-section, .flight-section, .stay-section, .tna-section, .visit-check-section, .category-news-wrapper, .faq-section, .article-page {
+.mrt-section, .flight-section, .stay-section, .tna-section, .travel-tools-section, .visit-check-section, .category-news-wrapper, .faq-section, .article-page {
   padding: 4px 12px 24px;
 }
 .mrt-section {
@@ -339,6 +339,14 @@ main, .site-footer {
   border-bottom: 8px solid #edf2ef;
   background: #fff;
 }
+.travel-tools-section {
+  display: grid;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 8px solid #edf2ef;
+  border-bottom: 8px solid #edf2ef;
+  background: #fff;
+}
 .visit-check-section {
   padding-top: 8px;
 }
@@ -365,6 +373,67 @@ main, .site-footer {
   color: var(--muted);
   font-size: 14px;
   font-weight: 800;
+}
+.travel-tool-list {
+  display: grid;
+  gap: 10px;
+}
+.travel-tool-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(16, 29, 23, .05);
+}
+.travel-tool-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 15px;
+}
+.travel-tool-summary em {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--green);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.travel-tool-summary strong {
+  display: block;
+  font-size: 18px;
+  line-height: 1.25;
+}
+.travel-tool-summary small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+.tool-toggle {
+  min-width: 56px;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid #cfe0d8;
+  border-radius: 999px;
+  background: #f5fbf8;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 900;
+}
+.travel-tool-card.is-open .tool-toggle {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+}
+.travel-tool-panel {
+  display: grid;
+  gap: 12px;
+  padding: 0 15px 15px;
 }
 .visit-check-grid {
   display: grid;
@@ -503,6 +572,25 @@ main, .site-footer {
   background: var(--green);
   color: #fff;
   font-weight: 900;
+}
+.travel-tool-panel .flight-search-form,
+.travel-tool-panel .stay-search-form,
+.travel-tool-panel .tna-search-form {
+  gap: 8px;
+}
+.travel-tool-panel .flight-search-form input,
+.travel-tool-panel .stay-search-form input,
+.travel-tool-panel .tna-search-form input,
+.travel-tool-panel .tna-search-form select {
+  min-height: 42px;
+  border-radius: 13px;
+  font-size: 15px;
+}
+.travel-tool-panel .flight-search-form button,
+.travel-tool-panel .stay-search-form button,
+.travel-tool-panel .tna-search-form button {
+  min-height: 42px;
+  border-radius: 13px;
 }
 .flight-status,
 .stay-status,
@@ -1039,6 +1127,7 @@ main, .site-footer {
   .flight-section,
   .stay-section,
   .tna-section,
+  .travel-tools-section,
   .visit-check-section,
   .category-news-wrapper,
   .faq-section,
@@ -1063,6 +1152,25 @@ main, .site-footer {
   }
   .mrt-card strong {
     font-size: 14px;
+  }
+  .travel-tool-card {
+    border-radius: 15px;
+    box-shadow: none;
+  }
+  .travel-tool-summary {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 14px;
+  }
+  .travel-tool-summary strong {
+    font-size: 17px;
+  }
+  .tool-toggle {
+    justify-self: start;
+    min-height: 36px;
+  }
+  .travel-tool-panel {
+    padding: 0 14px 14px;
   }
   .stay-card,
   .tna-card {

@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-official-info-4";
+import { articles, categories } from "./articles.js?v=20260710-tools-compact-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-official-info-4";
+const tourismDataVersion = "20260710-tools-compact-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -319,6 +319,130 @@ function renderTabs() {
       </button>
     `)
     .join("");
+}
+
+function renderPrimaryNav() {
+  const nav = $("#primaryNav");
+  if (!nav) return;
+  const links = [
+    ["#july", "제주 여행 뉴스"],
+    ["#places", "가볼 만한 곳"],
+    ["#visitCheck", "방문 전 체크"],
+    ["#travelTools", "여행 준비"],
+    ["#myrealtrip", "여행 상품"]
+  ];
+  nav.innerHTML = links
+    .map(([href, label]) => `<a href="${href}">${escapeHtml(label)}</a>`)
+    .join("");
+}
+
+function compactTravelSearchSections() {
+  if ($("#travelTools")) return;
+
+  const configs = [
+    {
+      id: "flights",
+      className: "flight-section",
+      eyebrow: "Air",
+      title: "항공권",
+      description: "일정이 정해졌을 때 서울-제주 최저가 흐름을 확인하세요.",
+      button: "열기"
+    },
+    {
+      id: "stays",
+      className: "stay-section",
+      eyebrow: "Stay",
+      title: "숙소",
+      description: "지역과 날짜를 넣어 숙소 후보를 가볍게 비교하세요.",
+      button: "열기"
+    },
+    {
+      id: "tourTickets",
+      className: "tna-section",
+      eyebrow: "Tour",
+      title: "투어·티켓",
+      description: "액티비티와 입장권은 여행 코스가 잡힌 뒤 확인하세요.",
+      button: "열기"
+    }
+  ];
+
+  const items = configs
+    .map((config) => ({ config, section: document.getElementById(config.id) }))
+    .filter(({ section }) => section);
+  if (!items.length) return;
+
+  const wrapper = document.createElement("section");
+  wrapper.className = "travel-tools-section";
+  wrapper.id = "travelTools";
+  wrapper.setAttribute("aria-labelledby", "travelToolsTitle");
+  wrapper.innerHTML = `
+    <div class="section-heading">
+      <p class="eyebrow">Travel Desk</p>
+      <h2 id="travelToolsTitle">여행 준비</h2>
+      <p>뉴스와 장소 정보를 먼저 보고, 필요한 예약 정보만 아래에서 펼쳐 확인하세요.</p>
+    </div>
+    <div class="travel-tool-list"></div>
+  `;
+  const list = wrapper.querySelector(".travel-tool-list");
+
+  items.forEach(({ config, section }) => {
+    const heading = section.querySelector(".section-heading");
+    const form = section.querySelector("form");
+    const result = section.querySelector(".flight-result, .stay-result, .tna-result");
+    const panel = document.createElement("div");
+    const panelId = `${config.id}Panel`;
+    panel.className = "travel-tool-panel";
+    panel.id = panelId;
+    panel.hidden = true;
+
+    if (form) panel.append(form);
+    if (result) panel.append(result);
+
+    section.classList.remove(config.className);
+    section.classList.add("travel-tool-card");
+    section.removeAttribute("aria-labelledby");
+    section.setAttribute("aria-label", config.title);
+    section.innerHTML = "";
+    const summaryNode = heading || document.createElement("div");
+    section.append(summaryNode);
+    section.append(panel);
+
+    const summary = section.querySelector(".section-heading") || summaryNode;
+    summary.className = "travel-tool-summary";
+    summary.innerHTML = `
+      <span>
+        <em>${escapeHtml(config.eyebrow)}</em>
+        <strong>${escapeHtml(config.title)}</strong>
+        <small>${escapeHtml(config.description)}</small>
+      </span>
+      <button class="tool-toggle" type="button" aria-expanded="false" aria-controls="${panelId}">${escapeHtml(config.button)}</button>
+    `;
+
+    summary.querySelector(".tool-toggle").addEventListener("click", () => {
+      const isOpen = section.classList.toggle("is-open");
+      panel.hidden = !isOpen;
+      const toggle = summary.querySelector(".tool-toggle");
+      toggle.setAttribute("aria-expanded", String(isOpen));
+      toggle.textContent = isOpen ? "닫기" : config.button;
+    });
+
+    list.append(section);
+  });
+
+  const main = document.querySelector("main");
+  const faq = $("#info");
+  const visitCheck = $("#visitCheck");
+  const categoryNews = $("#categoryNews");
+  const myrealtrip = $("#myrealtrip");
+
+  if (main && faq) {
+    if (visitCheck) main.insertBefore(visitCheck, faq);
+    if (categoryNews) main.insertBefore(categoryNews, faq);
+    main.insertBefore(wrapper, faq);
+    if (myrealtrip) main.insertBefore(myrealtrip, faq);
+  } else {
+    ($("#july") || main)?.after(wrapper);
+  }
 }
 
 function renderFeed(places = null) {
@@ -912,9 +1036,11 @@ function bindHome() {
 
 function renderHome() {
   if (!$("#newsFeedList")) return;
+  renderPrimaryNav();
   renderTabs();
   renderRecommended();
   renderFeed([]);
+  compactTravelSearchSections();
   renderMyRealTrip([], "loading");
   bindFlightSearch();
   bindStaySearch();
