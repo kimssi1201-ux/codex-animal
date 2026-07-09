@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-official-info-3";
+import { articles, categories } from "./articles.js?v=20260710-official-info-4";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-official-info-3";
+const tourismDataVersion = "20260710-official-info-4";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -1191,7 +1191,8 @@ function fallbackPlace(contentId, contentTypeId) {
 }
 
 function phoneUrl(value) {
-  const digits = String(value || "").replace(/[^\d+]/g, "");
+  const primaryNumber = String(value || "").split(/[~,/]/)[0];
+  const digits = primaryNumber.replace(/[^\d+]/g, "");
   if (digits.replace(/\D/g, "").length < 7) return "";
   return `tel:${digits}`;
 }
