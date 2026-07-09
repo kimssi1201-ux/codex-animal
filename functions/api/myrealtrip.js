@@ -1,4 +1,5 @@
 const DEFAULT_TIMEOUT_MS = 9000;
+const DEFAULT_MCP_URL = "https://mcp-servers.myrealtrip.com/mcp";
 
 function json(data, init = {}) {
   const headers = new Headers(init.headers || {});
@@ -28,6 +29,11 @@ function getConfig(env = {}) {
     env.MRT_ACCESS_TOKEN ||
     ""
   ).trim();
+  const mcpUrl = (
+    env.MYREALTRIP_MCP_URL ||
+    env.MRT_MCP_URL ||
+    DEFAULT_MCP_URL
+  ).trim();
   const partnerId = (
     env.MYREALTRIP_PARTNER_ID ||
     env.MRT_PARTNER_ID ||
@@ -54,7 +60,7 @@ function getConfig(env = {}) {
     ""
   ).trim();
 
-  return { apiUrl, apiBase, apiKey, partnerId, affiliateUrl, tourUrl, ticketUrl, hotelUrl };
+  return { apiUrl, apiBase, apiKey, mcpUrl, partnerId, affiliateUrl, tourUrl, ticketUrl, hotelUrl };
 }
 
 function buildTargetUrl(config, requestUrl) {
@@ -90,6 +96,97 @@ function normalizeUrl(value) {
 
 function normalizeImage(value) {
   return normalizeUrl(value);
+}
+
+function parseMcpContent(payload) {
+  const content = payload?.result?.content || [];
+  const text = content.find((item) => item?.type === "text")?.text || "";
+  if (!text) return payload?.result?.structuredContent || payload?.result || {};
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return { text };
+  }
+}
+
+function firstImage(node) {
+  if (!node || typeof node !== "object") return "";
+  if (node.type === "Image" && node.src) return String(node.src);
+  for (const child of node.children || []) {
+    const found = firstImage(child);
+    if (found) return found;
+  }
+  return "";
+}
+
+function textValues(node, values = []) {
+  if (!node || typeof node !== "object") return values;
+  if (node.type === "Text" && node.value) values.push(String(node.value));
+  for (const child of node.children || []) textValues(child, values);
+  return values;
+}
+
+function firstOpenUrl(node) {
+  if (!node || typeof node !== "object") return "";
+  const direct = node.onClickAction?.url || node.onClickAction?.payload?.target?.url || "";
+  if (direct) return String(direct);
+  for (const child of node.children || []) {
+    const found = firstOpenUrl(child);
+    if (found) return found;
+  }
+  return "";
+}
+
+function productsFromWidget(widget = {}) {
+  const children = Array.isArray(widget.children) ? widget.children : [];
+  return children
+    .map((item) => {
+      const texts = textValues(item);
+      const price = texts.find((value) => /원|₩|price/i.test(value)) || "";
+      const rating = texts.find((value) => /★|⭐|\d+\.\d/.test(value)) || "";
+      const title = texts.find((value) => value && value !== price && value !== rating) || "제주 여행 상품";
+      return {
+        id: "",
+        title,
+        category: rating || "마이리얼트립",
+        priceText: price || "가격 확인",
+        image: firstImage(item),
+        url: normalizeUrl(firstOpenUrl(item))
+      };
+    })
+    .filter((item) => item.title);
+}
+
+async function mcpSearchItems(config, keyword, limit = 6) {
+  if (!config.mcpUrl) return [];
+  const response = await fetchWithTimeout(config.mcpUrl, {
+    method: "POST",
+    headers: {
+      accept: "application/json, text/event-stream",
+      "content-type": "application/json; charset=utf-8"
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: Date.now(),
+      method: "tools/call",
+      params: {
+        name: "searchTnas",
+        arguments: {
+          query: keyword || "제주 액티비티",
+          page: 1,
+          perPage: limit
+        }
+      }
+    })
+  });
+  const payload = await response.json();
+  if (!response.ok || payload?.error) {
+    throw new Error(payload?.error?.message || `MyRealTrip MCP HTTP ${response.status}`);
+  }
+  const parsed = parseMcpContent(payload);
+  const explicitItems = asArray(parsed).map(normalizeItem).filter((item) => item.title);
+  if (explicitItems.length) return explicitItems.slice(0, limit);
+  return productsFromWidget(parsed.widget).slice(0, limit);
 }
 
 function addKeyword(value, keyword) {
@@ -204,6 +301,22 @@ export async function onRequestGet(context) {
   const fallbackAffiliateItems = affiliateItems(config, keyword);
 
   if (!targetUrl || !config.apiKey) {
+    try {
+      const mcpItems = await mcpSearchItems(config, `${keyword} 액티비티`, Number(requestUrl.searchParams.get("limit") || 6));
+      if (mcpItems.length) {
+        return json({
+          ok: true,
+          configured: true,
+          mcp: true,
+          items: mcpItems,
+          totalCount: mcpItems.length,
+          updatedAt: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      // Continue to affiliate fallback or configuration guidance.
+    }
+
     if (fallbackAffiliateItems.length) {
       return json({
         ok: true,
@@ -248,6 +361,23 @@ export async function onRequestGet(context) {
       updatedAt: new Date().toISOString()
     });
   } catch (error) {
+    try {
+      const mcpItems = await mcpSearchItems(config, `${keyword} 액티비티`, Number(requestUrl.searchParams.get("limit") || 6));
+      if (mcpItems.length) {
+        return json({
+          ok: true,
+          configured: true,
+          mcp: true,
+          items: mcpItems,
+          totalCount: mcpItems.length,
+          message: "API 응답 실패로 MCP 상품 카드를 표시합니다.",
+          updatedAt: new Date().toISOString()
+        });
+      }
+    } catch (mcpError) {
+      // Continue to affiliate fallback or error response.
+    }
+
     if (fallbackAffiliateItems.length) {
       return json({
         ok: true,
