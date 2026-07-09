@@ -184,7 +184,7 @@ function productsFromWidget(widget = {}) {
   return children
     .map((item) => {
       const texts = textValues(item);
-      const price = texts.find((value) => /원|₩|price/i.test(value)) || "";
+      const price = texts.find((value) => /[\d,]+원|₩\s*[\d,]+|price/i.test(value)) || "";
       const rating = texts.find((value) => /★|⭐|\d+\.\d/.test(value)) || "";
       const title = texts.find((value) => value && value !== price && value !== rating) || "투어·티켓 상품";
       return {
