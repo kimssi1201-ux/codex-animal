@@ -1,6 +1,18 @@
 const DEFAULT_TIMEOUT_MS = 9000;
+const DEFAULT_MCP_URL = "https://mcp-servers.myrealtrip.com/mcp";
 const DEFAULT_AIRPORT_AUTOCOMPLETE_PATH = "/v1/products/flight/airport-autocomplete";
 const DEFAULT_CALENDAR_PATH = "/v1/products/flight/lowest-price-calendar";
+const DOMESTIC_AIRPORTS = [
+  { code: "GMP", city: "서울", name: "김포국제공항", country: "대한민국" },
+  { code: "ICN", city: "인천", name: "인천국제공항", country: "대한민국" },
+  { code: "CJU", city: "제주", name: "제주국제공항", country: "대한민국" },
+  { code: "PUS", city: "부산", name: "김해국제공항", country: "대한민국" },
+  { code: "TAE", city: "대구", name: "대구국제공항", country: "대한민국" },
+  { code: "KWJ", city: "광주", name: "광주공항", country: "대한민국" },
+  { code: "RSU", city: "여수", name: "여수공항", country: "대한민국" },
+  { code: "USN", city: "울산", name: "울산공항", country: "대한민국" },
+  { code: "WJU", city: "원주", name: "원주공항", country: "대한민국" }
+];
 
 function json(data, init = {}) {
   const headers = new Headers(init.headers || {});
@@ -26,6 +38,11 @@ function getConfig(env = {}) {
     env.MRT_API_KEY ||
     env.MRT_ACCESS_TOKEN ||
     ""
+  ).trim();
+  const mcpUrl = (
+    env.MYREALTRIP_MCP_URL ||
+    env.MRT_MCP_URL ||
+    DEFAULT_MCP_URL
   ).trim();
   const partnerId = (
     env.MYREALTRIP_PARTNER_ID ||
@@ -53,7 +70,7 @@ function getConfig(env = {}) {
     ""
   ).trim();
 
-  return { apiBase, apiKey, partnerId, airportAutocompletePath, airportAutocompleteUrl, calendarPath, calendarUrl };
+  return { apiBase, apiKey, mcpUrl, partnerId, airportAutocompletePath, airportAutocompleteUrl, calendarPath, calendarUrl };
 }
 
 function absoluteUrl(value) {
@@ -117,6 +134,87 @@ function normalizeCalendarItem(item = {}) {
   };
 }
 
+function airportItems(keyword = "") {
+  const query = String(keyword || "").trim().toLowerCase();
+  const items = DOMESTIC_AIRPORTS.filter((airport) => {
+    if (!query) return true;
+    return [airport.code, airport.city, airport.name, airport.country]
+      .some((value) => String(value).toLowerCase().includes(query));
+  });
+  return items.map((airport) => ({
+    ...airport,
+    label: `${airport.city} ${airport.name}`
+  }));
+}
+
+function normalizeAirportCode(value, fallback = "GMP") {
+  const code = String(value || "").toUpperCase().trim();
+  if (code === "SEL") return "GMP";
+  return code || fallback;
+}
+
+function nextDepartDate(monthValue = "") {
+  const now = new Date();
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const tomorrow = new Date(today);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  const monthMatch = String(monthValue || "").match(/^(\d{4})-(\d{2})/);
+  const date = monthMatch
+    ? new Date(Date.UTC(Number(monthMatch[1]), Number(monthMatch[2]) - 1, 1))
+    : tomorrow;
+  if (date <= today) date.setTime(tomorrow.getTime());
+  return date.toISOString().slice(0, 10);
+}
+
+function parseMcpContent(payload) {
+  const content = payload?.result?.content || [];
+  const text = content.find((item) => item?.type === "text")?.text || "";
+  if (!text) return payload?.result?.structuredContent || payload?.result || {};
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return { text };
+  }
+}
+
+function mcpFlightItems(parsed = {}) {
+  const items = parsed?.result?.items || parsed?.items || [];
+  return items.map((item = {}) => {
+    const outbound = item.outbound || {};
+    const price = item.price?.total || outbound.legPrice || item.totalPrice || "";
+    const airline = item.airline?.name || outbound.airlineName || outbound.airlineCode || item.airline || "";
+    const time = [outbound.departTime, outbound.arriveTime].filter(Boolean).join(" -> ");
+    return {
+      date: [outbound.departDate || item.departureDate || item.date || "", time].filter(Boolean).join(" "),
+      price,
+      currency: item.price?.currency || "KRW",
+      airline,
+      url: item.reservationUrl || item.url || item.link || ""
+    };
+  }).filter((item) => item.date || item.price);
+}
+
+async function callMcpTool(config, name, args) {
+  const response = await fetchWithTimeout(config.mcpUrl, {
+    method: "POST",
+    headers: {
+      accept: "application/json, text/event-stream",
+      "content-type": "application/json; charset=utf-8"
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: Date.now(),
+      method: "tools/call",
+      params: { name, arguments: args }
+    })
+  });
+  const payload = await response.json();
+  if (!response.ok || payload?.error) {
+    throw new Error(payload?.error?.message || `MyRealTrip MCP HTTP ${response.status}`);
+  }
+  return parseMcpContent(payload);
+}
+
 async function fetchWithTimeout(url, options = {}) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
@@ -161,6 +259,52 @@ export async function onRequestPost(context) {
   const path = action === "lowest-price-calendar" ? config.calendarPath : config.airportAutocompletePath;
   const explicitUrl = action === "lowest-price-calendar" ? config.calendarUrl : config.airportAutocompleteUrl;
   const url = absoluteUrl(explicitUrl) || targetUrl(config.apiBase, path);
+
+  if ((!url || !config.apiKey) && config.mcpUrl) {
+    try {
+      if (action === "airport-autocomplete") {
+        return json({
+          ok: true,
+          configured: true,
+          mcp: true,
+          action,
+          items: airportItems(body.keyword || body.query)
+        });
+      }
+
+      const origin = normalizeAirportCode(
+        body.originAirportCode || body.departureAirportCode || body.origin || body.departure,
+        "GMP"
+      );
+      const destination = normalizeAirportCode(
+        body.destinationAirportCode || body.arrivalAirportCode || body.destination || body.arrival,
+        "CJU"
+      );
+      const departDate = body.departureDate || body.departDate || nextDepartDate(body.yearMonth || body.month);
+      const parsed = await callMcpTool(config, "searchDomesticFlights", {
+        tripType: "ONE_WAY",
+        origin,
+        destination,
+        departDate,
+        passengers: {
+          adults: Number(body.adults || body.guests || 1),
+          children: Number(body.children || 0)
+        },
+        maxResults: Number(body.limit || 8)
+      });
+      const items = mcpFlightItems(parsed);
+      return json({ ok: true, configured: true, mcp: true, action, items, raw: parsed });
+    } catch (error) {
+      return json({
+        ok: false,
+        configured: true,
+        mcp: true,
+        action,
+        items: [],
+        message: error instanceof Error ? error.message : "항공권 정보를 불러오지 못했습니다."
+      }, { status: 502, cacheControl: "no-store" });
+    }
+  }
 
   if (!url || !config.apiKey) {
     return json({
