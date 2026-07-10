@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-content-2";
+import { articles, categories } from "./articles.js?v=20260710-content-3";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-content-2";
+const tourismDataVersion = "20260710-content-3";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -11,6 +11,54 @@ const regionCache = new Map();
 const tnaCategoryCache = new Map();
 const articleThumbnailCache = new Map();
 const articleThumbnailRequests = new Map();
+const officialImageSlugs = new Set([
+  "seongsan-sunrise-course",
+  "hyeopjae-half-day",
+  "hamdeok-cafe-street",
+  "udo-day-trip",
+  "seogwipo-olle-market-food",
+  "sangumburi-autumn-course",
+  "hallasan-beginner-trail",
+  "seopjikoji-coastal-walk-guide",
+  "bijarim-forest-walk-guide",
+  "saryeoni-forest-road-check",
+  "yongmeori-coast-visit-check",
+  "jeongbang-waterfall-guide",
+  "cheonjiyeon-night-walk-course",
+  "woljeongri-beach-cafe-walk",
+  "gimnyeong-beach-light-guide",
+  "osulloc-west-jeju-course",
+  "jeju-stone-park-rainy-day-course",
+  "soesokkak-hahyo-walk-guide",
+  "pyoseon-beach-family-guide",
+  "dongmun-market-evening-food-route",
+  "geum-oreum-sunset-walk-guide",
+  "saebyeol-oreum-silvergrass-guide",
+  "camellia-hill-season-guide",
+  "aqua-planet-jeju-family-guide",
+  "lee-jung-seop-street-walk-guide",
+  "gimnyeong-maze-park-family-guide",
+  "jeju-43-peace-park-guide",
+  "hangmong-historic-site-guide",
+  "jeju-herb-dongsan-night-guide",
+  "nohyung-supermarket-indoor-guide",
+  "arte-museum-jeju-indoor-guide",
+  "suwolbong-geotrail-guide",
+  "songaksan-dulle-gil-guide",
+  "bangju-church-architecture-guide",
+  "hallasan-arboretum-walk-guide"
+]);
+const articleImageKeywordOverrides = new Map([
+  ["udo-day-trip", "우도"],
+  ["seogwipo-olle-market-food", "서귀포 매일올레시장"],
+  ["hallasan-beginner-trail", "한라산"],
+  ["jeju-stone-park-rainy-day-course", "제주돌문화공원"],
+  ["dongmun-market-evening-food-route", "동문시장"],
+  ["lee-jung-seop-street-walk-guide", "이중섭거리"],
+  ["jeju-43-peace-park-guide", "제주4.3평화공원"],
+  ["nohyung-supermarket-indoor-guide", "노형수퍼마켙"],
+  ["hallasan-arboretum-walk-guide", "한라수목원"]
+]);
 
 let activeCategory = categories[0] || "전체";
 let officialRequestId = 0;
@@ -286,8 +334,9 @@ function recommendedCard(article, isLead = false) {
     <article class="recommend-card${isLead ? " is-lead" : ""}">
       <a href="${articleUrl(article)}">
         ${articleImageTag(article)}
-        <div class="recommend-meta meta">${metaLine([article.category, article.region, article.date])}</div>
+        ${isLead ? `<div class="recommend-meta meta">${metaLine([article.category, article.region])}</div>` : ""}
         <strong>${escapeHtml(article.title)}</strong>
+        ${isLead ? `<p>${escapeHtml(article.summary)}</p>` : ""}
       </a>
     </article>
   `;
@@ -331,7 +380,7 @@ function newsCard(article) {
         ${articleImageTag(article)}
       </a>
       <div class="news-copy">
-        <div class="meta">${metaLine(["장소 포스팅", article.category, article.region, article.date])}</div>
+        <div class="meta">${metaLine([article.category, article.region])}</div>
         <h2><a href="${articleUrl(article)}">${escapeHtml(article.title)}</a></h2>
         <p>${escapeHtml(article.summary)}</p>
       </div>
@@ -510,9 +559,8 @@ function renderFeed(places = null) {
   if (feedCount) feedCount.textContent = `${localItems.length}개`;
   if (feedTitle) feedTitle.textContent = activeCategory === categories[0] ? "전체글" : activeCategory;
   if (status) {
-    status.textContent = activeCategory === categories[0]
-      ? `제주 여행 글 ${localItems.length}개를 최신순으로 정리했습니다.`
-      : `${activeCategory} 글 ${localItems.length}개를 최신순으로 정리했습니다.`;
+    status.hidden = true;
+    status.textContent = "";
   }
   hydrateArticleThumbnails();
 }
@@ -527,11 +575,14 @@ function renderRecommended() {
   hydrateArticleThumbnails();
 }
 
+function shouldUseOfficialImage(article) {
+  return officialImageSlugs.has(article.slug);
+}
+
 function articleImageKeywords(article) {
+  const keyword = articleOfficialKeyword(article);
   return [
-    articleOfficialKeyword(article),
-    ...(article.course || []),
-    ...(article.nearbySpots || []),
+    keyword,
     article.title
   ]
     .map((keyword) => String(keyword || "").trim())
@@ -540,18 +591,34 @@ function articleImageKeywords(article) {
 }
 
 function matchArticleImagePlace(article, places = []) {
+  if (!shouldUseOfficialImage(article)) return null;
   const keywords = articleImageKeywords(article).map(normalizeText).filter(Boolean);
-  return places.find((place) => {
-    if (!place?.image) return false;
-    const title = normalizeText(place.title);
-    if (!title) return false;
-    return keywords.some((keyword) => title.includes(keyword) || keyword.includes(title));
-  });
+  const category = normalizeText(article.category);
+  const scored = places
+    .filter((place) => place?.image)
+    .map((place) => {
+      const title = normalizeText(place.title);
+      const placeCategory = normalizeText(place.category);
+      if (!title) return { place, score: 0 };
+      if (category !== "맛집" && placeCategory.includes("음식점")) return { place, score: 0 };
+      const score = keywords.reduce((best, keyword) => {
+        if (!keyword || !title.includes(keyword)) return best;
+        if (title === keyword) return Math.max(best, 100);
+        if (title.startsWith(keyword)) return Math.max(best, 84);
+        return Math.max(best, 70);
+      }, 0) + (placeCategory.includes("관광지") ? 8 : 0);
+      return { place, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  return scored[0]?.place || null;
 }
 
 function applyOfficialImagesToArticles(places = []) {
   let didUpdate = false;
   articles.forEach((article) => {
+    if (!shouldUseOfficialImage(article)) return;
     if (articleThumbnailCache.has(article.slug)) return;
     const match = matchArticleImagePlace(article, places);
     if (!match?.image) return;
@@ -570,6 +637,7 @@ function updateArticleThumbnailElements(article, image) {
 }
 
 async function fetchArticleThumbnail(article) {
+  if (!shouldUseOfficialImage(article)) return "";
   if (articleThumbnailCache.has(article.slug)) return articleThumbnailCache.get(article.slug);
   if (articleThumbnailRequests.has(article.slug)) return articleThumbnailRequests.get(article.slug);
 
@@ -1260,6 +1328,8 @@ function updateArticleInfoTable(article, place) {
 }
 
 function articleOfficialKeyword(article) {
+  const override = articleImageKeywordOverrides.get(article.slug);
+  if (override) return override;
   const spot = ((article.course || []).find(Boolean) || article.title || "").trim();
   return spot
     .replace(/^\d일차\s*/g, "")
