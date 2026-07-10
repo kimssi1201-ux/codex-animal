@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-tripview-2";
+import { articles, categories } from "./articles.js?v=20260710-template-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-tripview-2";
+const tourismDataVersion = "20260710-template-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -1287,6 +1287,53 @@ function articleBodyParagraphs(article) {
   return [...(article.content || []), ...extendedArticleParagraphs(article)];
 }
 
+function articleAudienceItems(article) {
+  const region = article.region || "제주";
+  const category = article.category || "여행지";
+  return [
+    `${region} 권역에서 ${category} 중심 일정을 잡고 싶은 여행자`,
+    "주차, 운영시간, 입장료를 먼저 확인하고 움직이고 싶은 초행 여행자",
+    "한 곳만 보고 끝내기보다 주변 장소까지 자연스럽게 묶고 싶은 여행자"
+  ];
+}
+
+function articlePlanningRows(article) {
+  const course = (article.course || []).filter(Boolean);
+  const first = course[0] || article.title;
+  const last = course[course.length - 1] || article.region;
+  const duration = course.length >= 4 ? "반나절 이상" : "1~2시간";
+  const pace = course.length >= 4 ? "장소를 모두 넣기보다 핵심 2~3곳을 먼저 정하세요." : "주변 추천 한두 곳만 더해도 일정이 자연스럽습니다.";
+
+  return [
+    ["추천 체류", duration],
+    ["시작 지점", first],
+    ["마무리 지점", last],
+    ["동선 팁", pace]
+  ];
+}
+
+function renderAudienceSection(article) {
+  return `
+    <section class="template-card">
+      <h2>이런 사람에게 추천</h2>
+      <ul class="recommend-list">
+        ${articleAudienceItems(article).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+      </ul>
+    </section>
+  `;
+}
+
+function renderPlanningSection(article) {
+  return `
+    <section class="template-card">
+      <h2>권장 동선</h2>
+      <dl class="planning-grid">
+        ${articlePlanningRows(article).map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
+      </dl>
+    </section>
+  `;
+}
+
 function placeInfoRows(place) {
   return rowsFromPairs([
     ["분류", place.category],
@@ -1303,6 +1350,15 @@ function updateMeta(title, description) {
   document.title = `${title} | 제주여행뉴스`;
   const descriptionMeta = document.querySelector('meta[name="description"]');
   if (descriptionMeta) descriptionMeta.setAttribute("content", description);
+}
+
+function articleSeoTitle(article) {
+  const suffix = "주차 운영시간 입장료 코스 정리";
+  return article.title.includes("주차") ? article.title : `${article.title} ${suffix}`;
+}
+
+function articleSeoDescription(article) {
+  return `${article.summary} 주소, 주차, 운영시간, 입장료, 추천 동선과 주변 여행지를 함께 정리했습니다.`;
 }
 
 function renderRelated(article) {
@@ -1412,7 +1468,7 @@ async function hydrateStaticOfficialInfo(article) {
 function renderStaticDetail(detail) {
   const slug = params.get("slug") || articles[0].slug;
   const article = articles.find((item) => item.slug === slug) || articles[0];
-  updateMeta(article.title, article.summary);
+  updateMeta(articleSeoTitle(article), articleSeoDescription(article));
   detail.innerHTML = `
     ${imageTag(thumbnailForArticle(article), article.title, "detail-hero", `data-article-thumb="${escapeHtml(article.slug)}"`)}
     <div class="detail-body">
@@ -1421,6 +1477,8 @@ function renderStaticDetail(detail) {
       <p class="summary">${escapeHtml(article.summary)}</p>
       <table class="info-table article-info-table"><tbody id="articleInfoRows">${staticInfoRows(article)}</tbody></table>
       ${renderInlineOfficialShell(article)}
+      ${renderAudienceSection(article)}
+      ${renderPlanningSection(article)}
       <section>
         <h2>본문 정보</h2>
         ${articleBodyParagraphs(article).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}

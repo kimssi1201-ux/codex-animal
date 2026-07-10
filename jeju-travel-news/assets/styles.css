@@ -911,6 +911,50 @@ main, .site-footer {
   margin: 0;
   padding-left: 20px;
 }
+.template-card {
+  display: grid;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fbfcfb;
+}
+.recommend-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+.recommend-list li,
+.course-list li,
+.check-list li {
+  line-height: 1.65;
+}
+.planning-grid {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+.planning-grid div {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.planning-grid dt {
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 900;
+}
+.planning-grid dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.55;
+}
 .spot-tags {
   display: flex;
   flex-wrap: wrap;
