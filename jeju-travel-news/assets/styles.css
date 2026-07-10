@@ -2921,3 +2921,103 @@ body {
     line-height: 1.28;
   }
 }
+
+/* Mobile recommendation list */
+@media (max-width: 560px) {
+  .recommend-news-row {
+    gap: 0;
+    padding: 0 0 18px;
+    border-top: 1px solid #e6ece9;
+    border-bottom: 8px solid #f3f5f4;
+    overflow: visible;
+  }
+
+  .recommend-card,
+  .recommend-card.is-lead {
+    height: auto;
+    min-height: 0;
+    border-radius: 0;
+    border-bottom: 1px solid #e6ece9;
+    background: #fff;
+    box-shadow: none;
+  }
+
+  .recommend-card:last-child {
+    border-bottom: 0;
+  }
+
+  .recommend-card a,
+  .recommend-card.is-lead a {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    height: auto;
+    min-height: 0;
+    padding: 12px 0;
+    color: var(--ink);
+  }
+
+  .recommend-card a::after {
+    display: none;
+  }
+
+  .recommend-card img,
+  .recommend-card.is-lead img {
+    width: 112px;
+    height: 82px;
+    aspect-ratio: auto;
+    border-radius: 10px;
+    opacity: 1;
+    object-fit: cover;
+    transform: none;
+  }
+
+  .recommend-card:hover img {
+    transform: none;
+  }
+
+  .recommend-content,
+  .recommend-card.is-lead .recommend-content {
+    position: static;
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .recommend-label {
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--green);
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  .recommend-content strong,
+  .recommend-card.is-lead .recommend-content strong,
+  .recommend-card:not(.is-lead) .recommend-content strong {
+    padding: 0;
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1.28;
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+    -webkit-line-clamp: 2;
+  }
+
+  .recommend-content p,
+  .recommend-card.is-lead .recommend-content p {
+    max-width: 100%;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.38;
+    -webkit-line-clamp: 2;
+  }
+
+  .recommend-content em {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.3;
+  }
+}
