@@ -1,37 +1,362 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>제주여행뉴스</title>
-    <link>https://www.moneyarchive.kr/</link>
-    <atom:link href="https://www.moneyarchive.kr/feed.xml" rel="self" type="application/rss+xml" />
-    <description>제주 가볼 만한 곳, 해변, 오름, 맛집, 카페, 숙소 위치 정보를 뉴스 피드로 정리합니다.</description>
-    <language>ko-KR</language>
-    <lastBuildDate>Wed, 08 Jul 2026 00:00:00 +0900</lastBuildDate>
-    <pubDate>Wed, 08 Jul 2026 00:00:00 +0900</pubDate>
-    <ttl>60</ttl>
-    <item>
-      <title>성산일출봉 일출 여행 코스</title>
-      <link>https://www.moneyarchive.kr/article.html?slug=seongsan-sunrise-course</link>
-      <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=seongsan-sunrise-course</guid>
-      <description>일출 명소 성산일출봉을 중심으로 광치기해변과 성산항 주변 식사까지 묶는 아침 코스입니다.</description>
-      <category>가볼 만한 곳</category>
-      <pubDate>Wed, 08 Jul 2026 00:00:00 +0900</pubDate>
-    </item>
-    <item>
-      <title>협재해수욕장 반나절 코스</title>
-      <link>https://www.moneyarchive.kr/article.html?slug=hyeopjae-half-day</link>
-      <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=hyeopjae-half-day</guid>
-      <description>맑은 바다와 비양도 전망을 보며 산책, 카페, 저녁 노을까지 이어가는 서쪽 반나절 코스입니다.</description>
-      <category>해변</category>
-      <pubDate>Wed, 08 Jul 2026 00:00:00 +0900</pubDate>
-    </item>
-    <item>
-      <title>섭지코지 해안 산책 가이드</title>
-      <link>https://www.moneyarchive.kr/article.html?slug=seopjikoji-coastal-walk-guide</link>
-      <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=seopjikoji-coastal-walk-guide</guid>
-      <description>성산일출봉과 함께 묶기 좋은 섭지코지의 산책 동선, 주차, 바람 대비를 정리했습니다.</description>
-      <category>가볼 만한 곳</category>
-      <pubDate>Wed, 08 Jul 2026 00:00:00 +0900</pubDate>
-    </item>
-  </channel>
+<rss version="2.0">
+<channel>
+  <title>제주여행뉴스</title>
+  <link>https://www.moneyarchive.kr/</link>
+  <description>제주 가볼 만한 곳, 맛집, 카페, 숙소, 계절 코스를 정리하는 제주 여행 정보 매거진</description>
+  <language>ko-KR</language>
+  <lastBuildDate>Thu, 09 Jul 2026 15:00:00 GMT</lastBuildDate>
+  <item>
+    <title>성산일출봉 일출 여행 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=seongsan-sunrise-course</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=seongsan-sunrise-course</guid>
+    <description>일출 명소 성산일출봉을 중심으로 광치기해변과 성산항 주변 식사까지 묶는 아침 코스입니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>협재해수욕장 반나절 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=hyeopjae-half-day</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=hyeopjae-half-day</guid>
+    <description>맑은 바다와 비양도 전망을 보며 산책, 카페, 저녁 노을까지 이어가는 서쪽 반나절 코스입니다.</description>
+    <category>해변</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>함덕해수욕장 카페 거리</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=hamdeok-cafe-street</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=hamdeok-cafe-street</guid>
+    <description>함덕해수욕장 산책과 해변 카페를 함께 묶는 가벼운 북동부 코스입니다.</description>
+    <category>카페</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>우도 당일치기 여행</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=udo-day-trip</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=udo-day-trip</guid>
+    <description>성산항에서 배를 타고 들어가 해변, 전망, 간식 코스를 하루 안에 둘러보는 일정입니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>애월 해안도로 드라이브</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=aewol-coastal-drive</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=aewol-coastal-drive</guid>
+    <description>공항에서 멀지 않은 애월 해안도로를 따라 카페와 바다 전망을 쉬엄쉬엄 보는 드라이브 코스입니다.</description>
+    <category>카페</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>서귀포 매일올레시장 먹거리 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=seogwipo-olle-market-food</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=seogwipo-olle-market-food</guid>
+    <description>서귀포 시내 숙소와 함께 묶기 좋은 시장 먹거리, 간식, 야식 중심 코스입니다.</description>
+    <category>맛집</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>산굼부리 가을 억새 여행</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=sangumburi-autumn-course</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=sangumburi-autumn-course</guid>
+    <description>가을 억새와 분화구 풍경을 중심으로 동부 오름 분위기를 가볍게 즐기는 코스입니다.</description>
+    <category>계절 코스</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>비 오는 날 제주 실내 여행</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=rainy-day-indoor-jeju</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=rainy-day-indoor-jeju</guid>
+    <description>비바람이 강한 날에도 무리 없이 갈 수 있는 박물관, 시장, 카페 중심 실내 코스입니다.</description>
+    <category>계절 코스</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>제주 동쪽 1박 2일 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=east-jeju-2days</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=east-jeju-2days</guid>
+    <description>성산, 우도, 함덕, 비자림을 1박 2일로 나누어 여유 있게 도는 동쪽 대표 코스입니다.</description>
+    <category>계절 코스</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>제주 서쪽 카페 투어</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=west-jeju-cafe-tour</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=west-jeju-cafe-tour</guid>
+    <description>애월, 한림, 협재를 이어 바다 전망 카페와 해변 산책을 함께 즐기는 코스입니다.</description>
+    <category>카페</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>한라산 초보 등산 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=hallasan-beginner-trail</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=hallasan-beginner-trail</guid>
+    <description>정상 등반이 부담스러운 여행자를 위해 짧은 탐방로와 준비물을 중심으로 정리한 한라산 입문 코스입니다.</description>
+    <category>오름</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>가족과 가기 좋은 제주 여행지</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=family-friendly-jeju</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=family-friendly-jeju</guid>
+    <description>아이와 함께 이동하기 쉬운 해변, 숲, 시장, 실내 공간을 하루 코스로 묶는 방법입니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>제주 숙소 위치 고르는 법</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=jeju-stay-location-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=jeju-stay-location-guide</guid>
+    <description>판매 유도 없이 여행 동선 기준으로 제주시, 서귀포, 동부, 서부 숙소 위치를 비교합니다.</description>
+    <category>숙소</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>섭지코지 해안 산책 가이드</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=seopjikoji-coastal-walk-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=seopjikoji-coastal-walk-guide</guid>
+    <description>성산일출봉과 함께 묶기 좋은 섭지코지의 산책 동선, 주차, 바람 대비를 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>비자림 숲길 산책 정보</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=bijarim-forest-walk-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=bijarim-forest-walk-guide</guid>
+    <description>비 오는 날에도 분위기가 좋은 비자림의 산책 시간, 신발, 주변 코스를 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>사려니숲길 걷기 전 체크</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=saryeoni-forest-road-check</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=saryeoni-forest-road-check</guid>
+    <description>제주 숲길 대표 코스인 사려니숲길을 걷기 전에 알아둘 교통, 복장, 소요 시간을 정리했습니다.</description>
+    <category>계절 코스</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>용머리해안 방문 전 체크</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=yongmeori-coast-visit-check</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=yongmeori-coast-visit-check</guid>
+    <description>파도와 기상에 따라 입장이 달라지는 용머리해안을 방문할 때 확인할 점을 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>정방폭포 바다 앞 산책 정보</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=jeongbang-waterfall-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=jeongbang-waterfall-guide</guid>
+    <description>바다와 폭포를 함께 볼 수 있는 정방폭포의 관람 동선과 주변 이동 팁입니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>천지연폭포 야간 산책 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=cheonjiyeon-night-walk-course</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=cheonjiyeon-night-walk-course</guid>
+    <description>서귀포 숙박일에 넣기 좋은 천지연폭포 저녁 산책 동선과 방문 전 체크포인트입니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>월정리해변 카페 산책</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=woljeongri-beach-cafe-walk</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=woljeongri-beach-cafe-walk</guid>
+    <description>동쪽 해변과 카페를 함께 즐기기 좋은 월정리해변의 산책 순서와 혼잡 시간 팁입니다.</description>
+    <category>해변</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>김녕해수욕장 물빛 보기 좋은 시간</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=gimnyeong-beach-light-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=gimnyeong-beach-light-guide</guid>
+    <description>김녕해수욕장의 밝은 바다색을 보기 좋은 시간대와 가족 방문 팁을 정리했습니다.</description>
+    <category>해변</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>오설록 티뮤지엄 서쪽 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=osulloc-west-jeju-course</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=osulloc-west-jeju-course</guid>
+    <description>비 오는 날이나 더운 날 넣기 좋은 오설록 주변 서쪽 실내·카페 코스입니다.</description>
+    <category>카페</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>제주돌문화공원 비 오는 날 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=jeju-stone-park-rainy-day-course</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=jeju-stone-park-rainy-day-course</guid>
+    <description>날씨가 흐린 날에도 제주다운 분위기를 느끼기 좋은 제주돌문화공원 산책 정보입니다.</description>
+    <category>계절 코스</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>쇠소깍 하효 산책 정보</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=soesokkak-hahyo-walk-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=soesokkak-hahyo-walk-guide</guid>
+    <description>민물과 바닷물이 만나는 쇠소깍을 중심으로 하효동 산책과 주변 코스를 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>표선해수욕장 가족 여행 가이드</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=pyoseon-beach-family-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=pyoseon-beach-family-guide</guid>
+    <description>수심과 공간이 비교적 여유로운 표선해수욕장을 가족 일정에 넣는 방법입니다.</description>
+    <category>해변</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>동문시장 저녁 먹거리 동선</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=dongmun-market-evening-food-route</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=dongmun-market-evening-food-route</guid>
+    <description>공항 도착일이나 마지막 날 넣기 좋은 동문시장 저녁 먹거리 코스와 주차 팁입니다.</description>
+    <category>맛집</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>제주시 흑돼지거리 방문 전 체크</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=jeju-black-pork-street-check</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=jeju-black-pork-street-check</guid>
+    <description>제주 여행 첫날 저녁으로 많이 찾는 흑돼지거리의 위치, 대기, 주변 산책 동선입니다.</description>
+    <category>맛집</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>금오름 노을 산책 가이드</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=geum-oreum-sunset-walk-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=geum-oreum-sunset-walk-guide</guid>
+    <description>서쪽 여행 중 노을 시간에 넣기 좋은 금오름의 산책 난이도와 준비물을 정리했습니다.</description>
+    <category>오름</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>새별오름 억새 시즌 정보</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=saebyeol-oreum-silvergrass-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=saebyeol-oreum-silvergrass-guide</guid>
+    <description>가을 억새와 탁 트인 전망으로 유명한 새별오름의 방문 시간과 혼잡 팁입니다.</description>
+    <category>오름</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>제주시 숙소권 동선 가이드</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=jeju-city-stay-route-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=jeju-city-stay-route-guide</guid>
+    <description>늦은 도착, 짧은 일정, 대중교통 여행자에게 맞는 제주시 숙소권 동선을 정리했습니다.</description>
+    <category>숙소</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>서귀포 숙소권 여행 동선</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=seogwipo-stay-route-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=seogwipo-stay-route-guide</guid>
+    <description>폭포, 시장, 남쪽 해안을 중심으로 여행할 때 서귀포 숙소권이 편한 이유를 정리했습니다.</description>
+    <category>숙소</category>
+    <pubDate>Tue, 07 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>카멜리아힐 계절별 방문 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=camellia-hill-season-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=camellia-hill-season-guide</guid>
+    <description>동백과 수국 시즌에 맞춰 방문하기 좋은 카멜리아힐의 주차, 입장료, 관람 동선을 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Thu, 09 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>아쿠아플라넷 제주 실내 가족 여행</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=aqua-planet-jeju-family-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=aqua-planet-jeju-family-guide</guid>
+    <description>비 오는 날이나 아이와 함께 가기 좋은 아쿠아플라넷 제주의 주차, 입장료, 관람 순서를 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Thu, 09 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>이중섭거리 서귀포 산책 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=lee-jung-seop-street-walk-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=lee-jung-seop-street-walk-guide</guid>
+    <description>서귀포 시내 숙소와 묶기 좋은 이중섭거리 산책, 시장, 카페 동선을 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Thu, 09 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>김녕미로공원 가족 여행 체크</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=gimnyeong-maze-park-family-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=gimnyeong-maze-park-family-guide</guid>
+    <description>아이와 함께 가기 좋은 김녕미로공원의 입장료, 주차, 주변 해변 동선을 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Thu, 09 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>제주4.3평화공원 실내 전시 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=jeju-43-peace-park-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=jeju-43-peace-park-guide</guid>
+    <description>비 오는 날에도 차분하게 둘러보기 좋은 제주4.3평화공원의 전시, 주차, 관람 동선을 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Thu, 09 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>항몽유적지 역사 산책 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=hangmong-historic-site-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=hangmong-historic-site-guide</guid>
+    <description>애월 이동 중 짧게 들르기 좋은 항몽유적지의 주차, 산책, 역사 여행 포인트를 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Thu, 09 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>제주허브동산 야간 산책 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=jeju-herb-dongsan-night-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=jeju-herb-dongsan-night-guide</guid>
+    <description>표선과 성산 사이 일정에 넣기 좋은 제주허브동산의 야간 산책, 입장료, 주차 정보를 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Thu, 09 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>노형수퍼마켙 실내 여행 체크</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=nohyung-supermarket-indoor-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=nohyung-supermarket-indoor-guide</guid>
+    <description>공항 근처에서 비 오는 날 넣기 좋은 노형수퍼마켙의 주차, 입장료, 관람 포인트를 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Thu, 09 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>아르떼뮤지엄 제주 실내 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=arte-museum-jeju-indoor-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=arte-museum-jeju-indoor-guide</guid>
+    <description>비 오는 날 서쪽 일정에 넣기 좋은 아르떼뮤지엄 제주의 예매, 주차, 관람 동선을 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Thu, 09 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>수월봉 지질트레일 주차 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=suwolbong-geotrail-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=suwolbong-geotrail-guide</guid>
+    <description>제주 서쪽 드라이브에 넣기 좋은 수월봉 지질트레일의 주차, 전망, 소요시간을 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Thu, 09 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>송악산 둘레길 산책 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=songaksan-dulle-gil-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=songaksan-dulle-gil-guide</guid>
+    <description>산방산과 마라도 전망을 함께 보는 송악산 둘레길의 주차, 소요시간, 바람 체크포인트를 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Thu, 09 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>방주교회 서귀포 건축 여행</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=bangju-church-architecture-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=bangju-church-architecture-guide</guid>
+    <description>안덕과 중문 사이에서 조용히 들르기 좋은 방주교회의 관람 예절, 주차, 주변 동선을 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Thu, 09 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>한라수목원 제주시 산책 코스</title>
+    <link>https://www.moneyarchive.kr/article.html?slug=hallasan-arboretum-walk-guide</link>
+    <guid isPermaLink="true">https://www.moneyarchive.kr/article.html?slug=hallasan-arboretum-walk-guide</guid>
+    <description>공항과 제주시 숙소권에서 가볍게 걷기 좋은 한라수목원의 주차, 산책, 가족 동선을 정리했습니다.</description>
+    <category>가볼 만한 곳</category>
+    <pubDate>Thu, 09 Jul 2026 15:00:00 GMT</pubDate>
+  </item>
+</channel>
 </rss>
