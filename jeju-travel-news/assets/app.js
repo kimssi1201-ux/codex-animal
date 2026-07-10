@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-content-7";
+import { articles, categories } from "./articles.js?v=20260710-content-8";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-content-7";
+const tourismDataVersion = "20260710-content-8";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -404,6 +404,14 @@ function galleryCard(article) {
   `;
 }
 
+function visualGalleryCard(article) {
+  return `
+    <a class="visual-gallery-card" href="${articleUrl(article)}" aria-label="${escapeHtml(article.title)}">
+      ${articleImageTag(article)}
+    </a>
+  `;
+}
+
 function renderVisualGallery() {
   const gallery = $("#visualGallery");
   if (!gallery) return;
@@ -412,9 +420,9 @@ function renderVisualGallery() {
   gallery.innerHTML = `
     <div class="visual-gallery-head">
       <h2>${escapeHtml(title)}</h2>
-      <span>${items.length}곳</span>
+      <span>${items.length}장</span>
     </div>
-    <div class="visual-gallery-grid">${items.map(galleryCard).join("")}</div>
+    <div class="visual-gallery-grid">${items.map(visualGalleryCard).join("")}</div>
   `;
 }
 
