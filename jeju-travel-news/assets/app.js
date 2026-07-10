@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-content-4";
+import { articles, categories } from "./articles.js?v=20260710-content-5";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-content-4";
+const tourismDataVersion = "20260710-content-5";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -61,6 +61,7 @@ const articleImageKeywordOverrides = new Map([
 ]);
 
 let activeCategory = categories[0] || "전체";
+const filterCategories = categories.filter((category) => category !== categories[0]);
 let officialRequestId = 0;
 let articleThumbnailObserver = null;
 const observedArticleThumbs = new WeakSet();
@@ -68,7 +69,7 @@ const observedArticleThumbs = new WeakSet();
 const faqItems = [
   {
     question: "제주여행뉴스에서는 무엇을 먼저 보면 좋나요?",
-    answer: "상단 카테고리를 고른 뒤 추천 기사와 세로형 뉴스 피드를 보면 됩니다. 처음 방문이라면 전체, 해변, 가볼 만한 곳 순서로 보는 편이 쉽습니다."
+    answer: "추천 기사를 먼저 보고, 관심 있는 카테고리를 고르면 됩니다. 처음 방문이라면 가볼 만한 곳, 해변, 계절 코스 순서로 보는 편이 쉽습니다."
   },
   {
     question: "관광지 정보는 어디에서 확인하나요?",
@@ -405,9 +406,9 @@ function placeCard(place) {
 function renderTabs() {
   const tabs = $("#topCategoryTabs");
   if (!tabs) return;
-  tabs.innerHTML = categories
+  tabs.innerHTML = filterCategories
     .map((category) => {
-      const count = category === categories[0] ? articles.length : articles.filter((article) => article.category === category).length;
+      const count = articles.filter((article) => article.category === category).length;
       return `
       <button type="button" class="${category === activeCategory ? "is-active" : ""}" data-category="${escapeHtml(category)}">
         <span>${escapeHtml(category)}</span>
@@ -421,7 +422,7 @@ function renderTabs() {
 function renderPrimaryNav() {
   const nav = $("#primaryNav");
   if (!nav) return;
-  const links = categories.map((category) => ({ category, active: category === activeCategory }));
+  const links = filterCategories.map((category) => ({ category, active: category === activeCategory }));
   nav.innerHTML = links
     .map((item) => `
       <a class="${item.active ? "is-active" : ""}" href="#july" data-category="${escapeHtml(item.category)}">
@@ -552,7 +553,7 @@ function renderFeed(places = null) {
   const feedCount = $("#feedCount");
   const feedTitle = $("#feedListTitle");
   if (feedCount) feedCount.textContent = `${localItems.length}개`;
-  if (feedTitle) feedTitle.textContent = activeCategory === categories[0] ? "전체글" : activeCategory;
+  if (feedTitle) feedTitle.textContent = activeCategory === categories[0] ? "최신 글" : activeCategory;
   if (status) {
     status.hidden = true;
     status.textContent = "";
