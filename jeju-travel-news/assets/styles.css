@@ -2789,3 +2789,114 @@ body {
     font-size: 23px;
   }
 }
+
+/* Hero balance fix */
+.recommend-news-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(220px, 1fr));
+  grid-auto-flow: row dense;
+  gap: 16px;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.recommend-card {
+  height: 100%;
+  min-height: 220px;
+  min-width: 0;
+}
+
+.recommend-card.is-lead {
+  grid-column: span 2;
+  grid-row: span 2;
+  min-height: 456px;
+}
+
+.recommend-card img,
+.recommend-card.is-lead img {
+  object-position: center center;
+}
+
+.recommend-card:nth-child(1) img {
+  object-position: center 46%;
+}
+
+.recommend-card:nth-child(2) img,
+.recommend-card:nth-child(4) img {
+  object-position: center 42%;
+}
+
+.recommend-card:nth-child(3) img,
+.recommend-card:nth-child(5) img {
+  object-position: center 54%;
+}
+
+.recommend-card:not(.is-lead) .recommend-content {
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+}
+
+.recommend-card:not(.is-lead) .recommend-content strong {
+  font-size: 17px;
+  line-height: 1.32;
+}
+
+@media (max-width: 860px) {
+  .recommend-news-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+    gap: 14px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .recommend-card {
+    min-height: 190px;
+  }
+
+  .recommend-card.is-lead {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    min-height: 330px;
+  }
+}
+
+@media (max-width: 560px) {
+  .recommend-news-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding-bottom: 30px;
+  }
+
+  .recommend-card {
+    min-height: 210px;
+  }
+
+  .recommend-card.is-lead {
+    grid-column: auto;
+    min-height: 276px;
+  }
+
+  .recommend-card.is-lead .recommend-content strong {
+    font-size: clamp(25px, 7.4vw, 31px);
+    line-height: 1.08;
+  }
+
+  .recommend-content p {
+    max-width: 100%;
+  }
+
+  .recommend-card:not(.is-lead) .recommend-content {
+    right: 11px;
+    bottom: 11px;
+    left: 11px;
+  }
+
+  .recommend-card:not(.is-lead) .recommend-content strong {
+    font-size: 14px;
+    line-height: 1.28;
+  }
+}
