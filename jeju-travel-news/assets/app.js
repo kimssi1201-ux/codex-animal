@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260711-content-12";
+import { articles, categories } from "./articles.js?v=20260711-content-13";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260711-content-12";
+const tourismDataVersion = "20260711-content-13";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
