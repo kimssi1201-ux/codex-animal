@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-tripview-1";
+import { articles, categories } from "./articles.js?v=20260710-tripview-2";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-tripview-1";
+const tourismDataVersion = "20260710-tripview-2";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -293,6 +293,37 @@ function recommendedCard(article, isLead = false) {
   `;
 }
 
+function leadArticleCard(article) {
+  return `
+    <a class="news-lead" href="${articleUrl(article)}">
+      <span class="lead-thumb">${articleImageTag(article)}</span>
+      <strong>${escapeHtml(article.title)}</strong>
+      <span>${metaLine([article.category, article.region, article.date])}</span>
+    </a>
+  `;
+}
+
+function pickArticleCard(article) {
+  return `
+    <a class="pick-card" href="${articleUrl(article)}">
+      <span class="pick-thumb">${articleImageTag(article)}</span>
+      <strong>${escapeHtml(article.title)}</strong>
+    </a>
+  `;
+}
+
+function rowArticleCard(article) {
+  return `
+    <a class="news-row" href="${articleUrl(article)}">
+      <span class="row-thumb">${articleImageTag(article)}</span>
+      <span>
+        <strong>${escapeHtml(article.title)}</strong>
+        <em>${escapeHtml([article.category, article.region, article.date].filter(Boolean).join(" · "))}</em>
+      </span>
+    </a>
+  `;
+}
+
 function newsCard(article) {
   return `
     <article class="news-feed-card">
@@ -346,15 +377,13 @@ function renderTabs() {
 function renderPrimaryNav() {
   const nav = $("#primaryNav");
   if (!nav) return;
-  const links = [
-    ["#july", "제주 여행 뉴스"],
-    ["#places", "가볼 만한 곳"],
-    ["#visitCheck", "방문 전 체크"],
-    ["#travelTools", "여행 준비"],
-    ["#myrealtrip", "여행 상품"]
-  ];
+  const links = categories.map((category) => ({ category, active: category === activeCategory }));
   nav.innerHTML = links
-    .map(([href, label]) => `<a href="${href}">${escapeHtml(label)}</a>`)
+    .map((item) => `
+      <a class="${item.active ? "is-active" : ""}" href="#july" data-category="${escapeHtml(item.category)}">
+        ${escapeHtml(item.category)}
+      </a>
+    `)
     .join("");
 }
 
@@ -458,8 +487,8 @@ function compactTravelSearchSections() {
   const myrealtrip = $("#myrealtrip");
 
   if (main && faq) {
-    if (visitCheck) main.insertBefore(visitCheck, faq);
     if (categoryNews) main.insertBefore(categoryNews, faq);
+    if (visitCheck) main.insertBefore(visitCheck, faq);
     main.insertBefore(wrapper, faq);
     if (myrealtrip) main.insertBefore(myrealtrip, faq);
   } else {
@@ -473,22 +502,17 @@ function renderFeed(places = null) {
   if (!feed) return;
 
   const localItems = visibleArticles();
-  const placeItems = Array.isArray(places) ? places : [];
-  const feedHtml = [
-    ...localItems.map(newsCard),
-    ...placeItems.slice(0, 8).map(placeCard)
-  ].join("");
+  const feedHtml = localItems.map(newsCard).join("");
 
   feed.innerHTML = feedHtml || `<p class="empty-state">현재 선택한 카테고리의 제주 여행 정보가 없습니다.</p>`;
   const feedCount = $("#feedCount");
   const feedTitle = $("#feedListTitle");
-  const totalCount = localItems.length + placeItems.slice(0, 8).length;
-  if (feedCount) feedCount.textContent = `${totalCount}개`;
+  if (feedCount) feedCount.textContent = `${localItems.length}개`;
   if (feedTitle) feedTitle.textContent = activeCategory === categories[0] ? "전체글" : activeCategory;
   if (status) {
     status.textContent = activeCategory === categories[0]
-      ? `장소 가이드 ${localItems.length}건 · 공식 관광정보 ${placeItems.length}건`
-      : `${activeCategory} 가이드 ${localItems.length}건 · 공식 관광정보 ${placeItems.length}건`;
+      ? `제주 여행 글 ${localItems.length}개를 최신순으로 정리했습니다.`
+      : `${activeCategory} 글 ${localItems.length}개를 최신순으로 정리했습니다.`;
   }
   hydrateArticleThumbnails();
 }
@@ -610,17 +634,19 @@ function renderCategoryNews() {
   const wrapper = $("#categoryNewsSections");
   if (!wrapper) return;
   wrapper.innerHTML = categories
-    .filter((category) => category !== "전체")
+    .filter((category) => category !== categories[0])
     .map((category) => {
-      const items = articles.filter((article) => article.category === category).slice(0, 3);
+      const items = articles.filter((article) => article.category === category);
       if (!items.length) return "";
+      const [lead, ...rest] = items;
+      const picks = rest.slice(0, 3);
+      const rows = rest.slice(3);
       return `
-        <section class="category-news-section" id="${category === "가볼 만한 곳" ? "places" : ""}">
-          <div class="section-heading">
-            <p class="eyebrow">Category</p>
-            <h2>${escapeHtml(category)}</h2>
-          </div>
-          <div class="news-list-feed compact-feed">${items.map(newsCard).join("")}</div>
+        <section class="news-section category-news-section" id="${category === "가볼 만한 곳" ? "places" : `category-${encodeURIComponent(category)}`}">
+          <h2>${escapeHtml(category)}</h2>
+          ${leadArticleCard(lead)}
+          ${picks.length ? `<div class="pick-grid">${picks.map(pickArticleCard).join("")}</div>` : ""}
+          ${rows.length ? `<div class="news-list">${rows.map(rowArticleCard).join("")}</div>` : ""}
         </section>
       `;
     })
@@ -1129,6 +1155,7 @@ async function loadOfficialPlaces() {
 
 function setActiveCategory(category) {
   activeCategory = category;
+  renderPrimaryNav();
   renderTabs();
   loadOfficialPlaces();
 }
@@ -1165,13 +1192,19 @@ function bindHeader() {
 }
 
 function bindHome() {
-  const tabs = $("#topCategoryTabs");
-  if (!tabs) return;
-  tabs.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-category]");
-    if (!button) return;
-    setActiveCategory(button.dataset.category);
-  });
+  const bindCategoryContainer = (container) => {
+    if (!container) return;
+    container.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-category]");
+      if (!button) return;
+      event.preventDefault();
+      setActiveCategory(button.dataset.category);
+      $("#july")?.scrollIntoView({ block: "start" });
+    });
+  };
+
+  bindCategoryContainer($("#topCategoryTabs"));
+  bindCategoryContainer($("#primaryNav"));
 }
 
 function renderHome() {
