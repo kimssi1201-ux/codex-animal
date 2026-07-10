@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-content-3";
+import { articles, categories } from "./articles.js?v=20260710-content-4";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-content-3";
+const tourismDataVersion = "20260710-content-4";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -316,17 +316,12 @@ function metaLine(parts) {
     .join("");
 }
 
-function thumbnailForArticle(article) {
-  return articleThumbnailCache.get(article.slug) || article.image;
+function thumbnailForArticle(article, useOfficialImage = false) {
+  return useOfficialImage ? articleThumbnailCache.get(article.slug) || article.image : article.image;
 }
 
 function articleImageTag(article, className = "") {
-  return imageTag(
-    thumbnailForArticle(article),
-    article.title,
-    className,
-    `data-article-thumb="${escapeHtml(article.slug)}"`
-  );
+  return imageTag(article.image, article.title, className);
 }
 
 function recommendedCard(article, isLead = false) {
@@ -1540,7 +1535,7 @@ function renderStaticDetail(detail) {
   const article = articles.find((item) => item.slug === slug) || articles[0];
   updateMeta(articleSeoTitle(article), articleSeoDescription(article));
   detail.innerHTML = `
-    ${imageTag(thumbnailForArticle(article), article.title, "detail-hero", `data-article-thumb="${escapeHtml(article.slug)}"`)}
+    ${imageTag(thumbnailForArticle(article, true), article.title, "detail-hero", `data-article-thumb="${escapeHtml(article.slug)}"`)}
     <div class="detail-body">
       <div class="meta">${metaLine([article.category, article.region, article.date])}</div>
       <h1>${escapeHtml(article.title)}</h1>
