@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-api-thumbs-1";
+import { articles, categories } from "./articles.js?v=20260710-tripview-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-api-thumbs-1";
+const tourismDataVersion = "20260710-tripview-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -12,7 +12,7 @@ const tnaCategoryCache = new Map();
 const articleThumbnailCache = new Map();
 const articleThumbnailRequests = new Map();
 
-let activeCategory = "전체";
+let activeCategory = categories[0] || "전체";
 let officialRequestId = 0;
 let articleThumbnailObserver = null;
 const observedArticleThumbs = new WeakSet();
@@ -258,7 +258,7 @@ function priceText(value, currency = "KRW") {
 }
 
 function visibleArticles() {
-  return activeCategory === "전체" ? articles : articles.filter((article) => article.category === activeCategory);
+  return activeCategory === categories[0] ? articles : articles.filter((article) => article.category === activeCategory);
 }
 
 function metaLine(parts) {
@@ -281,12 +281,12 @@ function articleImageTag(article, className = "") {
   );
 }
 
-function recommendedCard(article) {
+function recommendedCard(article, isLead = false) {
   return `
-    <article class="recommend-card">
+    <article class="recommend-card${isLead ? " is-lead" : ""}">
       <a href="${articleUrl(article)}">
         ${articleImageTag(article)}
-        <span>${escapeHtml(article.category)}</span>
+        <div class="recommend-meta meta">${metaLine([article.category, article.region, article.date])}</div>
         <strong>${escapeHtml(article.title)}</strong>
       </a>
     </article>
@@ -331,11 +331,15 @@ function renderTabs() {
   const tabs = $("#topCategoryTabs");
   if (!tabs) return;
   tabs.innerHTML = categories
-    .map((category) => `
+    .map((category) => {
+      const count = category === categories[0] ? articles.length : articles.filter((article) => article.category === category).length;
+      return `
       <button type="button" class="${category === activeCategory ? "is-active" : ""}" data-category="${escapeHtml(category)}">
-        ${escapeHtml(category)}
+        <span>${escapeHtml(category)}</span>
+        <b>${count}</b>
       </button>
-    `)
+    `;
+    })
     .join("");
 }
 
@@ -476,8 +480,13 @@ function renderFeed(places = null) {
   ].join("");
 
   feed.innerHTML = feedHtml || `<p class="empty-state">현재 선택한 카테고리의 제주 여행 정보가 없습니다.</p>`;
+  const feedCount = $("#feedCount");
+  const feedTitle = $("#feedListTitle");
+  const totalCount = localItems.length + placeItems.slice(0, 8).length;
+  if (feedCount) feedCount.textContent = `${totalCount}개`;
+  if (feedTitle) feedTitle.textContent = activeCategory === categories[0] ? "전체글" : activeCategory;
   if (status) {
-    status.textContent = activeCategory === "전체"
+    status.textContent = activeCategory === categories[0]
       ? `장소 가이드 ${localItems.length}건 · 공식 관광정보 ${placeItems.length}건`
       : `${activeCategory} 가이드 ${localItems.length}건 · 공식 관광정보 ${placeItems.length}건`;
   }
@@ -487,7 +496,10 @@ function renderFeed(places = null) {
 function renderRecommended() {
   const row = $("#recommendedArticles");
   if (!row) return;
-  row.innerHTML = articles.slice(0, 3).map(recommendedCard).join("");
+  const picks = articles.slice(0, 4);
+  row.innerHTML = picks
+    .map((article, index) => recommendedCard(article, index === 0))
+    .join("");
   hydrateArticleThumbnails();
 }
 
