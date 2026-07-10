@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-content-10";
+import { articles, categories } from "./articles.js?v=20260711-content-11";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-content-10";
+const tourismDataVersion = "20260711-content-11";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -539,7 +539,7 @@ function renderTodayKeywords() {
   bar.setAttribute("aria-label", "오늘의 여행 키워드");
   bar.innerHTML = `
     <div class="today-keyword-inner">
-      <strong>TODAY</strong>
+      <strong>JEJU NOW</strong>
       <div>
         ${todayKeywords.map((item) => `
           <a href="#july" data-category="${escapeHtml(item.category)}">${escapeHtml(item.label)}</a>
