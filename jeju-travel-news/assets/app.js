@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-content-6";
+import { articles, categories } from "./articles.js?v=20260710-content-7";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-content-6";
+const tourismDataVersion = "20260710-content-7";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -407,10 +407,11 @@ function galleryCard(article) {
 function renderVisualGallery() {
   const gallery = $("#visualGallery");
   if (!gallery) return;
-  const items = uniqueByImage(articles.slice(4)).slice(0, 8);
+  const items = uniqueByImage(visibleArticles().slice(1)).slice(0, 8);
+  const title = activeCategory === categories[0] ? "사진으로 보는 제주" : `${activeCategory} 사진`;
   gallery.innerHTML = `
     <div class="visual-gallery-head">
-      <h2>사진으로 보는 제주</h2>
+      <h2>${escapeHtml(title)}</h2>
       <span>${items.length}곳</span>
     </div>
     <div class="visual-gallery-grid">${items.map(galleryCard).join("")}</div>
@@ -626,11 +627,17 @@ function renderFeed(places = null) {
 function renderRecommended() {
   const row = $("#recommendedArticles");
   if (!row) return;
-  const picks = articles.slice(0, 4);
+  const picks = visibleArticles().slice(0, 4);
   row.innerHTML = picks
     .map((article, index) => recommendedCard(article, index === 0))
     .join("");
   hydrateArticleThumbnails();
+}
+
+function renderCategoryView(places = []) {
+  renderRecommended();
+  renderVisualGallery();
+  renderFeed(places);
 }
 
 function shouldUseOfficialImage(article) {
@@ -1253,12 +1260,12 @@ async function loadOfficialPlaces() {
 
   if (officialCache.has(requestCategory)) {
     const places = officialCache.get(requestCategory);
-    if (applyOfficialImagesToArticles(places)) renderRecommended();
-    renderFeed(places);
+    applyOfficialImagesToArticles(places);
+    renderCategoryView(places);
     return;
   }
 
-  renderFeed([]);
+  renderCategoryView([]);
 
   try {
     const response = await fetch(`/api/jeju?category=${encodeURIComponent(requestCategory)}&v=${tourismDataVersion}`, {
@@ -1274,8 +1281,7 @@ async function loadOfficialPlaces() {
   }
 
   if (requestId === officialRequestId && requestCategory === activeCategory) {
-    renderRecommended();
-    renderFeed(officialCache.get(requestCategory));
+    renderCategoryView(officialCache.get(requestCategory));
   }
 }
 
@@ -1283,6 +1289,7 @@ function setActiveCategory(category) {
   activeCategory = category;
   renderPrimaryNav();
   renderTabs();
+  renderCategoryView([]);
   loadOfficialPlaces();
 }
 
@@ -1337,9 +1344,7 @@ function renderHome() {
   if (!$("#newsFeedList")) return;
   renderPrimaryNav();
   renderTabs();
-  renderRecommended();
-  renderVisualGallery();
-  renderFeed([]);
+  renderCategoryView([]);
   compactTravelSearchSections();
   renderMyRealTrip([], "loading");
   bindFlightSearch();
