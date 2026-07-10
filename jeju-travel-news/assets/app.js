@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-content-5";
+import { articles, categories } from "./articles.js?v=20260710-content-6";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-content-5";
+const tourismDataVersion = "20260710-content-6";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -381,6 +381,68 @@ function newsCard(article) {
         <p>${escapeHtml(article.summary)}</p>
       </div>
     </article>
+  `;
+}
+
+function uniqueByImage(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const image = normalizeImageUrl(item.image);
+    if (seen.has(image)) return false;
+    seen.add(image);
+    return true;
+  });
+}
+
+function galleryCard(article) {
+  return `
+    <a class="gallery-card" href="${articleUrl(article)}">
+      ${articleImageTag(article)}
+      <span>${escapeHtml(article.category)}</span>
+      <strong>${escapeHtml(article.title)}</strong>
+    </a>
+  `;
+}
+
+function renderVisualGallery() {
+  const gallery = $("#visualGallery");
+  if (!gallery) return;
+  const items = uniqueByImage(articles.slice(4)).slice(0, 8);
+  gallery.innerHTML = `
+    <div class="visual-gallery-head">
+      <h2>사진으로 보는 제주</h2>
+      <span>${items.length}곳</span>
+    </div>
+    <div class="visual-gallery-grid">${items.map(galleryCard).join("")}</div>
+  `;
+}
+
+function detailGalleryArticles(article, limit = 6) {
+  const nearby = (article.nearbySpots || []).map(normalizeText).filter(Boolean);
+  const regionHead = normalizeText(String(article.region || "").split("·")[0]);
+  const scored = articles
+    .filter((item) => item.slug !== article.slug)
+    .map((item) => {
+      const target = normalizeText([item.title, item.region, ...(item.course || [])].join(" "));
+      const sameCategory = item.category === article.category ? 3 : 0;
+      const sameRegion = regionHead && normalizeText(item.region).includes(regionHead) ? 2 : 0;
+      const nearbyMatch = nearby.some((spot) => target.includes(spot) || spot.includes(normalizeText(item.title))) ? 5 : 0;
+      return { item, score: sameCategory + sameRegion + nearbyMatch };
+    })
+    .sort((a, b) => b.score - a.score);
+  const preferred = scored.filter(({ score }) => score > 0).map(({ item }) => item);
+  const fallback = articles.filter((item) => item.slug !== article.slug);
+  return uniqueByImage([...preferred, ...fallback]).slice(0, limit);
+}
+
+function renderArticleGallery(article) {
+  const items = detailGalleryArticles(article);
+  if (!items.length) return "";
+  return `
+    <section class="article-gallery-section">
+      <h2>함께 볼 만한 사진</h2>
+      <div class="article-gallery-grid">${items.map(galleryCard).join("")}</div>
+    </section>
   `;
 }
 
@@ -1276,6 +1338,7 @@ function renderHome() {
   renderPrimaryNav();
   renderTabs();
   renderRecommended();
+  renderVisualGallery();
   renderFeed([]);
   compactTravelSearchSections();
   renderMyRealTrip([], "loading");
@@ -1542,6 +1605,7 @@ function renderStaticDetail(detail) {
       <h1>${escapeHtml(article.title)}</h1>
       <p class="summary">${escapeHtml(article.summary)}</p>
       <table class="info-table article-info-table"><tbody id="articleInfoRows">${staticInfoRows(article)}</tbody></table>
+      ${renderArticleGallery(article)}
       ${renderInlineOfficialShell(article)}
       ${renderAudienceSection(article)}
       ${renderPlanningSection(article)}
