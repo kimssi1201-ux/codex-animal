@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-content-8";
+import { articles, categories } from "./articles.js?v=20260710-content-9";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-content-8";
+const tourismDataVersion = "20260710-content-9";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -1410,23 +1410,78 @@ function articleOfficialKeyword(article) {
     .trim() || article.title;
 }
 
-function extendedArticleParagraphs(article) {
+function articleBodySections(article) {
   const course = (article.course || []).filter(Boolean);
   const nearby = (article.nearbySpots || []).filter(Boolean);
   const firstCourse = course[0] || article.title;
-  const lastCourse = course[course.length - 1] || nearby[0] || article.region;
+  const secondCourse = course[1] || article.region || "주변 코스";
+  const lastCourse = course[course.length - 1] || nearby[0] || article.region || article.title;
+  const routeText = course.length ? course.slice(0, 5).join(" → ") : article.title;
   const nearbyText = nearby.length ? nearby.slice(0, 4).join(", ") : "주변 관광지";
+  const baseContent = (article.content || []).filter(Boolean);
+  const intro = baseContent[0] || `${article.title}은 ${article.region || "제주"}에서 일정에 넣기 좋은 ${article.category || "여행지"}입니다.`;
+  const localTip = baseContent[1] || `${article.region || "제주"} 권역은 날씨와 교통 상황에 따라 체감 이동 시간이 달라질 수 있으니 여유 시간을 두고 움직이는 편이 좋습니다.`;
 
   return [
-    `${article.title}을 일정에 넣을 때는 ${firstCourse}에서 시작해 ${lastCourse}까지 이어지는 흐름으로 잡으면 이동이 자연스럽습니다. 사진을 찍는 시간, 식사 시간, 주차장에서 목적지까지 걷는 시간을 함께 계산하면 실제 체류 시간이 부족하지 않습니다.`,
-    `초행이라면 장소를 많이 넣기보다 핵심 포인트를 두세 곳으로 줄이는 편이 좋습니다. ${article.region} 권역은 날씨와 도로 상황에 따라 체감 이동 시간이 달라질 수 있으니, 오전에는 야외 코스, 오후에는 카페나 시장처럼 쉬어갈 수 있는 곳을 섞어 두면 일정이 안정적입니다.`,
-    `방문 전에는 운영시간, 입장료, 주차 가능 여부를 다시 확인하세요. ${article.parking} ${article.operatingHours} 현장 상황이 바뀌면 가까운 대체 코스로 ${nearbyText} 중 한두 곳을 준비해 두는 것도 좋습니다.`,
-    `가족 여행이나 렌터카 여행이라면 화장실, 그늘, 편의점, 식사 장소 위치를 먼저 보는 편이 편합니다. 도보 이동이 긴 날에는 얇은 겉옷과 물을 준비하고, 바람이 강한 해안이나 오름은 사진보다 안전한 이동 동선을 우선하세요.`
+    {
+      title: "여행 포인트",
+      paragraphs: [
+        intro,
+        `${article.title}은 한 장소만 빠르게 보고 이동하기보다 주변 흐름을 함께 잡을 때 만족도가 높습니다. ${article.category || "여행"} 일정이라면 사진을 찍는 시간, 식사 시간, 주차장에서 목적지까지 걷는 시간을 같이 계산해 두세요.`
+      ]
+    },
+    {
+      title: "추천 동선",
+      paragraphs: [
+        `기본 동선은 ${routeText} 순서로 잡으면 무리 없이 이어집니다. 시작 지점은 ${firstCourse}, 중간에 여유를 두고 볼 곳은 ${secondCourse}, 마무리 지점은 ${lastCourse}로 생각하면 전체 흐름이 단순해집니다.`,
+        `일정이 짧다면 모든 장소를 다 넣기보다 핵심 2~3곳만 고르는 편이 낫습니다. 반대로 반나절 이상 시간이 있다면 ${nearbyText}까지 묶어 같은 권역 안에서 천천히 움직이는 구성이 좋습니다.`
+      ]
+    },
+    {
+      title: "머무는 시간과 이동 팁",
+      paragraphs: [
+        localTip,
+        `렌터카 이동이라면 주차 위치를 먼저 확인하세요. ${article.parking} 도보 이동이 길어질 수 있는 날에는 목적지 바로 앞 주차만 고집하지 말고 가까운 공영 주차장이나 대체 코스를 함께 보는 편이 편합니다.`
+      ]
+    },
+    {
+      title: "방문 전 확인",
+      paragraphs: [
+        `운영시간과 입장료는 계절, 날씨, 현장 사정에 따라 달라질 수 있습니다. ${article.operatingHours} ${article.fee} 출발 전에는 지도 위치와 공식 안내를 한 번 더 확인하는 것이 안전합니다.`,
+        `해변, 오름, 숲길처럼 야외 비중이 큰 일정은 바람과 비 예보에 영향을 많이 받습니다. 아이와 함께 가거나 부모님을 모시고 간다면 화장실, 그늘, 편의점, 식사 장소를 먼저 확인하고 이동하세요.`
+      ]
+    }
   ];
 }
 
-function articleBodyParagraphs(article) {
-  return [...(article.content || []), ...extendedArticleParagraphs(article)];
+function articleReadableLead(article) {
+  const course = (article.course || []).filter(Boolean);
+  const firstCourse = course[0] || article.title;
+  const lastCourse = course[course.length - 1] || article.region || article.title;
+  const nearby = (article.nearbySpots || []).filter(Boolean);
+  const nearbyText = nearby.length ? `${nearby.slice(0, 3).join(", ")}까지` : "주변 코스까지";
+  return `${firstCourse}에서 시작해 ${lastCourse}로 이어지는 흐름을 기준으로 정리했습니다. ${article.region || "제주"} 권역에서 ${article.category || "여행"} 일정을 잡을 때 필요한 동선, 체류 시간, 방문 전 확인 사항을 함께 보세요. 여유가 있으면 ${nearbyText} 묶어 보면 좋습니다.`;
+}
+
+function renderArticleBodySection(article) {
+  return `
+    <section class="article-readable-section">
+      <div class="section-kicker">TRAVEL NOTE</div>
+      <h2>본문 정보</h2>
+      <div class="readable-lead">
+        <strong>읽기 전 핵심</strong>
+        <p>${escapeHtml(articleReadableLead(article))}</p>
+      </div>
+      <div class="article-note-list">
+        ${articleBodySections(article).map((section) => `
+          <article class="article-note-block">
+            <h3>${escapeHtml(section.title)}</h3>
+            ${section.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+          </article>
+        `).join("")}
+      </div>
+    </section>
+  `;
 }
 
 function articleAudienceItems(article) {
@@ -1622,13 +1677,10 @@ function renderStaticDetail(detail) {
       ${renderInlineOfficialShell(article)}
       ${renderAudienceSection(article)}
       ${renderPlanningSection(article)}
-      <section>
-        <h2>본문 정보</h2>
-        ${articleBodyParagraphs(article).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
-      </section>
+      ${renderArticleBodySection(article)}
       <section>
         <h2>여행 코스 요약</h2>
-        <ol class="course-list">${article.course.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
+        <ol class="course-list">${(article.course || []).map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
       </section>
       <section>
         <h2>방문 전 체크포인트</h2>
