@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260710-content-9";
+import { articles, categories } from "./articles.js?v=20260710-content-10";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260710-content-9";
+const tourismDataVersion = "20260710-content-10";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -65,6 +65,17 @@ const filterCategories = categories.filter((category) => category !== categories
 let officialRequestId = 0;
 let articleThumbnailObserver = null;
 const observedArticleThumbs = new WeakSet();
+
+const todayKeywords = [
+  { label: "제주 가볼만한 곳", category: "가볼 만한 곳" },
+  { label: "제주 해변", category: "해변" },
+  { label: "제주 맛집", category: "맛집" },
+  { label: "카페 투어", category: "카페" },
+  { label: "오름 산책", category: "오름" },
+  { label: "계절 코스", category: "계절 코스" },
+  { label: "숙소 위치", category: "숙소" },
+  { label: "비 오는 날", category: "계절 코스" }
+];
 
 const faqItems = [
   {
@@ -322,7 +333,7 @@ function thumbnailForArticle(article, useOfficialImage = false) {
 }
 
 function articleImageTag(article, className = "") {
-  return imageTag(article.image, article.title, className);
+  return imageTag(thumbnailForArticle(article, true), article.title, className, `data-article-thumb="${escapeHtml(article.slug)}"`);
 }
 
 function recommendedCard(article, isLead = false) {
@@ -330,9 +341,25 @@ function recommendedCard(article, isLead = false) {
     <article class="recommend-card${isLead ? " is-lead" : ""}">
       <a href="${articleUrl(article)}">
         ${articleImageTag(article)}
-        ${isLead ? `<div class="recommend-meta meta">${metaLine([article.category, article.region])}</div>` : ""}
-        <strong>${escapeHtml(article.title)}</strong>
-        ${isLead ? `<p>${escapeHtml(article.summary)}</p>` : ""}
+        <span class="recommend-content">
+          <span class="recommend-label">${escapeHtml(article.category)}</span>
+          <strong>${escapeHtml(article.title)}</strong>
+          ${isLead ? `<p>${escapeHtml(article.summary)}</p>` : ""}
+          <em>${escapeHtml([article.date, article.region].filter(Boolean).join(" · "))}</em>
+        </span>
+      </a>
+    </article>
+  `;
+}
+
+function sectionArticleCard(article) {
+  return `
+    <article class="section-card">
+      <a href="${articleUrl(article)}">
+        <span class="section-thumb">${articleImageTag(article)}</span>
+        <span class="section-card-label">${escapeHtml(article.category)}</span>
+        <h3>${escapeHtml(article.title)}</h3>
+        <p>${escapeHtml(article.summary)}</p>
       </a>
     </article>
   `;
@@ -503,6 +530,26 @@ function renderPrimaryNav() {
     .join("");
 }
 
+function renderTodayKeywords() {
+  if ($(".today-keyword-bar")) return;
+  const header = $(".site-header");
+  if (!header) return;
+  const bar = document.createElement("nav");
+  bar.className = "today-keyword-bar";
+  bar.setAttribute("aria-label", "오늘의 여행 키워드");
+  bar.innerHTML = `
+    <div class="today-keyword-inner">
+      <strong>TODAY</strong>
+      <div>
+        ${todayKeywords.map((item) => `
+          <a href="#july" data-category="${escapeHtml(item.category)}">${escapeHtml(item.label)}</a>
+        `).join("")}
+      </div>
+    </div>
+  `;
+  header.after(bar);
+}
+
 function compactTravelSearchSections() {
   if ($("#travelTools")) return;
 
@@ -617,14 +664,16 @@ function renderFeed(places = null) {
   const status = $("#julyStatus") || $("#feedStatus");
   if (!feed) return;
 
-  const localItems = visibleArticles();
-  const feedHtml = localItems.map(newsCard).join("");
+  const localItems = activeCategory === categories[0]
+    ? articles.filter((article) => article.category === "가볼 만한 곳").slice(0, 9)
+    : visibleArticles();
+  const feedHtml = localItems.map(sectionArticleCard).join("");
 
   feed.innerHTML = feedHtml || `<p class="empty-state">현재 선택한 카테고리의 제주 여행 정보가 없습니다.</p>`;
   const feedCount = $("#feedCount");
   const feedTitle = $("#feedListTitle");
-  if (feedCount) feedCount.textContent = `${localItems.length}개`;
-  if (feedTitle) feedTitle.textContent = activeCategory === categories[0] ? "최신 글" : activeCategory;
+  if (feedCount) feedCount.textContent = "더보기 +";
+  if (feedTitle) feedTitle.textContent = activeCategory === categories[0] ? "가볼만한 곳" : activeCategory;
   if (status) {
     status.hidden = true;
     status.textContent = "";
@@ -635,7 +684,7 @@ function renderFeed(places = null) {
 function renderRecommended() {
   const row = $("#recommendedArticles");
   if (!row) return;
-  const picks = visibleArticles().slice(0, 4);
+  const picks = visibleArticles().slice(0, 5);
   row.innerHTML = picks
     .map((article, index) => recommendedCard(article, index === 0))
     .join("");
@@ -774,24 +823,40 @@ function hydrateArticleThumbnails() {
 function renderCategoryNews() {
   const wrapper = $("#categoryNewsSections");
   if (!wrapper) return;
-  wrapper.innerHTML = categories
-    .filter((category) => category !== categories[0])
-    .map((category) => {
-      const items = articles.filter((article) => article.category === category);
+  const sections = [
+    {
+      id: "latest-news",
+      eyebrow: "LATEST",
+      title: "최신 여행뉴스",
+      items: articles.slice(0, 6)
+    },
+    ...categories
+      .filter((category) => category !== categories[0] && category !== "가볼 만한 곳")
+      .map((category) => ({
+        id: `category-${encodeURIComponent(category)}`,
+        eyebrow: "TRAVEL",
+        title: category,
+        items: articles.filter((article) => article.category === category).slice(0, 6)
+      }))
+  ];
+
+  wrapper.innerHTML = sections
+    .map((section) => {
+      const items = section.items || [];
       if (!items.length) return "";
-      const [lead, ...rest] = items;
-      const picks = rest.slice(0, 3);
-      const rows = rest.slice(3);
       return `
-        <section class="news-section category-news-section" id="${category === "가볼 만한 곳" ? "places" : `category-${encodeURIComponent(category)}`}">
-          <h2>${escapeHtml(category)}</h2>
-          ${leadArticleCard(lead)}
-          ${picks.length ? `<div class="pick-grid">${picks.map(pickArticleCard).join("")}</div>` : ""}
-          ${rows.length ? `<div class="news-list">${rows.map(rowArticleCard).join("")}</div>` : ""}
+        <section class="news-section category-news-section" id="${section.id}">
+          <div class="portal-section-head">
+            <span>${escapeHtml(section.eyebrow)}</span>
+            <h2>${escapeHtml(section.title)}</h2>
+            <a href="#july" data-category="${escapeHtml(section.title)}">더보기 +</a>
+          </div>
+          <div class="section-card-grid">${items.map(sectionArticleCard).join("")}</div>
         </section>
       `;
     })
     .join("");
+  hydrateArticleThumbnails();
 }
 
 function renderFaq() {
@@ -1294,7 +1359,11 @@ async function loadOfficialPlaces() {
 }
 
 function setActiveCategory(category) {
-  activeCategory = category;
+  if (category && !categories.includes(category)) {
+    activeCategory = categories[0];
+  } else {
+    activeCategory = category || categories[0];
+  }
   renderPrimaryNav();
   renderTabs();
   renderCategoryView([]);
@@ -1346,10 +1415,13 @@ function bindHome() {
 
   bindCategoryContainer($("#topCategoryTabs"));
   bindCategoryContainer($("#primaryNav"));
+  bindCategoryContainer($(".today-keyword-bar"));
+  bindCategoryContainer($("#categoryNewsSections"));
 }
 
 function renderHome() {
   if (!$("#newsFeedList")) return;
+  renderTodayKeywords();
   renderPrimaryNav();
   renderTabs();
   renderCategoryView([]);
