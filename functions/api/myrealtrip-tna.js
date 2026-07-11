@@ -91,6 +91,78 @@ function targetUrl(apiBase, path) {
   }
 }
 
+function normalizeUrl(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const normalized = text.startsWith("//") ? `https:${text}` : text;
+  if (normalized.startsWith("http://")) return normalized.replace(/^http:\/\//i, "https://");
+  if (!/^https:\/\//i.test(normalized)) return "";
+  try {
+    return new URL(normalized).href;
+  } catch (error) {
+    return "";
+  }
+}
+
+function firstMappedImage(value, allowGenericUrl = false, seen = new WeakSet()) {
+  if (!value) return "";
+  if (typeof value === "string") return allowGenericUrl ? normalizeUrl(value) : "";
+  if (typeof value !== "object") return "";
+  if (seen.has(value)) return "";
+  seen.add(value);
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = firstMappedImage(item, allowGenericUrl, seen);
+      if (found) return found;
+    }
+    return "";
+  }
+
+  if (value.type === "Image") {
+    const image = normalizeUrl(value.src || value.url || value.imageUrl || value.thumbnailUrl || "");
+    if (image) return image;
+  }
+
+  const directKeys = [
+    "image",
+    "imageUrl",
+    "thumbnail",
+    "thumbnailUrl",
+    "mainImage",
+    "mainImageUrl",
+    "coverImage",
+    "coverImageUrl",
+    "representativeImage",
+    "representativeImageUrl",
+    "productImage",
+    "productImageUrl",
+    "photo",
+    "photoUrl",
+    "picture",
+    "pictureUrl"
+  ];
+
+  for (const key of directKeys) {
+    const found = firstMappedImage(value[key], true, seen);
+    if (found) return found;
+  }
+
+  if (allowGenericUrl) {
+    const generic = normalizeUrl(value.url || value.src || value.href || "");
+    if (generic) return generic;
+  }
+
+  for (const [key, child] of Object.entries(value)) {
+    if (/(image|thumbnail|photo|picture|cover|media|gallery)/i.test(key)) {
+      const found = firstMappedImage(child, true, seen);
+      if (found) return found;
+    }
+  }
+
+  return "";
+}
+
 function asArray(payload) {
   const candidates = [
     payload?.items,
@@ -99,12 +171,31 @@ function asArray(payload) {
     payload?.tours,
     payload?.tickets,
     payload?.results,
+    payload?.list,
+    payload?.productList,
+    payload?.result?.items,
+    payload?.result?.products,
+    payload?.result?.tours,
+    payload?.result?.tickets,
+    payload?.result?.results,
+    payload?.result?.data?.items,
+    payload?.result?.data?.products,
+    payload?.result?.data?.tours,
+    payload?.result?.data?.tickets,
+    payload?.result?.data?.results,
+    payload?.body?.items,
+    payload?.body?.products,
+    payload?.content?.items,
+    payload?.content?.products,
     payload?.data?.items,
     payload?.data?.categories,
     payload?.data?.products,
     payload?.data?.tours,
     payload?.data?.tickets,
     payload?.data?.results,
+    payload?.data?.list,
+    payload?.data?.productList,
+    payload?.data?.content,
     payload?.data
   ];
   return candidates.find(Array.isArray) || [];
@@ -117,17 +208,7 @@ function normalizeCategory(item = {}) {
 }
 
 function normalizeProduct(item = {}) {
-  const image = (
-    item.image ||
-    item.imageUrl ||
-    item.thumbnail ||
-    item.thumbnailUrl ||
-    item.mainImage ||
-    item.coverImage ||
-    item?.images?.[0]?.url ||
-    item?.images?.[0] ||
-    ""
-  );
+  const image = firstMappedImage(item, false);
   const price = item.priceText || item.displayPrice || item.priceLabel || item.salePrice || item.price || item.minPrice || "가격 확인";
   return {
     id: String(item.id || item.productId || item.tnaProductId || item.offerId || ""),
@@ -136,7 +217,7 @@ function normalizeProduct(item = {}) {
     region: String(item.cityName || item.regionName || item.region || item.location || ""),
     priceText: String(price),
     image: String(image),
-    url: String(item.url || item.link || item.deepLink || item.webUrl || item.shareUrl || "")
+    url: String(normalizeUrl(item.url || item.link || item.deepLink || item.webUrl || item.shareUrl || ""))
   };
 }
 
@@ -153,7 +234,8 @@ function parseMcpContent(payload) {
 
 function firstImage(node) {
   if (!node || typeof node !== "object") return "";
-  if (node.type === "Image" && node.src) return String(node.src);
+  const mapped = firstMappedImage(node, false);
+  if (mapped) return mapped;
   for (const child of node.children || []) {
     const found = firstImage(child);
     if (found) return found;

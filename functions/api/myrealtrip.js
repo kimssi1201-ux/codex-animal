@@ -98,6 +98,65 @@ function normalizeImage(value) {
   return normalizeUrl(value);
 }
 
+function firstMappedImage(value, allowGenericUrl = false, seen = new WeakSet()) {
+  if (!value) return "";
+  if (typeof value === "string") return allowGenericUrl ? normalizeImage(value) : "";
+  if (typeof value !== "object") return "";
+  if (seen.has(value)) return "";
+  seen.add(value);
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = firstMappedImage(item, allowGenericUrl, seen);
+      if (found) return found;
+    }
+    return "";
+  }
+
+  if (value.type === "Image") {
+    const image = normalizeImage(value.src || value.url || value.imageUrl || value.thumbnailUrl || "");
+    if (image) return image;
+  }
+
+  const directKeys = [
+    "image",
+    "imageUrl",
+    "thumbnail",
+    "thumbnailUrl",
+    "mainImage",
+    "mainImageUrl",
+    "coverImage",
+    "coverImageUrl",
+    "representativeImage",
+    "representativeImageUrl",
+    "productImage",
+    "productImageUrl",
+    "photo",
+    "photoUrl",
+    "picture",
+    "pictureUrl"
+  ];
+
+  for (const key of directKeys) {
+    const found = firstMappedImage(value[key], true, seen);
+    if (found) return found;
+  }
+
+  if (allowGenericUrl) {
+    const generic = normalizeImage(value.url || value.src || value.href || "");
+    if (generic) return generic;
+  }
+
+  for (const [key, child] of Object.entries(value)) {
+    if (/(image|thumbnail|photo|picture|cover|media|gallery)/i.test(key)) {
+      const found = firstMappedImage(child, true, seen);
+      if (found) return found;
+    }
+  }
+
+  return "";
+}
+
 function parseMcpContent(payload) {
   const content = payload?.result?.content || [];
   const text = content.find((item) => item?.type === "text")?.text || "";
@@ -111,7 +170,8 @@ function parseMcpContent(payload) {
 
 function firstImage(node) {
   if (!node || typeof node !== "object") return "";
-  if (node.type === "Image" && node.src) return String(node.src);
+  const mapped = firstMappedImage(node, false);
+  if (mapped) return mapped;
   for (const child of node.children || []) {
     const found = firstImage(child);
     if (found) return found;
@@ -242,9 +302,24 @@ function asArray(payload) {
     payload?.items,
     payload?.products,
     payload?.results,
+    payload?.list,
+    payload?.productList,
+    payload?.result?.items,
+    payload?.result?.products,
+    payload?.result?.results,
+    payload?.result?.data?.items,
+    payload?.result?.data?.products,
+    payload?.result?.data?.results,
+    payload?.body?.items,
+    payload?.body?.products,
+    payload?.content?.items,
+    payload?.content?.products,
     payload?.data?.items,
     payload?.data?.products,
     payload?.data?.results,
+    payload?.data?.list,
+    payload?.data?.productList,
+    payload?.data?.content,
     payload?.data
   ];
   const list = candidates.find(Array.isArray);
@@ -252,16 +327,7 @@ function asArray(payload) {
 }
 
 function normalizeItem(item = {}) {
-  const image = normalizeImage(
-    item.image ||
-    item.imageUrl ||
-    item.thumbnail ||
-    item.thumbnailUrl ||
-    item.mainImage ||
-    item.coverImage ||
-    item?.images?.[0]?.url ||
-    item?.images?.[0]
-  );
+  const image = firstMappedImage(item, false);
 
   return {
     id: String(item.id || item.productId || item.offerId || item.uuid || ""),

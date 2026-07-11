@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260711-content-15";
+import { articles, categories } from "./articles.js?v=20260711-content-16";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260711-content-15";
+const tourismDataVersion = "20260711-content-16";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -219,6 +219,72 @@ function safeExternalUrl(value) {
   }
 }
 
+function firstMappedProductImage(value, allowGenericUrl = false, seen = new WeakSet()) {
+  if (!value) return "";
+  if (typeof value === "string") {
+    const raw = value.trim();
+    return allowGenericUrl && raw ? normalizeImageUrl(raw) : "";
+  }
+  if (typeof value !== "object") return "";
+  if (seen.has(value)) return "";
+  seen.add(value);
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = firstMappedProductImage(item, allowGenericUrl, seen);
+      if (found) return found;
+    }
+    return "";
+  }
+
+  if (value.type === "Image") {
+    const raw = String(value.src || value.url || value.imageUrl || value.thumbnailUrl || "").trim();
+    const image = raw ? normalizeImageUrl(raw) : "";
+    if (image) return image;
+  }
+
+  const directKeys = [
+    "image",
+    "imageUrl",
+    "thumbnail",
+    "thumbnailUrl",
+    "mainImage",
+    "mainImageUrl",
+    "coverImage",
+    "coverImageUrl",
+    "representativeImage",
+    "representativeImageUrl",
+    "productImage",
+    "productImageUrl",
+    "hotelImage",
+    "hotelImageUrl",
+    "photo",
+    "photoUrl",
+    "picture",
+    "pictureUrl"
+  ];
+
+  for (const key of directKeys) {
+    const found = firstMappedProductImage(value[key], true, seen);
+    if (found) return found;
+  }
+
+  if (allowGenericUrl) {
+    const raw = String(value.url || value.src || value.href || "").trim();
+    const generic = raw ? normalizeImageUrl(raw) : "";
+    if (generic) return generic;
+  }
+
+  for (const [key, child] of Object.entries(value)) {
+    if (/(image|thumbnail|photo|picture|cover|media|gallery)/i.test(key)) {
+      const found = firstMappedProductImage(child, true, seen);
+      if (found) return found;
+    }
+  }
+
+  return "";
+}
+
 function imageTag(src, alt, className = "", attrs = "") {
   const classAttribute = className ? ` class="${escapeHtml(className)}"` : "";
   const extraAttributes = attrs ? ` ${attrs}` : "";
@@ -239,7 +305,7 @@ function normalizeProduct(product = {}) {
     title: product.title || product.name || product.productName || "제주 여행 상품",
     category: product.category || product.type || product.productType || "여행 상품",
     priceText: product.priceText || product.displayPrice || product.price || product.salePrice || "가격 확인",
-    image: product.image || product.imageUrl || product.thumbnail || product.thumbnailUrl || product.mainImage || "",
+    image: firstMappedProductImage(product, false),
     url: safeExternalUrl(product.url || product.link || product.deepLink || product.webUrl)
   };
 }
@@ -365,7 +431,7 @@ function normalizeTnaProduct(product = {}) {
     category: product.categoryName || product.category || product.type || "투어·티켓",
     region: product.region || product.regionName || product.cityName || product.location || "",
     priceText: product.priceText || product.displayPrice || product.priceLabel || product.price || product.salePrice || "가격 확인",
-    image: product.image || product.imageUrl || product.thumbnail || product.thumbnailUrl || product.mainImage || "",
+    image: firstMappedProductImage(product, false),
     url: safeExternalUrl(product.url || product.link || product.deepLink || product.webUrl)
   };
 }
