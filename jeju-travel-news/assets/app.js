@@ -1,14 +1,15 @@
-import { articles, categories } from "./articles.js?v=20260711-content-14";
+import { articles, categories } from "./articles.js?v=20260711-content-15";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260711-content-14";
+const tourismDataVersion = "20260711-content-15";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
 const regionCache = new Map();
 const tnaCategoryCache = new Map();
+const myrealtripRequestKeys = new Map();
 const articleThumbnailCache = new Map();
 const articleThumbnailRequests = new Map();
 const officialImageSlugs = new Set([
@@ -241,6 +242,99 @@ function normalizeProduct(product = {}) {
     image: product.image || product.imageUrl || product.thumbnail || product.thumbnailUrl || product.mainImage || "",
     url: safeExternalUrl(product.url || product.link || product.deepLink || product.webUrl)
   };
+}
+
+function cleanTravelKeyword(value) {
+  return String(value || "")
+    .replace(/[·•]/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/\s*(여행\s*)?(코스|가이드|정보|체크|방문 전 체크)$/g, "")
+    .trim();
+}
+
+function hasAnyKeyword(value, keywords) {
+  const text = String(value || "");
+  return keywords.some((keyword) => text.includes(keyword));
+}
+
+function compactKeywordParts(parts) {
+  const unique = [];
+  parts
+    .map(cleanTravelKeyword)
+    .filter(Boolean)
+    .forEach((part) => {
+      if (!unique.some((item) => normalizeText(item) === normalizeText(part))) unique.push(part);
+    });
+  return unique.join(" ").replace(/\s+/g, " ").trim();
+}
+
+function myrealtripContextFromArticle(article = {}, categoryOverride = "") {
+  const category = cleanTravelKeyword(categoryOverride || article.category);
+  const spot = cleanTravelKeyword(articleOfficialKeyword(article) || article.title);
+  const region = cleanTravelKeyword(article.region).replace(/^제주\s*/, "제주 ");
+  const title = cleanTravelKeyword(article.title);
+  const base = spot || title || region || "제주";
+  let keyword = compactKeywordParts(["제주", base]);
+  let label = base || "제주";
+  let type = "tour";
+
+  if (hasAnyKeyword(category, ["숙소", "호텔", "펜션"])) {
+    keyword = compactKeywordParts([region || "제주", "숙소"]);
+    label = cleanTravelKeyword(region || "제주 숙소");
+    type = "hotel";
+  } else if (hasAnyKeyword(category, ["맛집", "먹거리"])) {
+    keyword = compactKeywordParts(["제주", base, "맛집"]);
+  } else if (hasAnyKeyword(category, ["카페"])) {
+    keyword = compactKeywordParts(["제주", base, "카페"]);
+  } else if (hasAnyKeyword(category, ["해변", "바다"])) {
+    keyword = compactKeywordParts(["제주", base, "해변"]);
+  } else if (hasAnyKeyword(category, ["오름", "숲", "산책"])) {
+    keyword = compactKeywordParts(["제주", base, "트레킹"]);
+  } else if (hasAnyKeyword(category, ["계절", "코스"])) {
+    keyword = compactKeywordParts(["제주", base, "투어"]);
+  } else {
+    keyword = compactKeywordParts(["제주", base, "투어"]);
+  }
+
+  return {
+    keyword: keyword || "제주 투어",
+    label: label || keyword || "제주",
+    type,
+    category
+  };
+}
+
+function myrealtripContextFromHome() {
+  const category = activeCategory === categories[0] ? "" : activeCategory;
+  const seed = visibleArticles()[0] || articles[0] || {};
+  return myrealtripContextFromArticle(seed, category);
+}
+
+function contextualMyRealTripFallbackItems(context = {}) {
+  const label = cleanTravelKeyword(context.label || context.keyword || "제주");
+  const titles = context.type === "hotel"
+    ? [`${label} 숙소`, `${label} 호텔`, `${label} 근처 여행 상품`]
+    : [`${label} 투어·티켓`, `${label} 액티비티`, `${label} 숙소`];
+
+  return myrealtripFallbackItems.map((item, index) => ({
+    ...item,
+    title: titles[index] || item.title,
+    category: "마이리얼트립",
+    priceText: "제휴 상품 확인"
+  }));
+}
+
+function contextualProduct(product, context = {}, index = 0) {
+  const item = normalizeProduct(product);
+  const label = cleanTravelKeyword(context.label || context.keyword);
+  const category = String(item.category || "");
+  const isAffiliateFallback = category.includes("마이리얼트립") || category.includes("MyRealTrip");
+  if (!label || !isAffiliateFallback || normalizeText(item.title).includes(normalizeText(label))) return item;
+
+  const titles = context.type === "hotel"
+    ? [`${label} 숙소`, `${label} 호텔`, `${label} 주변 여행 상품`]
+    : [`${label} 투어·티켓`, `${label} 액티비티`, `${label} 숙소`];
+  return { ...item, title: titles[index] || item.title };
 }
 
 function normalizeAirport(item = {}) {
@@ -695,6 +789,7 @@ function renderCategoryView(places = []) {
   renderRecommended();
   renderVisualGallery();
   renderFeed(places);
+  loadContextualMyRealTrip(myrealtripContextFromHome());
 }
 
 function shouldUseOfficialImage(article) {
@@ -885,8 +980,8 @@ function renderVisitCheck() {
     .join("");
 }
 
-function myrealtripCard(product) {
-  const item = normalizeProduct(product);
+function myrealtripCard(product, context = {}, index = 0) {
+  const item = contextualProduct(product, context, index);
   const content = `
     ${imageTag(item.image, item.title)}
     <span>
@@ -907,45 +1002,66 @@ function myrealtripCard(product) {
   return `<article class="mrt-card is-disabled">${content}</article>`;
 }
 
-function renderMyRealTrip(items = [], mode = "loading") {
-  const grid = $("#myrealtripGrid");
+function renderMyRealTrip(items = [], mode = "loading", context = {}, gridSelector = "#myrealtripGrid") {
+  const grid = $(gridSelector);
   if (!grid) return;
+  const label = cleanTravelKeyword(context.label || context.keyword || "제주");
+  const heading = grid.closest(".mrt-section")?.querySelector(".section-heading h2");
+  if (heading && gridSelector === "#myrealtripGrid") {
+    heading.textContent = `${label} 여행 상품·제휴 추천`;
+  }
 
   if (mode === "ready" && items.length) {
-    grid.innerHTML = items.slice(0, 6).map(myrealtripCard).join("");
+    grid.innerHTML = items.slice(0, 6).map((item, index) => myrealtripCard(item, context, index)).join("");
     return;
   }
 
   const message = mode === "not-configured"
     ? "마이리얼트립 광고 연결 정보가 아직 설정되지 않았습니다. API 키나 제휴 URL이 연결되면 이 영역에 실제 상품 광고가 표시됩니다."
-    : "제주 여행 상품 광고 정보를 확인하고 있습니다.";
+    : `${label} 여행 상품 광고 정보를 확인하고 있습니다.`;
 
   grid.innerHTML = `
     <div class="mrt-status">
       <strong>${escapeHtml(message)}</strong>
-      <p>모바일 뉴스 피드 흐름을 해치지 않도록 여행 상품 카드 영역으로 정리했습니다.</p>
+      <p>${escapeHtml(label)} 일정과 가까운 투어, 숙소, 액티비티 중심으로 노출합니다.</p>
     </div>
-    ${myrealtripFallbackItems.map(myrealtripCard).join("")}
+    ${contextualMyRealTripFallbackItems(context).map((item, index) => myrealtripCard(item, context, index)).join("")}
   `;
 }
 
-async function loadMyRealTrip() {
-  const grid = $("#myrealtripGrid");
+async function loadMyRealTrip(context = myrealtripContextFromHome(), gridSelector = "#myrealtripGrid") {
+  return loadContextualMyRealTrip(context, gridSelector);
+}
+
+async function loadContextualMyRealTrip(context = myrealtripContextFromHome(), gridSelector = "#myrealtripGrid") {
+  const grid = $(gridSelector);
   if (!grid) return;
-  renderMyRealTrip([], "loading");
+
+  const keyword = cleanTravelKeyword(context.keyword || "제주");
+  const type = context.type || "tour";
+  const requestKey = `${keyword}|${type}`;
+  if (myrealtripRequestKeys.get(gridSelector) === requestKey) return;
+  myrealtripRequestKeys.set(gridSelector, requestKey);
+  renderMyRealTrip([], "loading", context, gridSelector);
 
   try {
-    const response = await fetch(`/api/myrealtrip?keyword=${encodeURIComponent("제주")}&type=tour&v=${tourismDataVersion}`, {
+    const query = new URLSearchParams({
+      keyword,
+      type,
+      limit: "6",
+      v: tourismDataVersion
+    });
+    const response = await fetch(`/api/myrealtrip?${query.toString()}`, {
       headers: { accept: "application/json" }
     });
     const payload = await response.json();
     if (!response.ok || payload?.ok === false) {
-      renderMyRealTrip([], payload?.configured === false ? "not-configured" : "loading");
+      renderMyRealTrip([], payload?.configured === false ? "not-configured" : "loading", context, gridSelector);
       return;
     }
-    renderMyRealTrip(payload.items || [], "ready");
+    renderMyRealTrip(payload.items || [], "ready", context, gridSelector);
   } catch (error) {
-    renderMyRealTrip([], "not-configured");
+    renderMyRealTrip([], "not-configured", context, gridSelector);
   }
 }
 
@@ -1426,7 +1542,6 @@ function renderHome() {
   renderTabs();
   renderCategoryView([]);
   compactTravelSearchSections();
-  renderMyRealTrip([], "loading");
   bindFlightSearch();
   bindStaySearch();
   bindTnaSearch();
@@ -1436,7 +1551,6 @@ function renderHome() {
   renderFooter();
   bindHome();
   loadOfficialPlaces();
-  loadMyRealTrip();
 }
 
 function rowsFromPairs(pairs) {
@@ -1737,6 +1851,7 @@ async function hydrateStaticOfficialInfo(article) {
 function renderStaticDetail(detail) {
   const slug = params.get("slug") || articles[0].slug;
   const article = articles.find((item) => item.slug === slug) || articles[0];
+  const myrealtripContext = myrealtripContextFromArticle(article);
   updateMeta(articleSeoTitle(article), articleSeoDescription(article));
   detail.innerHTML = `
     ${imageTag(thumbnailForArticle(article, true), article.title, "detail-hero", `data-article-thumb="${escapeHtml(article.slug)}"`)}
@@ -1766,9 +1881,18 @@ function renderStaticDetail(detail) {
         <h2>주변 추천</h2>
         <div class="spot-tags">${(article.nearbySpots || []).map((spot) => `<a href="${escapeHtml(spotUrl(spot, article.slug))}">${escapeHtml(spot)}</a>`).join("")}</div>
       </section>
+      <section class="mrt-section article-mrt-section" aria-labelledby="articleMyRealTripTitle">
+        <div class="section-heading">
+          <p class="eyebrow">MYREALTRIP</p>
+          <h2 id="articleMyRealTripTitle">${escapeHtml(myrealtripContext.label)} 여행 상품</h2>
+          <p>${escapeHtml(myrealtripContext.keyword)} 기준으로 관련 투어, 숙소, 액티비티를 보여줍니다.</p>
+        </div>
+        <div class="mrt-grid" id="articleMyRealTripGrid"></div>
+      </section>
     </div>
   `;
   hydrateStaticOfficialInfo(article);
+  loadContextualMyRealTrip(myrealtripContext, "#articleMyRealTripGrid");
   renderRelated(article);
 }
 
