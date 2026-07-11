@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260711-content-16";
+import { articles, categories } from "./articles.js?v=20260711-content-17";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260711-content-16";
+const tourismDataVersion = "20260711-content-17";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -50,9 +50,22 @@ const officialImageSlugs = new Set([
   "hallasan-arboretum-walk-guide"
 ]);
 const articleImageKeywordOverrides = new Map([
+  ["seongsan-sunrise-course", "성산일출봉"],
+  ["hyeopjae-half-day", "협재해수욕장"],
+  ["hamdeok-cafe-street", "함덕해수욕장"],
   ["udo-day-trip", "우도"],
   ["seogwipo-olle-market-food", "서귀포 매일올레시장"],
+  ["sangumburi-autumn-course", "산굼부리"],
   ["hallasan-beginner-trail", "한라산"],
+  ["seopjikoji-coastal-walk-guide", "섭지코지"],
+  ["bijarim-forest-walk-guide", "비자림"],
+  ["saryeoni-forest-road-check", "사려니숲길"],
+  ["yongmeori-coast-visit-check", "용머리해안"],
+  ["jeongbang-waterfall-guide", "정방폭포"],
+  ["cheonjiyeon-night-walk-course", "천지연폭포"],
+  ["woljeongri-beach-cafe-walk", "월정리해변"],
+  ["gimnyeong-beach-light-guide", "김녕해수욕장"],
+  ["pyoseon-beach-family-guide", "표선해수욕장"],
   ["jeju-stone-park-rainy-day-course", "제주돌문화공원"],
   ["dongmun-market-evening-food-route", "동문시장"],
   ["lee-jung-seop-street-walk-guide", "이중섭거리"],
@@ -873,6 +886,33 @@ function articleImageKeywords(article) {
     .filter((keyword, index, list) => list.findIndex((item) => normalizeText(item) === normalizeText(keyword)) === index);
 }
 
+function articleImageKey(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const normalized = normalizeImageUrl(raw);
+  try {
+    const url = new URL(normalized, window.location.origin);
+    return `${url.origin}${url.pathname}`.toLowerCase();
+  } catch (error) {
+    return normalized.split(/[?#]/)[0].toLowerCase();
+  }
+}
+
+function articleImageUsedByOtherArticle(image, currentSlug) {
+  const key = articleImageKey(image);
+  if (!key) return false;
+  for (const [slug, cachedImage] of articleThumbnailCache.entries()) {
+    if (slug !== currentSlug && articleImageKey(cachedImage) === key) return true;
+  }
+  return articles.some((article) => article.slug !== currentSlug && articleImageKey(article.image) === key);
+}
+
+function setOfficialArticleImage(article, image) {
+  if (!image || articleImageUsedByOtherArticle(image, article.slug)) return false;
+  articleThumbnailCache.set(article.slug, normalizeImageUrl(image));
+  return true;
+}
+
 function matchArticleImagePlace(article, places = []) {
   if (!shouldUseOfficialImage(article)) return null;
   const keywords = articleImageKeywords(article).map(normalizeText).filter(Boolean);
@@ -883,6 +923,7 @@ function matchArticleImagePlace(article, places = []) {
       const title = normalizeText(place.title);
       const placeCategory = normalizeText(place.category);
       if (!title) return { place, score: 0 };
+      if (articleImageUsedByOtherArticle(place.image, article.slug)) return { place, score: 0 };
       if (category !== "맛집" && placeCategory.includes("음식점")) return { place, score: 0 };
       const score = keywords.reduce((best, keyword) => {
         if (!keyword || !title.includes(keyword)) return best;
@@ -905,8 +946,7 @@ function applyOfficialImagesToArticles(places = []) {
     if (articleThumbnailCache.has(article.slug)) return;
     const match = matchArticleImagePlace(article, places);
     if (!match?.image) return;
-    articleThumbnailCache.set(article.slug, match.image);
-    didUpdate = true;
+    didUpdate = setOfficialArticleImage(article, match.image) || didUpdate;
   });
   return didUpdate;
 }
@@ -932,9 +972,9 @@ async function fetchArticleThumbnail(article) {
       const payload = await response.json();
       const match = response.ok && payload.ok ? matchArticleImagePlace(article, payload.items || []) : null;
       if (!match?.image) return "";
-      articleThumbnailCache.set(article.slug, match.image);
+      if (!setOfficialArticleImage(article, match.image)) return "";
       updateArticleThumbnailElements(article, match.image);
-      return match.image;
+      return articleThumbnailCache.get(article.slug) || "";
     } catch (error) {
       return "";
     }
