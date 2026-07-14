@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#f6f8fb">
+  <title>제주여행뉴스 관리자</title>
+  <link rel="stylesheet" href="/admin/assets/admin.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="side-nav" aria-label="관리 메뉴">
+      <a class="admin-brand" href="/admin/">
+        <span class="brand-icon">JN</span>
+        <span>
+          <strong>Site Monitor</strong>
+          <small>moneyarchive.kr</small>
+        </span>
+      </a>
+      <nav>
+        <p>설정</p>
+        <a href="#search">검색 설정</a>
+        <a href="#indexing">색인·누락</a>
+        <a href="#cta">유입 CTA</a>
+        <a href="#redirect">리다이렉트</a>
+        <p>콘텐츠</p>
+        <a class="is-active" href="#posts">포스트</a>
+        <a href="#comments">댓글</a>
+        <a href="#authors">기자</a>
+        <a href="#media">미디어</a>
+        <p>운영</p>
+        <a href="#automation">자동화</a>
+        <a href="#revenue">MRT 수익</a>
+      </nav>
+    </aside>
+
+    <main class="admin-main">
+      <header class="top-bar">
+        <div>
+          <p class="eyebrow">JEJU TRAVEL NEWS</p>
+          <h1>포스트 관리</h1>
+        </div>
+        <div class="top-actions">
+          <a class="ghost-button" href="/" target="_blank" rel="noreferrer">사이트 보기</a>
+          <button class="ghost-button" type="button" id="exportButton">내보내기</button>
+          <button class="primary-button" type="button" id="newPostButton">새 글</button>
+        </div>
+      </header>
+
+      <section class="stats-grid" aria-label="포스트 현황">
+        <article>
+          <span>전체 글</span>
+          <strong id="statTotal">0</strong>
+        </article>
+        <article>
+          <span>발행됨</span>
+          <strong id="statPublished">0</strong>
+        </article>
+        <article>
+          <span>예약됨</span>
+          <strong id="statScheduled">0</strong>
+        </article>
+        <article>
+          <span>임시저장</span>
+          <strong id="statDraft">0</strong>
+        </article>
+      </section>
+
+      <section class="panel post-panel" id="posts">
+        <div class="panel-toolbar">
+          <label class="search-box">
+            <span>검색</span>
+            <input id="searchInput" type="search" placeholder="제목, slug, 지역 검색">
+          </label>
+          <label>
+            <span>카테고리</span>
+            <select id="categoryFilter"></select>
+          </label>
+          <label>
+            <span>상태</span>
+            <select id="statusFilter">
+              <option value="">전체 상태</option>
+              <option value="published">발행됨</option>
+              <option value="scheduled">예약됨</option>
+              <option value="draft">임시저장</option>
+            </select>
+          </label>
+          <button class="ghost-button" type="button" id="resetDraftsButton">로컬 변경 초기화</button>
+        </div>
+
+        <div class="post-table" id="postTable" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <aside class="editor-panel" id="editorPanel" aria-label="포스트 편집">
+      <form id="editorForm">
+        <div class="editor-head">
+          <div>
+            <p class="eyebrow">EDITOR</p>
+            <h2 id="editorTitle">글 선택</h2>
+          </div>
+          <span class="status-pill" id="editorStatus">대기</span>
+        </div>
+
+        <label>
+          <span>제목</span>
+          <input name="title" required>
+        </label>
+        <label>
+          <span>Slug</span>
+          <input name="slug" required inputmode="url">
+        </label>
+        <div class="form-grid">
+          <label>
+            <span>카테고리</span>
+            <select name="category" id="editorCategory"></select>
+          </label>
+          <label>
+            <span>상태</span>
+            <select name="status">
+              <option value="published">발행됨</option>
+              <option value="scheduled">예약됨</option>
+              <option value="draft">임시저장</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-grid">
+          <label>
+            <span>지역</span>
+            <input name="region">
+          </label>
+          <label>
+            <span>발행일</span>
+            <input name="date" type="date">
+          </label>
+        </div>
+        <label>
+          <span>썸네일 이미지 URL</span>
+          <input name="image" inputmode="url">
+        </label>
+        <label>
+          <span>요약</span>
+          <textarea name="summary" rows="3"></textarea>
+        </label>
+        <label>
+          <span>코스</span>
+          <textarea name="course" rows="3" placeholder="한 줄에 하나씩 입력"></textarea>
+        </label>
+        <label>
+          <span>본문</span>
+          <textarea name="content" rows="6" placeholder="문단을 한 줄씩 입력"></textarea>
+        </label>
+        <label>
+          <span>주변 추천</span>
+          <textarea name="nearbySpots" rows="3" placeholder="한 줄에 하나씩 입력"></textarea>
+        </label>
+        <label>
+          <span>주소</span>
+          <input name="address">
+        </label>
+        <label>
+          <span>주차</span>
+          <textarea name="parking" rows="2"></textarea>
+        </label>
+        <label>
+          <span>운영시간</span>
+          <textarea name="operatingHours" rows="2"></textarea>
+        </label>
+        <label>
+          <span>입장료</span>
+          <textarea name="fee" rows="2"></textarea>
+        </label>
+
+        <div class="token-box">
+          <label>
+            <span>관리 토큰</span>
+            <input id="adminToken" type="password" autocomplete="current-password" placeholder="Cloudflare ADMIN_TOKEN">
+          </label>
+          <p>저장은 서버 환경변수 설정 후 동작합니다. 토큰은 브라우저에만 보관됩니다.</p>
+        </div>
+
+        <div class="editor-actions">
+          <button class="ghost-button" type="button" id="duplicateButton">복제</button>
+          <button class="ghost-button" type="button" id="saveLocalButton">로컬 저장</button>
+          <button class="primary-button" type="submit">GitHub 저장</button>
+        </div>
+        <p class="message" id="editorMessage" role="status"></p>
+      </form>
+    </aside>
+  </div>
+
+  <script type="module" src="/admin/assets/admin.js"></script>
+</body>
+</html>

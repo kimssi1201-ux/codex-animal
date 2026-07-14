@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260711-content-17";
+import { articles, categories } from "./articles.js?v=20260714-admin-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260711-content-17";
+const tourismDataVersion = "20260714-admin-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -12,6 +12,7 @@ const tnaCategoryCache = new Map();
 const myrealtripRequestKeys = new Map();
 const articleThumbnailCache = new Map();
 const articleThumbnailRequests = new Map();
+const publicNow = Date.now();
 const officialImageSlugs = new Set([
   "seongsan-sunrise-course",
   "hyeopjae-half-day",
@@ -73,6 +74,23 @@ const articleImageKeywordOverrides = new Map([
   ["nohyung-supermarket-indoor-guide", "노형수퍼마켙"],
   ["hallasan-arboretum-walk-guide", "한라수목원"]
 ]);
+
+function articlePublishTime(article) {
+  const value = article.publishAt || article.date || "";
+  const time = Date.parse(value);
+  return Number.isFinite(time) ? time : 0;
+}
+
+function isPublicArticle(article) {
+  const status = String(article.status || "published").toLowerCase();
+  if (status === "draft" || status === "private") return false;
+  if (status === "scheduled" || articlePublishTime(article) > publicNow) {
+    return articlePublishTime(article) <= publicNow;
+  }
+  return true;
+}
+
+const publicArticles = articles.filter(isPublicArticle);
 
 let activeCategory = categories[0] || "전체";
 const filterCategories = categories.filter((category) => category !== categories[0]);
@@ -182,7 +200,7 @@ function officialUrl(place) {
 
 function spotUrl(spot, currentSlug = "") {
   const normalizedSpot = normalizeText(spot);
-  const match = articles.find((article) => {
+  const match = publicArticles.find((article) => {
     if (article.slug === currentSlug) return false;
     const title = normalizeText(article.title);
     const region = normalizeText(article.region);
@@ -385,7 +403,7 @@ function myrealtripContextFromArticle(article = {}, categoryOverride = "") {
 
 function myrealtripContextFromHome() {
   const category = activeCategory === categories[0] ? "" : activeCategory;
-  const seed = visibleArticles()[0] || articles[0] || {};
+  const seed = visibleArticles()[0] || publicArticles[0] || {};
   return myrealtripContextFromArticle(seed, category);
 }
 
@@ -491,7 +509,7 @@ function priceText(value, currency = "KRW") {
 }
 
 function visibleArticles() {
-  return activeCategory === categories[0] ? articles : articles.filter((article) => article.category === activeCategory);
+  return activeCategory === categories[0] ? publicArticles : publicArticles.filter((article) => article.category === activeCategory);
 }
 
 function metaLine(parts) {
@@ -640,7 +658,7 @@ function detailGalleryArticles(article, limit = 6) {
     })
     .sort((a, b) => b.score - a.score);
   const preferred = scored.filter(({ score }) => score > 0).map(({ item }) => item);
-  const fallback = articles.filter((item) => item.slug !== article.slug);
+  const fallback = publicArticles.filter((item) => item.slug !== article.slug);
   return uniqueByImage([...preferred, ...fallback]).slice(0, limit);
 }
 
@@ -679,7 +697,7 @@ function renderTabs() {
   if (!tabs) return;
   tabs.innerHTML = filterCategories
     .map((category) => {
-      const count = articles.filter((article) => article.category === category).length;
+      const count = publicArticles.filter((article) => article.category === category).length;
       return `
       <button type="button" class="${category === activeCategory ? "is-active" : ""}" data-category="${escapeHtml(category)}">
         <span>${escapeHtml(category)}</span>
@@ -838,7 +856,7 @@ function renderFeed(places = null) {
   if (!feed) return;
 
   const localItems = activeCategory === categories[0]
-    ? articles.filter((article) => article.category === "가볼 만한 곳").slice(0, 9)
+    ? publicArticles.filter((article) => article.category === "가볼 만한 곳").slice(0, 9)
     : visibleArticles();
   const feedHtml = localItems.map(sectionArticleCard).join("");
 
@@ -904,7 +922,7 @@ function articleImageUsedByOtherArticle(image, currentSlug) {
   for (const [slug, cachedImage] of articleThumbnailCache.entries()) {
     if (slug !== currentSlug && articleImageKey(cachedImage) === key) return true;
   }
-  return articles.some((article) => article.slug !== currentSlug && articleImageKey(article.image) === key);
+  return publicArticles.some((article) => article.slug !== currentSlug && articleImageKey(article.image) === key);
 }
 
 function setOfficialArticleImage(article, image) {
@@ -941,7 +959,7 @@ function matchArticleImagePlace(article, places = []) {
 
 function applyOfficialImagesToArticles(places = []) {
   let didUpdate = false;
-  articles.forEach((article) => {
+  publicArticles.forEach((article) => {
     if (!shouldUseOfficialImage(article)) return;
     if (articleThumbnailCache.has(article.slug)) return;
     const match = matchArticleImagePlace(article, places);
@@ -989,7 +1007,7 @@ function hydrateArticleThumbnails() {
   if (!images.length) return;
 
   const loadImage = (img) => {
-    const article = articles.find((item) => item.slug === img.dataset.articleThumb);
+    const article = publicArticles.find((item) => item.slug === img.dataset.articleThumb);
     if (!article) return;
     const cached = articleThumbnailCache.get(article.slug);
     if (cached) {
@@ -1029,7 +1047,7 @@ function renderCategoryNews() {
       id: "latest-news",
       eyebrow: "LATEST",
       title: "최신 여행뉴스",
-      items: articles.slice(0, 6)
+      items: publicArticles.slice(0, 6)
     },
     ...categories
       .filter((category) => category !== categories[0] && category !== "가볼 만한 곳")
@@ -1037,7 +1055,7 @@ function renderCategoryNews() {
         id: `category-${encodeURIComponent(category)}`,
         eyebrow: "TRAVEL",
         title: category,
-        items: articles.filter((article) => article.category === category).slice(0, 6)
+        items: publicArticles.filter((article) => article.category === category).slice(0, 6)
       }))
   ];
 
@@ -1955,8 +1973,13 @@ async function hydrateStaticOfficialInfo(article) {
 }
 
 function renderStaticDetail(detail) {
-  const slug = params.get("slug") || articles[0].slug;
-  const article = articles.find((item) => item.slug === slug) || articles[0];
+  const slug = params.get("slug") || publicArticles[0]?.slug || "";
+  const article = publicArticles.find((item) => item.slug === slug) || publicArticles[0];
+  if (!article) {
+    updateMeta("제주 여행 정보", "현재 공개된 제주 여행 글이 없습니다.");
+    detail.innerHTML = `<div class="detail-loading">현재 공개된 제주 여행 글이 없습니다.</div>`;
+    return;
+  }
   const myrealtripContext = myrealtripContextFromArticle(article);
   updateMeta(articleSeoTitle(article), articleSeoDescription(article));
   detail.innerHTML = `
@@ -2133,7 +2156,7 @@ async function renderOfficialDetail(detail, contentId, contentTypeId, fallbackOv
 
   const relatedBox = $("#relatedArticles");
   if (relatedBox) {
-    relatedBox.innerHTML = articles.slice(0, 4).map(newsCard).join("");
+    relatedBox.innerHTML = publicArticles.slice(0, 4).map(newsCard).join("");
   }
 }
 
