@@ -1,0 +1,45 @@
+name: Auto Jeju Post
+
+on:
+  workflow_dispatch:
+    inputs:
+      count:
+        description: "Number of posts to add"
+        required: false
+        default: "1"
+  schedule:
+    # 07:20 KST every day
+    - cron: "20 22 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate post
+        env:
+          AUTO_POST_COUNT: ${{ github.event.inputs.count || '1' }}
+          KTO_TOUR_API_KEY: ${{ secrets.KTO_TOUR_API_KEY }}
+        run: node scripts/auto-jeju-post.mjs
+
+      - name: Commit changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add jeju-travel-news/assets/articles.js sitemap.xml feed.xml
+          git commit -m "Auto publish Jeju travel post"
+          git push
