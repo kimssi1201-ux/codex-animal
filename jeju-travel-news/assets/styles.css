@@ -475,7 +475,7 @@ main, .site-footer {
   font-weight: 900;
 }
 
-.mrt-section, .flight-section, .stay-section, .tna-section, .travel-tools-section, .visit-check-section, .category-news-wrapper, .faq-section, .article-page {
+.mrt-section, .flight-section, .stay-section, .tna-section, .travel-tools-section, .coupang-affiliate-section, .visit-check-section, .category-news-wrapper, .faq-section, .article-page {
   padding: 4px 12px 24px;
 }
 .mrt-section {
@@ -485,6 +485,37 @@ main, .site-footer {
   border-top: 8px solid #edf2ef;
   border-bottom: 8px solid #edf2ef;
   background: #fff;
+}
+.coupang-affiliate-section {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+  border-bottom: 8px solid #edf2ef;
+  background: #fff;
+}
+.article-affiliate-section {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.affiliate-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+.coupang-widget-frame {
+  width: 100%;
+  max-width: 100%;
+  min-height: 140px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.coupang-widget-frame iframe,
+.coupang-widget-frame object,
+.coupang-widget-frame embed {
+  max-width: none;
 }
 .flight-section {
   display: grid;
