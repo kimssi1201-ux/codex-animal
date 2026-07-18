@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260718-images-7";
+import { articles, categories } from "./articles.js?v=20260718-images-8";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260718-images-7";
+const tourismDataVersion = "20260718-images-8";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -115,6 +115,7 @@ const articleImageFallbacks = new Map([
   ["aewol-stay-location-guide", "https://tong.visitkorea.or.kr/cms/resource/06/4077606_image2_1.jpg"],
   ["seongsan-stay-location-guide", "https://tong.visitkorea.or.kr/cms/resource/82/2944282_image2_1.bmp"],
   ["jungmun-stay-location-guide", "https://tong.visitkorea.or.kr/cms/resource/85/4074085_image2_1.jpg"],
+  ["sangumburi-autumn-course", "https://tong.visitkorea.or.kr/cms/resource/55/3354255_image2_1.jpg"],
   ["rainy-day-indoor-jeju", "https://tong.visitkorea.or.kr/cms/resource/50/3553250_image2_1.jpg"],
   ["east-jeju-2days", "https://tong.visitkorea.or.kr/cms/resource/00/3354600_image2_1.jpg"],
   ["saryeoni-forest-road-check", "https://tong.visitkorea.or.kr/cms/resource/91/3541991_image2_1.jpg"],
