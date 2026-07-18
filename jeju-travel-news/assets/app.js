@@ -52,7 +52,7 @@ const officialImageSlugs = new Set([
 ]);
 const articleImageKeywordOverrides = new Map([
   ["aewol-coastal-drive", "애월해안도로"],
-  ["rainy-day-indoor-jeju", "제주도립미술관"],
+  ["rainy-day-indoor-jeju", "제주현대미술관"],
   ["east-jeju-2days", "함덕해수욕장"],
   ["west-jeju-cafe-tour", "협재해수욕장"],
   ["seongsan-sunrise-course", "성산일출봉"],
@@ -74,7 +74,7 @@ const articleImageKeywordOverrides = new Map([
   ["gimnyeong-beach-light-guide", "김녕해수욕장"],
   ["pyoseon-beach-family-guide", "표선해수욕장"],
   ["jeju-stone-park-rainy-day-course", "제주돌문화공원"],
-  ["dongmun-market-evening-food-route", "동문시장"],
+  ["dongmun-market-evening-food-route", "동문재래시장"],
   ["jeju-black-pork-street-check", "흑돼지거리"],
   ["jeju-city-accommodation-route", "한라수목원"],
   ["seogwipo-accommodation-route", "천지연폭포"],
