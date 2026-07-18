@@ -489,7 +489,7 @@ main, .site-footer {
 .coupang-affiliate-section {
   display: grid;
   gap: 10px;
-  padding-top: 12px;
+  padding-top: 10px;
   border-bottom: 8px solid #edf2ef;
   background: #fff;
 }
@@ -505,17 +505,26 @@ main, .site-footer {
   line-height: 1.45;
 }
 .coupang-widget-frame {
+  display: flex;
+  justify-content: center;
   width: 100%;
-  max-width: 100%;
-  min-height: 140px;
-  overflow-x: auto;
+  max-width: 560px;
+  min-height: 120px;
+  margin: 0 auto;
+  overflow: hidden;
   overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
 }
 .coupang-widget-frame iframe,
 .coupang-widget-frame object,
 .coupang-widget-frame embed {
-  max-width: none;
+  display: block;
+  width: 100% !important;
+  max-width: 560px !important;
+  height: 120px !important;
+  border: 0;
 }
 .flight-section {
   display: grid;
