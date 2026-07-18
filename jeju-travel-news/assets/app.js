@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260718-images-2";
+import { articles, categories } from "./articles.js?v=20260718-images-6";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260718-images-2";
+const tourismDataVersion = "20260718-images-6";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -87,19 +87,29 @@ const articleImageKeywordOverrides = new Map([
   ["jocheon-breakfast-brunch-route", "함덕해수욕장"],
   ["aewol-sunset-cafe-route", "애월해안도로"],
   ["andok-tea-dessert-cafe-route", "오설록"],
-  ["hamdeok-stay-location-guide", "함덕해수욕장"],
-  ["aewol-stay-location-guide", "애월해안도로"],
-  ["seongsan-stay-location-guide", "성산일출봉"],
-  ["jungmun-stay-location-guide", "중문관광단지"],
-  ["spring-jeju-canola-blossom-route", "성산일출봉"],
+  ["hamdeok-stay-location-guide", "함덕"],
+  ["aewol-stay-location-guide", "애월"],
+  ["seongsan-stay-location-guide", "성산"],
+  ["jungmun-stay-location-guide", "중문"],
+  ["spring-jeju-canola-blossom-route", "유채꽃"],
   ["summer-jeju-beach-swim-check", "협재해수욕장"],
   ["winter-jeju-camellia-snow-route", "카멜리아힐"],
   ["nohyung-supermarket-indoor-guide", "노형수퍼마켙"],
   ["hallasan-arboretum-walk-guide", "한라수목원"]
 ]);
 const articleImageFallbacks = new Map([
+  ["jeju-stay-location-guide", "https://tong.visitkorea.or.kr/cms/resource/83/2876783_image2_1.jpg"],
+  ["jeju-city-stay-route-guide", "https://tong.visitkorea.or.kr/cms/resource/82/3089182_image2_1.jpg"],
+  ["seogwipo-stay-route-guide", "https://tong.visitkorea.or.kr/cms/resource/45/3569245_image2_1.jpg"],
+  ["hamdeok-stay-location-guide", "https://tong.visitkorea.or.kr/cms/resource/57/4086557_image2_1.jpg"],
+  ["aewol-stay-location-guide", "https://tong.visitkorea.or.kr/cms/resource/06/4077606_image2_1.jpg"],
+  ["seongsan-stay-location-guide", "https://tong.visitkorea.or.kr/cms/resource/82/2944282_image2_1.bmp"],
+  ["jungmun-stay-location-guide", "https://tong.visitkorea.or.kr/cms/resource/85/4074085_image2_1.jpg"],
   ["rainy-day-indoor-jeju", "https://tong.visitkorea.or.kr/cms/resource/50/3553250_image2_1.jpg"],
-  ["dongmun-market-evening-food-route", "https://tong.visitkorea.or.kr/cms/resource/38/2678438_image2_1.jpg"]
+  ["east-jeju-2days", "https://tong.visitkorea.or.kr/cms/resource/00/3354600_image2_1.jpg"],
+  ["saryeoni-forest-road-check", "https://tong.visitkorea.or.kr/cms/resource/91/3541991_image2_1.jpg"],
+  ["dongmun-market-evening-food-route", "https://tong.visitkorea.or.kr/cms/resource/38/2678438_image2_1.jpg"],
+  ["spring-jeju-canola-blossom-route", "https://tong.visitkorea.or.kr/cms/resource/69/3588469_image2_1.jpg"]
 ]);
 
 function articlePublishTime(article) {
@@ -354,7 +364,10 @@ function bindImageFallbacks() {
     const image = event.target;
     if (!(image instanceof HTMLImageElement) || image.dataset.fallbackApplied) return;
     image.dataset.fallbackApplied = "true";
-    image.src = fallbackImage;
+    const articleFallback = image.dataset.articleThumb
+      ? articleImageFallbacks.get(image.dataset.articleThumb)
+      : "";
+    image.src = normalizeImageUrl(articleFallback || fallbackImage);
   }, true);
 }
 
@@ -547,7 +560,9 @@ function metaLine(parts) {
 }
 
 function thumbnailForArticle(article, useOfficialImage = false) {
-  return useOfficialImage ? articleThumbnailCache.get(article.slug) || article.image : article.image;
+  return useOfficialImage
+    ? articleThumbnailCache.get(article.slug) || articleImageFallbacks.get(article.slug) || article.image
+    : article.image;
 }
 
 function articleImageTag(article, className = "") {
@@ -949,12 +964,19 @@ function articleImageKeywords(article) {
     .filter((keyword, index, list) => list.findIndex((item) => normalizeText(item) === normalizeText(keyword)) === index);
 }
 
-function articlePlaceMatches(article, place) {
-  const title = normalizeText(place?.title);
+function articlePlaceCategoryAllowed(article, place) {
   const category = normalizeText(article.category);
   const placeCategory = normalizeText(place?.category);
+  if (!placeCategory) return false;
+  if (category === "숙소") return placeCategory.includes("숙소");
+  if (category === "맛집" || category === "카페") return placeCategory.includes("음식점");
+  return !placeCategory.includes("음식점") && !placeCategory.includes("쇼핑");
+}
+
+function articlePlaceMatches(article, place) {
+  const title = normalizeText(place?.title);
   if (!title || !place?.contentId) return false;
-  if (category !== "맛집" && placeCategory.includes("음식점")) return false;
+  if (!articlePlaceCategoryAllowed(article, place)) return false;
   return articleImageKeywords(article)
     .map(normalizeText)
     .filter(Boolean)
@@ -992,23 +1014,21 @@ function setOfficialArticleImage(article, image) {
 function matchArticleImagePlace(article, places = []) {
   if (!shouldUseOfficialImage(article)) return null;
   const keywords = articleImageKeywords(article).map(normalizeText).filter(Boolean);
-  const category = normalizeText(article.category);
   const scored = places
     .filter((place) => place?.image)
     .map((place) => {
       const title = normalizeText(place.title);
-      const placeCategory = normalizeText(place.category);
       if (!title) return { place, score: 0 };
       if (!/images\.unsplash\.com/i.test(String(article.image || "")) && articleImageUsedByOtherArticle(place.image, article.slug)) {
         return { place, score: 0 };
       }
-      if (category !== "맛집" && placeCategory.includes("음식점")) return { place, score: 0 };
+      if (!articlePlaceCategoryAllowed(article, place)) return { place, score: 0 };
       const score = keywords.reduce((best, keyword) => {
         if (!keyword || !title.includes(keyword)) return best;
         if (title === keyword) return Math.max(best, 100);
         if (title.startsWith(keyword)) return Math.max(best, 84);
         return Math.max(best, 70);
-      }, 0) + (placeCategory.includes("관광지") ? 8 : 0);
+      }, 0) + (normalizeText(place.category).includes("관광지") ? 8 : 0);
       return { place, score };
     })
     .filter((item) => item.score > 0)
@@ -1040,6 +1060,7 @@ function applyOfficialImagesToArticles(places = []) {
   publicArticles.forEach((article) => {
     if (!shouldUseOfficialImage(article)) return;
     if (articleThumbnailCache.has(article.slug)) return;
+    if (articleImageFallbacks.has(article.slug)) return;
     const match = matchArticleImagePlace(article, places);
     if (!match?.image) return;
     didUpdate = setOfficialArticleImage(article, match.image) || didUpdate;
