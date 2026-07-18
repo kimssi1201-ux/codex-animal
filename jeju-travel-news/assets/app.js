@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260718-images-10";
+import { articles, categories } from "./articles.js?v=20260718-images-12";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260718-images-10";
+const tourismDataVersion = "20260718-images-12";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -954,8 +954,18 @@ function renderRecommended() {
 }
 
 function renderCategoryView(places = []) {
-  renderRecommended();
-  renderVisualGallery();
+  const isFilteredView = activeCategory !== categories[0];
+  const july = $("#july");
+  const recommended = $("#recommendedArticles");
+  const gallery = $("#visualGallery");
+  july?.classList.toggle("is-category-filtered", isFilteredView);
+  if (isFilteredView) {
+    if (recommended) recommended.innerHTML = "";
+    if (gallery) gallery.innerHTML = "";
+  } else {
+    renderRecommended();
+    renderVisualGallery();
+  }
   renderFeed(places);
   loadContextualMyRealTrip(myrealtripContextFromHome());
 }
@@ -1016,8 +1026,7 @@ function articleImageUsedByOtherArticle(image, currentSlug) {
 }
 
 function setOfficialArticleImage(article, image) {
-  const hasGenericImage = /images\.unsplash\.com/i.test(String(article.image || ""));
-  if (!image || (!hasGenericImage && articleImageUsedByOtherArticle(image, article.slug))) return false;
+  if (!image || articleImageUsedByOtherArticle(image, article.slug)) return false;
   articleThumbnailCache.set(article.slug, normalizeImageUrl(image));
   return true;
 }
@@ -1030,7 +1039,7 @@ function matchArticleImagePlace(article, places = []) {
     .map((place) => {
       const title = normalizeText(place.title);
       if (!title) return { place, score: 0 };
-      if (!/images\.unsplash\.com/i.test(String(article.image || "")) && articleImageUsedByOtherArticle(place.image, article.slug)) {
+      if (articleImageUsedByOtherArticle(place.image, article.slug)) {
         return { place, score: 0 };
       }
       if (!articlePlaceCategoryAllowed(article, place)) return { place, score: 0 };

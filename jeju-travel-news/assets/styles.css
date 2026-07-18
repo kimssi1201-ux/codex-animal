@@ -493,6 +493,11 @@ main, .site-footer {
   border-bottom: 8px solid #edf2ef;
   background: #fff;
 }
+
+.mobile-news-feed.is-category-filtered .recommend-news-row,
+.mobile-news-feed.is-category-filtered .visual-gallery {
+  display: none;
+}
 .article-affiliate-section {
   margin-top: 14px;
   border-top: 1px solid var(--line);
