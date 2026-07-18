@@ -140,6 +140,17 @@ function normalizeText(value) {
     .toLowerCase();
 }
 
+function imageKey(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  try {
+    const url = new URL(raw);
+    return `${url.origin}${url.pathname}`.toLowerCase();
+  } catch (error) {
+    return raw.split(/[?#]/)[0].toLowerCase();
+  }
+}
+
 function xmlEscape(value) {
   return String(value || "")
     .replaceAll("&", "&amp;")
@@ -272,11 +283,17 @@ function buildCourse(candidate, place, nearby) {
   return [place, nearby[0] || "주변 산책", nearby[1] || "카페 휴식", nearby[2] || "식사"];
 }
 
-function buildArticle(candidate, date, official = null) {
+function buildArticle(candidate, date, official = null, usedImageKeys = new Set()) {
   const [place, region, nearby] = inferPlace(candidate.title);
   const course = buildCourse(candidate, place, nearby);
   const imagePool = imageByCategory[candidate.category] || [fallbackImage];
-  const image = official?.image || imagePool[candidate.index % imagePool.length] || fallbackImage;
+  const imageCandidates = [
+    official?.image,
+    ...imagePool,
+    ...Object.values(imageByCategory).flat(),
+    fallbackImage
+  ].filter(Boolean);
+  const image = imageCandidates.find((value) => !usedImageKeys.has(imageKey(value))) || imageCandidates[0] || fallbackImage;
   const address = official?.address || `${region} 일대`;
   const intent = categoryIntent(candidate.category);
   const slug = slugify(candidate.title, date, candidate.index);
@@ -327,7 +344,14 @@ async function fetchOfficialInfo(candidate) {
     const payload = await response.json();
     const item = payload?.response?.body?.items?.item;
     const items = Array.isArray(item) ? item : item ? [item] : [];
-    const match = items.find((entry) => entry.firstimage || entry.firstimage2) || items[0];
+    const keywordKey = normalizeText(keyword);
+    const match = items.find((entry) => {
+      const titleKey = normalizeText(entry.title);
+      const addressKey = normalizeText([entry.addr1, entry.addr2].filter(Boolean).join(" "));
+      const samePlace = titleKey && (titleKey.includes(keywordKey) || keywordKey.includes(titleKey));
+      const isJeju = addressKey.includes("제주") || String(entry.areacode || "") === "39";
+      return samePlace && isJeju && (entry.firstimage || entry.firstimage2);
+    });
     if (!match) return null;
     return {
       image: match.firstimage || match.firstimage2 || "",
@@ -391,15 +415,17 @@ async function main() {
   const { categories, articles } = await importArticles();
   const candidates = await parseRoadmap();
   const nextArticles = [...articles];
+  const usedImageKeys = new Set(nextArticles.map((article) => imageKey(article.image)).filter(Boolean));
   const added = [];
 
   for (const candidate of candidates) {
     if (added.length >= count) break;
     if (alreadyCovered(candidate, nextArticles)) continue;
     const official = await fetchOfficialInfo(candidate);
-    const article = buildArticle(candidate, date, official);
+    const article = buildArticle(candidate, date, official, usedImageKeys);
     if (nextArticles.some((item) => item.slug === article.slug)) continue;
     nextArticles.unshift(article);
+    usedImageKeys.add(imageKey(article.image));
     added.push(article);
   }
 

@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260718-nearby-1";
+import { articles, categories } from "./articles.js?v=20260718-images-2";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260718-nearby-1";
+const tourismDataVersion = "20260718-images-2";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -922,6 +922,18 @@ function articleImageKeywords(article) {
     .filter((keyword, index, list) => list.findIndex((item) => normalizeText(item) === normalizeText(keyword)) === index);
 }
 
+function articlePlaceMatches(article, place) {
+  const title = normalizeText(place?.title);
+  const category = normalizeText(article.category);
+  const placeCategory = normalizeText(place?.category);
+  if (!title || !place?.contentId) return false;
+  if (category !== "맛집" && placeCategory.includes("음식점")) return false;
+  return articleImageKeywords(article)
+    .map(normalizeText)
+    .filter(Boolean)
+    .some((keyword) => title.includes(keyword));
+}
+
 function articleImageKey(value) {
   const raw = String(value || "").trim();
   if (!raw) return "";
@@ -975,6 +987,24 @@ function matchArticleImagePlace(article, places = []) {
   return scored[0]?.place || null;
 }
 
+async function fetchArticleDetailImage(place) {
+  if (!place?.contentId) return "";
+  try {
+    const query = new URLSearchParams({
+      contentId: place.contentId,
+      contentTypeId: place.contentTypeId || "",
+      title: place.title || "",
+      v: tourismDataVersion
+    });
+    const response = await fetch(`/api/jeju?${query.toString()}`, { headers: { accept: "application/json" } });
+    const payload = await response.json();
+    if (!response.ok || !payload?.ok) return "";
+    return normalizeImageUrl(payload.item?.image || payload.item?.images?.[0] || "");
+  } catch (error) {
+    return "";
+  }
+}
+
 function applyOfficialImagesToArticles(places = []) {
   let didUpdate = false;
   publicArticles.forEach((article) => {
@@ -1006,10 +1036,13 @@ async function fetchArticleThumbnail(article) {
       const query = new URLSearchParams({ keyword, category: "전체", v: tourismDataVersion });
       const response = await fetch(`/api/jeju?${query.toString()}`, { headers: { accept: "application/json" } });
       const payload = await response.json();
-      const match = response.ok && payload.ok ? matchArticleImagePlace(article, payload.items || []) : null;
-      if (!match?.image) return "";
-      if (!setOfficialArticleImage(article, match.image)) return "";
-      updateArticleThumbnailElements(article, match.image);
+      if (!response.ok || !payload.ok) return "";
+      const places = payload.items || [];
+      const match = matchArticleImagePlace(article, places);
+      const place = places.find((item) => articlePlaceMatches(article, item));
+      const image = match?.image || await fetchArticleDetailImage(place);
+      if (!image || !setOfficialArticleImage(article, image)) return "";
+      updateArticleThumbnailElements(article, image);
       return articleThumbnailCache.get(article.slug) || "";
     } catch (error) {
       return "";

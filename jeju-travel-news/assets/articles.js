@@ -16,7 +16,7 @@ export const articles = [
     "category": "가볼 만한 곳",
     "status": "published",
     "region": "제주 전역",
-    "image": "https://tong.visitkorea.or.kr/cms/resource/82/2944282_image2_1.bmp",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/60/3556260_image2_1.jpg",
     "summary": "제주를 중심으로 주차, 운영시간, 주변 코스 관련 정보를 확인하기 좋게 정리한 제주 여행 정보입니다.",
     "date": "2026-07-18",
     "course": [
@@ -48,7 +48,7 @@ export const articles = [
     "category": "가볼 만한 곳",
     "status": "published",
     "region": "제주 서부 · 한경",
-    "image": "https://tong.visitkorea.or.kr/cms/resource/82/2944282_image2_1.bmp",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/50/3553250_image2_1.jpg",
     "summary": "제주현대미술관을 중심으로 주차, 운영시간, 주변 코스 관련 정보를 확인하기 좋게 정리한 제주 여행 정보입니다.",
     "date": "2026-07-17",
     "course": [
@@ -516,7 +516,7 @@ export const articles = [
     "slug": "saryeoni-forest-road-check",
     "category": "계절 코스",
     "region": "제주 중산간 · 조천",
-    "image": "https://images.unsplash.com/photo-1418065460487-3956ef9b1595?auto=format&fit=crop&w=1200&q=82",
+    "image": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=82",
     "summary": "제주 숲길 대표 코스인 사려니숲길을 걷기 전에 알아둘 교통, 복장, 소요 시간을 정리했습니다.",
     "date": "2026-07-08",
     "course": [
@@ -1096,7 +1096,7 @@ export const articles = [
     "slug": "jeju-43-peace-park-guide",
     "category": "가볼 만한 곳",
     "region": "제주 제주시 · 봉개",
-    "image": "https://images.unsplash.com/photo-1566127992631-137a642a90f4?auto=format&fit=crop&w=1200&q=82",
+    "image": "https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1200&q=82",
     "summary": "비 오는 날에도 차분하게 둘러보기 좋은 제주4.3평화공원의 전시, 주차, 관람 동선을 정리했습니다.",
     "date": "2026-07-10",
     "course": [
