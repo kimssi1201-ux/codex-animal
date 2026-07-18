@@ -283,7 +283,7 @@ export const articles = [
     "slug": "rainy-day-indoor-jeju",
     "category": "계절 코스",
     "region": "제주 전역",
-    "image": "https://tong.visitkorea.or.kr/cms/resource/50/3553250_image2_1.jpg",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/63/3562163_image2_1.jpg",
     "summary": "비바람이 강한 날에도 무리 없이 갈 수 있는 박물관, 시장, 카페 중심 실내 코스입니다.",
     "date": "2026-07-08",
     "course": [
@@ -312,7 +312,7 @@ export const articles = [
     "slug": "east-jeju-2days",
     "category": "계절 코스",
     "region": "제주 동부",
-    "image": "https://tong.visitkorea.or.kr/cms/resource/00/3354600_image2_1.jpg",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/64/3384664_image2_1.jpg",
     "summary": "성산, 우도, 함덕, 비자림을 1박 2일로 나누어 여유 있게 도는 동쪽 대표 코스입니다.",
     "date": "2026-07-08",
     "course": [
@@ -516,7 +516,7 @@ export const articles = [
     "slug": "saryeoni-forest-road-check",
     "category": "계절 코스",
     "region": "제주 중산간 · 조천",
-    "image": "https://tong.visitkorea.or.kr/cms/resource/91/3541991_image2_1.jpg",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/30/3525130_image2_1.jpg",
     "summary": "제주 숲길 대표 코스인 사려니숲길을 걷기 전에 알아둘 교통, 복장, 소요 시간을 정리했습니다.",
     "date": "2026-07-08",
     "course": [
@@ -1687,7 +1687,7 @@ export const articles = [
     "slug": "seongsan-stay-location-guide",
     "category": "숙소",
     "region": "제주 동부 · 성산",
-    "image": "https://tong.visitkorea.or.kr/cms/resource/82/2944282_image2_1.bmp",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/92/3527092_image2_1.jpg",
     "summary": "성산일출봉, 우도, 섭지코지를 중심으로 숙소를 잡을 때의 장단점을 정리했습니다.",
     "date": "2026-07-10",
     "course": [

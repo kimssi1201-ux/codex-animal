@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260718-images-8";
+import { articles, categories } from "./articles.js?v=20260718-images-10";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260718-images-8";
+const tourismDataVersion = "20260718-images-10";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -113,12 +113,12 @@ const articleImageFallbacks = new Map([
   ["seogwipo-stay-route-guide", "https://tong.visitkorea.or.kr/cms/resource/45/3569245_image2_1.jpg"],
   ["hamdeok-stay-location-guide", "https://tong.visitkorea.or.kr/cms/resource/57/4086557_image2_1.jpg"],
   ["aewol-stay-location-guide", "https://tong.visitkorea.or.kr/cms/resource/06/4077606_image2_1.jpg"],
-  ["seongsan-stay-location-guide", "https://tong.visitkorea.or.kr/cms/resource/82/2944282_image2_1.bmp"],
+  ["seongsan-stay-location-guide", "https://tong.visitkorea.or.kr/cms/resource/92/3527092_image2_1.jpg"],
   ["jungmun-stay-location-guide", "https://tong.visitkorea.or.kr/cms/resource/85/4074085_image2_1.jpg"],
   ["sangumburi-autumn-course", "https://tong.visitkorea.or.kr/cms/resource/55/3354255_image2_1.jpg"],
-  ["rainy-day-indoor-jeju", "https://tong.visitkorea.or.kr/cms/resource/50/3553250_image2_1.jpg"],
-  ["east-jeju-2days", "https://tong.visitkorea.or.kr/cms/resource/00/3354600_image2_1.jpg"],
-  ["saryeoni-forest-road-check", "https://tong.visitkorea.or.kr/cms/resource/91/3541991_image2_1.jpg"],
+  ["rainy-day-indoor-jeju", "https://tong.visitkorea.or.kr/cms/resource/63/3562163_image2_1.jpg"],
+  ["east-jeju-2days", "https://tong.visitkorea.or.kr/cms/resource/64/3384664_image2_1.jpg"],
+  ["saryeoni-forest-road-check", "https://tong.visitkorea.or.kr/cms/resource/30/3525130_image2_1.jpg"],
   ["dongmun-market-evening-food-route", "https://tong.visitkorea.or.kr/cms/resource/38/2678438_image2_1.jpg"],
   ["spring-jeju-canola-blossom-route", "https://tong.visitkorea.or.kr/cms/resource/69/3588469_image2_1.jpg"]
 ]);
@@ -1091,6 +1091,13 @@ async function fetchArticleThumbnail(article) {
   if (!shouldUseOfficialImage(article)) return "";
   if (articleThumbnailCache.has(article.slug)) return articleThumbnailCache.get(article.slug);
   if (articleThumbnailRequests.has(article.slug)) return articleThumbnailRequests.get(article.slug);
+
+  const fixedImage = articleImageFallbacks.get(article.slug);
+  if (fixedImage) {
+    setOfficialArticleImage(article, fixedImage);
+    updateArticleThumbnailElements(article, fixedImage);
+    return fixedImage;
+  }
 
   const keyword = articleOfficialKeyword(article);
   const request = (async () => {
