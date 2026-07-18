@@ -97,6 +97,10 @@ const articleImageKeywordOverrides = new Map([
   ["nohyung-supermarket-indoor-guide", "노형수퍼마켙"],
   ["hallasan-arboretum-walk-guide", "한라수목원"]
 ]);
+const articleImageFallbacks = new Map([
+  ["rainy-day-indoor-jeju", "https://tong.visitkorea.or.kr/cms/resource/50/3553250_image2_1.jpg"],
+  ["dongmun-market-evening-food-route", "https://tong.visitkorea.or.kr/cms/resource/38/2678438_image2_1.jpg"]
+]);
 
 function articlePublishTime(article) {
   const value = article.publishAt || article.date || "";
@@ -1066,7 +1070,7 @@ async function fetchArticleThumbnail(article) {
       const places = payload.items || [];
       const match = matchArticleImagePlace(article, places);
       const place = places.find((item) => articlePlaceMatches(article, item));
-      const image = match?.image || await fetchArticleDetailImage(place);
+      const image = match?.image || await fetchArticleDetailImage(place) || articleImageFallbacks.get(article.slug) || "";
       if (!image || !setOfficialArticleImage(article, image)) return "";
       updateArticleThumbnailElements(article, image);
       return articleThumbnailCache.get(article.slug) || "";
