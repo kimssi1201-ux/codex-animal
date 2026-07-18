@@ -2,6 +2,9 @@ const DEFAULT_TIMEOUT_MS = 9000;
 const DEFAULT_MCP_URL = "https://mcp-servers.myrealtrip.com/mcp";
 const DEFAULT_AIRPORT_AUTOCOMPLETE_PATH = "/v1/products/flight/airport-autocomplete";
 const DEFAULT_CALENDAR_PATH = "/v1/products/flight/lowest-price-calendar";
+const MAX_BODY_LENGTH = 32768;
+const MAX_TEXT_LENGTH = 80;
+const MAX_RESULT_COUNT = 20;
 const DOMESTIC_AIRPORTS = [
   { code: "GMP", city: "서울", name: "김포국제공항", country: "대한민국" },
   { code: "ICN", city: "인천", name: "인천국제공항", country: "대한민국" },
@@ -13,6 +16,22 @@ const DOMESTIC_AIRPORTS = [
   { code: "USN", city: "울산", name: "울산공항", country: "대한민국" },
   { code: "WJU", city: "원주", name: "원주공항", country: "대한민국" }
 ];
+
+function boundedText(value, fallback = "", maxLength = MAX_TEXT_LENGTH) {
+  const text = String(value ?? fallback).trim();
+  return text.slice(0, maxLength);
+}
+
+function boundedInteger(value, fallback, min, max) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.min(max, Math.max(min, Math.trunc(number)));
+}
+
+function boundedDate(value, fallback = "") {
+  const date = boundedText(value, fallback, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : fallback;
+}
 
 function json(data, init = {}) {
   const headers = new Headers(init.headers || {});
@@ -135,7 +154,7 @@ function normalizeCalendarItem(item = {}) {
 }
 
 function airportItems(keyword = "") {
-  const query = String(keyword || "").trim().toLowerCase();
+  const query = boundedText(keyword).toLowerCase();
   const items = DOMESTIC_AIRPORTS.filter((airport) => {
     if (!query) return true;
     return [airport.code, airport.city, airport.name, airport.country]
@@ -148,7 +167,7 @@ function airportItems(keyword = "") {
 }
 
 function normalizeAirportCode(value, fallback = "GMP") {
-  const code = String(value || "").toUpperCase().trim();
+  const code = boundedText(value, "", 6).toUpperCase().replace(/[^A-Z]/g, "");
   if (code === "SEL") return "GMP";
   return code || fallback;
 }
@@ -235,7 +254,10 @@ function requestHeaders(config) {
 
 async function readBody(request) {
   try {
-    return await request.json();
+    const text = await request.text();
+    if (text.length > MAX_BODY_LENGTH) return null;
+    const body = JSON.parse(text);
+    return body && typeof body === "object" && !Array.isArray(body) ? body : {};
   } catch (error) {
     return {};
   }
@@ -254,8 +276,14 @@ export async function onRequestOptions() {
 export async function onRequestPost(context) {
   const requestUrl = new URL(context.request.url);
   const config = getConfig(context.env || {});
-  const action = requestUrl.searchParams.get("action") || "airport-autocomplete";
+  const action = boundedText(requestUrl.searchParams.get("action"), "airport-autocomplete", 40);
+  if (!["airport-autocomplete", "lowest-price-calendar"].includes(action)) {
+    return json({ ok: false, error: "지원하지 않는 항공권 조회 방식입니다." }, { status: 400, cacheControl: "no-store" });
+  }
   const body = await readBody(context.request);
+  if (body === null) {
+    return json({ ok: false, error: "요청 본문이 너무 큽니다." }, { status: 413, cacheControl: "no-store" });
+  }
   const path = action === "lowest-price-calendar" ? config.calendarPath : config.airportAutocompletePath;
   const explicitUrl = action === "lowest-price-calendar" ? config.calendarUrl : config.airportAutocompleteUrl;
   const url = absoluteUrl(explicitUrl) || targetUrl(config.apiBase, path);
@@ -280,20 +308,23 @@ export async function onRequestPost(context) {
         body.destinationAirportCode || body.arrivalAirportCode || body.destination || body.arrival,
         "CJU"
       );
-      const departDate = body.departureDate || body.departDate || nextDepartDate(body.yearMonth || body.month);
+      const departDate = boundedDate(
+        body.departureDate || body.departDate,
+        nextDepartDate(body.yearMonth || body.month)
+      );
       const parsed = await callMcpTool(config, "searchDomesticFlights", {
         tripType: "ONE_WAY",
         origin,
         destination,
         departDate,
         passengers: {
-          adults: Number(body.adults || body.guests || 1),
-          children: Number(body.children || 0)
+          adults: boundedInteger(body.adults || body.guests, 1, 1, 9),
+          children: boundedInteger(body.children, 0, 0, 9)
         },
-        maxResults: Number(body.limit || 8)
+        maxResults: boundedInteger(body.limit, 8, 1, MAX_RESULT_COUNT)
       });
       const items = mcpFlightItems(parsed);
-      return json({ ok: true, configured: true, mcp: true, action, items, raw: parsed });
+      return json({ ok: true, configured: true, mcp: true, action, items });
     } catch (error) {
       return json({
         ok: false,
@@ -329,11 +360,11 @@ export async function onRequestPost(context) {
 
     if (action === "lowest-price-calendar") {
       const items = asArray(payload).map(normalizeCalendarItem).filter((item) => item.date || item.price);
-      return json({ ok: true, configured: true, action, items, raw: payload });
+      return json({ ok: true, configured: true, action, items });
     }
 
     const items = asArray(payload).map(normalizeAirport).filter((item) => item.code || item.name);
-    return json({ ok: true, configured: true, action, items, raw: payload });
+    return json({ ok: true, configured: true, action, items });
   } catch (error) {
     return json({
       ok: false,
@@ -347,7 +378,7 @@ export async function onRequestPost(context) {
 
 export async function onRequestGet(context) {
   const requestUrl = new URL(context.request.url);
-  const keyword = requestUrl.searchParams.get("keyword") || "제주";
+  const keyword = boundedText(requestUrl.searchParams.get("keyword"), "제주");
   const request = new Request(context.request.url, {
     method: "POST",
     headers: { "content-type": "application/json" },

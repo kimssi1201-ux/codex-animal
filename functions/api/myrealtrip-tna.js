@@ -3,6 +3,21 @@ const DEFAULT_MCP_URL = "https://mcp-servers.myrealtrip.com/mcp";
 const DEFAULT_CATEGORIES_PATH = "/v1/products/tna/categories";
 const DEFAULT_SEARCH_PATH = "/v1/products/tna/search";
 const DEFAULT_DETAIL_PATH = "/v1/products/tna/detail";
+const MAX_BODY_LENGTH = 32768;
+const MAX_TEXT_LENGTH = 120;
+const MAX_PAGE = 100;
+const MAX_RESULT_COUNT = 24;
+
+function boundedText(value, fallback = "", maxLength = MAX_TEXT_LENGTH) {
+  const text = String(value ?? fallback).trim();
+  return text.slice(0, maxLength);
+}
+
+function boundedInteger(value, fallback, min, max) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.min(max, Math.max(min, Math.trunc(number)));
+}
 
 function json(data, init = {}) {
   const headers = new Headers(init.headers || {});
@@ -335,7 +350,10 @@ function requestHeaders(config) {
 
 async function readBody(request) {
   try {
-    return await request.json();
+    const text = await request.text();
+    if (text.length > MAX_BODY_LENGTH) return null;
+    const body = JSON.parse(text);
+    return body && typeof body === "object" && !Array.isArray(body) ? body : {};
   } catch (error) {
     return {};
   }
@@ -364,41 +382,47 @@ export async function onRequestOptions() {
 export async function onRequestPost(context) {
   const requestUrl = new URL(context.request.url);
   const config = getConfig(context.env || {});
-  const action = requestUrl.searchParams.get("action") || "categories";
+  const action = boundedText(requestUrl.searchParams.get("action"), "categories", 40);
+  if (!["categories", "search", "detail"].includes(action)) {
+    return json({ ok: false, error: "지원하지 않는 투어·티켓 조회 방식입니다." }, { status: 400, cacheControl: "no-store" });
+  }
   const body = await readBody(context.request);
+  if (body === null) {
+    return json({ ok: false, error: "요청 본문이 너무 큽니다." }, { status: 413, cacheControl: "no-store" });
+  }
 
   if (config.mcpUrl) {
     try {
       if (action === "categories") {
-        const city = body.city || body.cityName || body.query || "제주";
+        const city = boundedText(body.city || body.cityName || body.query, "제주");
         const parsed = await callMcpTool(config, "getCategoryList", { city });
-        const items = normalizeMcpCategories(parsed);
-        return json({ ok: true, configured: true, mcp: true, action, items, raw: parsed });
+        const items = normalizeMcpCategories(parsed).slice(0, MAX_RESULT_COUNT);
+        return json({ ok: true, configured: true, mcp: true, action, items });
       }
 
       if (action === "search") {
-        const city = body.city || body.cityName || "";
-        const keyword = body.keyword || body.query || "";
+        const city = boundedText(body.city || body.cityName);
+        const keyword = boundedText(body.keyword || body.query);
         const query = [city, keyword].filter(Boolean).join(" ").trim() || "제주";
         const args = {
           query,
-          page: Number(body.page || 1),
-          perPage: Number(body.perPage || body.limit || 12)
+          page: boundedInteger(body.page, 1, 1, MAX_PAGE),
+          perPage: boundedInteger(body.perPage || body.limit, 12, 1, MAX_RESULT_COUNT)
         };
-        if (body.category) args.category = body.category;
-        if (body.sort) args.sort = body.sort;
+        if (body.category) args.category = boundedText(body.category);
+        if (body.sort) args.sort = boundedText(body.sort, "", 40);
         const parsed = await callMcpTool(config, "searchTnas", args);
-        const items = normalizeMcpProducts(parsed);
-        return json({ ok: true, configured: true, mcp: true, action, items, raw: parsed });
+        const items = normalizeMcpProducts(parsed).slice(0, MAX_RESULT_COUNT);
+        return json({ ok: true, configured: true, mcp: true, action, items });
       }
 
       if (action === "detail") {
         const parsed = await callMcpTool(config, "getTnaDetail", {
-          gid: String(body.gid || body.id || ""),
-          url: String(body.url || "")
+          gid: boundedText(body.gid || body.id),
+          url: boundedText(body.url, "", 500)
         });
-        const items = normalizeMcpProducts(parsed);
-        return json({ ok: true, configured: true, mcp: true, action, items, raw: parsed });
+        const items = normalizeMcpProducts(parsed).slice(0, 1);
+        return json({ ok: true, configured: true, mcp: true, action, items });
       }
     } catch (error) {
       return json({
@@ -438,11 +462,11 @@ export async function onRequestPost(context) {
 
     if (action === "detail") {
       const item = target.normalize(payload?.item || payload?.data || payload);
-      return json({ ok: true, configured: true, action, item, items: item.title ? [item] : [], raw: payload });
+      return json({ ok: true, configured: true, action, item, items: item.title ? [item] : [] });
     }
 
     const items = asArray(payload).map(target.normalize).filter((item) => item.value || item.title);
-    return json({ ok: true, configured: true, action, items, raw: payload });
+    return json({ ok: true, configured: true, action, items: items.slice(0, MAX_RESULT_COUNT) });
   } catch (error) {
     return json({
       ok: false,
@@ -456,8 +480,8 @@ export async function onRequestPost(context) {
 
 export async function onRequestGet(context) {
   const requestUrl = new URL(context.request.url);
-  const city = requestUrl.searchParams.get("city") || "제주";
-  const keyword = requestUrl.searchParams.get("keyword") || "";
+  const city = boundedText(requestUrl.searchParams.get("city"), "제주");
+  const keyword = boundedText(requestUrl.searchParams.get("keyword"));
   const request = new Request(context.request.url, {
     method: "POST",
     headers: { "content-type": "application/json" },

@@ -1,5 +1,17 @@
 const DEFAULT_TIMEOUT_MS = 9000;
 const DEFAULT_MCP_URL = "https://mcp-servers.myrealtrip.com/mcp";
+const MAX_QUERY_LENGTH = 80;
+const MAX_RESULT_LIMIT = 12;
+
+function boundedText(value, fallback = "", maxLength = MAX_QUERY_LENGTH) {
+  return String(value || fallback).trim().slice(0, maxLength);
+}
+
+function boundedInteger(value, fallback, min = 1, max = MAX_RESULT_LIMIT) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.min(max, Math.max(min, Math.trunc(number)));
+}
 
 function json(data, init = {}) {
   const headers = new Headers(init.headers || {});
@@ -64,10 +76,10 @@ function getConfig(env = {}) {
 }
 
 function buildTargetUrl(config, requestUrl) {
-  const keyword = requestUrl.searchParams.get("keyword") || "제주";
-  const type = requestUrl.searchParams.get("type") || "tour";
-  const page = requestUrl.searchParams.get("page") || "1";
-  const limit = requestUrl.searchParams.get("limit") || "12";
+  const keyword = boundedText(requestUrl.searchParams.get("keyword"), "제주");
+  const type = boundedText(requestUrl.searchParams.get("type"), "tour", 20);
+  const page = String(boundedInteger(requestUrl.searchParams.get("page"), 1, 1, 100));
+  const limit = String(boundedInteger(requestUrl.searchParams.get("limit"), 12));
 
   const base = config.apiUrl || (config.apiBase ? `${config.apiBase.replace(/\/$/, "")}/search` : "");
   if (!base) return "";
@@ -219,6 +231,7 @@ function productsFromWidget(widget = {}) {
 
 async function mcpSearchItems(config, keyword, limit = 6) {
   if (!config.mcpUrl) return [];
+  const safeLimit = boundedInteger(limit, 6, 1, MAX_RESULT_LIMIT);
   const response = await fetchWithTimeout(config.mcpUrl, {
     method: "POST",
     headers: {
@@ -232,9 +245,9 @@ async function mcpSearchItems(config, keyword, limit = 6) {
       params: {
         name: "searchTnas",
         arguments: {
-          query: keyword || "제주 액티비티",
+          query: boundedText(keyword, "제주 액티비티"),
           page: 1,
-          perPage: limit
+          perPage: safeLimit
         }
       }
     })
@@ -245,8 +258,8 @@ async function mcpSearchItems(config, keyword, limit = 6) {
   }
   const parsed = parseMcpContent(payload);
   const explicitItems = asArray(parsed).map(normalizeItem).filter((item) => item.title);
-  if (explicitItems.length) return explicitItems.slice(0, limit);
-  return productsFromWidget(parsed.widget).slice(0, limit);
+  if (explicitItems.length) return explicitItems.slice(0, safeLimit);
+  return productsFromWidget(parsed.widget).slice(0, safeLimit);
 }
 
 function addKeyword(value, keyword) {
@@ -363,12 +376,13 @@ export async function onRequestGet(context) {
   const requestUrl = new URL(context.request.url);
   const config = getConfig(context.env || {});
   const targetUrl = buildTargetUrl(config, requestUrl);
-  const keyword = requestUrl.searchParams.get("keyword") || "제주";
+  const keyword = boundedText(requestUrl.searchParams.get("keyword"), "제주");
+  const limit = boundedInteger(requestUrl.searchParams.get("limit"), 6, 1, MAX_RESULT_LIMIT);
   const fallbackAffiliateItems = affiliateItems(config, keyword);
 
   if (!targetUrl || !config.apiKey) {
     try {
-      const mcpItems = await mcpSearchItems(config, `${keyword} 액티비티`, Number(requestUrl.searchParams.get("limit") || 6));
+      const mcpItems = await mcpSearchItems(config, `${keyword} 액티비티`, limit);
       if (mcpItems.length) {
         return json({
           ok: true,
@@ -428,7 +442,7 @@ export async function onRequestGet(context) {
     });
   } catch (error) {
     try {
-      const mcpItems = await mcpSearchItems(config, `${keyword} 액티비티`, Number(requestUrl.searchParams.get("limit") || 6));
+      const mcpItems = await mcpSearchItems(config, `${keyword} 액티비티`, limit);
       if (mcpItems.length) {
         return json({
           ok: true,

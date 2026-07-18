@@ -2,6 +2,25 @@ const DEFAULT_TIMEOUT_MS = 9000;
 const DEFAULT_MCP_URL = "https://mcp-servers.myrealtrip.com/mcp";
 const DEFAULT_REGION_AUTOCOMPLETE_PATH = "/v1/products/accommodation/region-autocomplete";
 const DEFAULT_SEARCH_PATH = "/v1/products/accommodation/search";
+const MAX_BODY_LENGTH = 32768;
+const MAX_TEXT_LENGTH = 80;
+const MAX_PAGE = 20;
+
+function boundedText(value, fallback = "", maxLength = MAX_TEXT_LENGTH) {
+  const text = String(value ?? fallback).trim();
+  return text.slice(0, maxLength);
+}
+
+function boundedInteger(value, fallback, min, max) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.min(max, Math.max(min, Math.trunc(number)));
+}
+
+function boundedDate(value, fallback = "") {
+  const date = boundedText(value, fallback, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : fallback;
+}
 
 function json(data, init = {}) {
   const headers = new Headers(init.headers || {});
@@ -318,7 +337,10 @@ function requestHeaders(config) {
 
 async function readBody(request) {
   try {
-    return await request.json();
+    const text = await request.text();
+    if (text.length > MAX_BODY_LENGTH) return null;
+    const body = JSON.parse(text);
+    return body && typeof body === "object" && !Array.isArray(body) ? body : {};
   } catch (error) {
     return {};
   }
@@ -337,8 +359,14 @@ export async function onRequestOptions() {
 export async function onRequestPost(context) {
   const requestUrl = new URL(context.request.url);
   const config = getConfig(context.env || {});
-  const action = requestUrl.searchParams.get("action") || "region-autocomplete";
+  const action = boundedText(requestUrl.searchParams.get("action"), "region-autocomplete", 40);
+  if (!["region-autocomplete", "search"].includes(action)) {
+    return json({ ok: false, error: "지원하지 않는 숙소 조회 방식입니다." }, { status: 400, cacheControl: "no-store" });
+  }
   const body = await readBody(context.request);
+  if (body === null) {
+    return json({ ok: false, error: "요청 본문이 너무 큽니다." }, { status: 413, cacheControl: "no-store" });
+  }
   const isSearch = action === "search";
   const path = isSearch ? config.searchPath : config.regionAutocompletePath;
   const explicitUrl = isSearch ? config.searchUrl : config.regionAutocompleteUrl;
@@ -347,7 +375,7 @@ export async function onRequestPost(context) {
   if ((!url || !config.apiKey) && config.mcpUrl) {
     try {
       if (!isSearch) {
-        const keyword = String(body.keyword || body.query || "제주").trim() || "제주";
+        const keyword = boundedText(body.keyword || body.query, "제주");
         return json({
           ok: true,
           configured: true,
@@ -357,18 +385,18 @@ export async function onRequestPost(context) {
         });
       }
 
-      const keyword = String(body.keyword || body.query || body.regionName || body.regionId || "제주").trim() || "제주";
+      const keyword = boundedText(body.keyword || body.query || body.regionName || body.regionId, "제주");
       const parsed = await callMcpTool(config, "searchStays", {
         keyword,
-        checkIn: body.checkIn,
-        checkOut: body.checkOut,
-        adultCount: Number(body.adults || body.guests || body.adultCount || 2),
-        childCount: Number(body.children || body.childCount || 0),
+        checkIn: boundedDate(body.checkIn),
+        checkOut: boundedDate(body.checkOut),
+        adultCount: boundedInteger(body.adults || body.guests || body.adultCount, 2, 1, 9),
+        childCount: boundedInteger(body.children || body.childCount, 0, 0, 9),
         isDomestic: true,
-        page: Number(body.page || 1)
+        page: boundedInteger(body.page, 1, 1, MAX_PAGE)
       });
       const items = productsFromWidget(parsed.widget);
-      return json({ ok: true, configured: true, mcp: true, action, items, raw: parsed });
+      return json({ ok: true, configured: true, mcp: true, action, items });
     } catch (error) {
       return json({
         ok: false,
@@ -406,7 +434,7 @@ export async function onRequestPost(context) {
       ? asArray(payload).map(normalizeAccommodation).filter((item) => item.title)
       : asArray(payload).map(normalizeRegion).filter((item) => item.regionId || item.name);
 
-    return json({ ok: true, configured: true, action, items, raw: payload });
+    return json({ ok: true, configured: true, action, items });
   } catch (error) {
     return json({
       ok: false,
@@ -420,7 +448,7 @@ export async function onRequestPost(context) {
 
 export async function onRequestGet(context) {
   const requestUrl = new URL(context.request.url);
-  const keyword = requestUrl.searchParams.get("keyword") || "제주";
+  const keyword = boundedText(requestUrl.searchParams.get("keyword"), "제주");
   const request = new Request(context.request.url, {
     method: "POST",
     headers: { "content-type": "application/json" },

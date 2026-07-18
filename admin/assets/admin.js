@@ -298,7 +298,7 @@ function buildArticlesSource(items) {
 async function publishToGitHub() {
   if (!saveCurrentLocally()) return;
   const token = $("#adminToken").value.trim();
-  localStorage.setItem(tokenKey, token);
+  sessionStorage.setItem(tokenKey, token);
   showMessage("GitHub 저장 요청 중입니다.");
 
   try {
@@ -381,7 +381,7 @@ function bindEvents() {
 
 function init() {
   renderCategoryOptions();
-  $("#adminToken").value = localStorage.getItem(tokenKey) || "";
+  $("#adminToken").value = sessionStorage.getItem(tokenKey) || "";
   bindEvents();
   fillEditor(state.articles[0]);
 }

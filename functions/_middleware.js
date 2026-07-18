@@ -1,23 +1,27 @@
 const SITE_URL = "https://www.moneyarchive.kr";
 const ADS_TXT = "google.com, pub-8468106244002167, DIRECT, f08c47fec0942fa0\n";
+const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'self'",
+  "form-action 'self'",
+  "img-src 'self' data: blob: https:",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self' data: https:",
+  "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.googletagservices.com https://*.google.com https://ads-partners.coupang.com https://*.coupang.com",
+  "connect-src 'self' https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://*.coupang.com",
+  "frame-src https://*.googlesyndication.com https://*.doubleclick.net https://*.coupang.com",
+  "worker-src 'self' blob:"
+].join("; ");
 
 const SECURITY_HEADERS = {
   "x-content-type-options": "nosniff",
   "referrer-policy": "strict-origin-when-cross-origin",
-  "permissions-policy": "camera=(), microphone=(), geolocation=()"
+  "permissions-policy": "camera=(), microphone=(), geolocation=()",
+  "strict-transport-security": "max-age=31536000; includeSubDomains",
+  "content-security-policy": CONTENT_SECURITY_POLICY
 };
-
-function withSecurityHeaders(response) {
-  const headers = new Headers(response.headers);
-  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
-    headers.set(key, value);
-  }
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers
-  });
-}
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);

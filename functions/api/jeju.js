@@ -4,6 +4,9 @@ const TOUR_API_CLASSIC_BASE = "https://apis.data.go.kr/B551011/KorService";
 const LDONG_REGN_JEJU = "50";
 const APP_NAME = "JejuTravelNews";
 const OFFICIAL_CHECK_REQUIRED = "공식 안내 확인 필요";
+const DEFAULT_TIMEOUT_MS = 9000;
+const MAX_QUERY_LENGTH = 80;
+const MAX_PAGE = 20;
 
 const CONTENT_TYPE_LABELS = {
   12: "관광지",
@@ -61,8 +64,29 @@ function tourUrl(baseUrl, endpoint, params, serviceKey, keyName = "serviceKey") 
   return `${baseUrl}/${endpoint}?${search.toString()}&${keyName}=${serviceKeyParam(serviceKey)}`;
 }
 
+function boundedText(value, fallback = "", maxLength = MAX_QUERY_LENGTH) {
+  const text = String(value ?? fallback).trim();
+  return text.slice(0, maxLength);
+}
+
+function boundedPage(value, fallback = 1) {
+  const page = Number(value);
+  if (!Number.isFinite(page)) return fallback;
+  return Math.min(MAX_PAGE, Math.max(1, Math.trunc(page)));
+}
+
+async function fetchWithTimeout(url, options = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function fetchTour(endpoint, params, serviceKey, baseUrl = TOUR_API_BASE, keyName = "serviceKey") {
-  const response = await fetch(tourUrl(baseUrl, endpoint, params, serviceKey, keyName), {
+  const response = await fetchWithTimeout(tourUrl(baseUrl, endpoint, params, serviceKey, keyName), {
     headers: { accept: "application/json" }
   });
   const text = await response.text();
@@ -308,8 +332,8 @@ function normalizeDetail(common, intro, images) {
 
 async function handleList(requestUrl, serviceKey) {
   const category = requestUrl.searchParams.get("category") || "전체";
-  const keyword = stripTags(requestUrl.searchParams.get("keyword") || "");
-  const pageNo = requestUrl.searchParams.get("page") || "1";
+  const keyword = boundedText(stripTags(requestUrl.searchParams.get("keyword") || ""));
+  const pageNo = String(boundedPage(requestUrl.searchParams.get("page")));
   const config = CATEGORY_REQUESTS[category] || CATEGORY_REQUESTS["전체"];
   const params = {
     numOfRows: "100",
@@ -344,7 +368,7 @@ async function handleList(requestUrl, serviceKey) {
 }
 
 async function findDetailFallbackByKeyword(keyword, contentId, contentTypeId, serviceKey) {
-  const cleanKeyword = stripTags(keyword);
+  const cleanKeyword = boundedText(stripTags(keyword));
   if (!cleanKeyword) return {};
 
   const params = {
@@ -361,9 +385,9 @@ async function findDetailFallbackByKeyword(keyword, contentId, contentTypeId, se
 }
 
 async function handleDetail(requestUrl, serviceKey) {
-  const contentId = requestUrl.searchParams.get("id") || requestUrl.searchParams.get("contentId");
-  const contentTypeId = requestUrl.searchParams.get("contentTypeId") || "";
-  const fallbackKeyword = requestUrl.searchParams.get("title") || requestUrl.searchParams.get("keyword") || "";
+  const contentId = boundedText(requestUrl.searchParams.get("id") || requestUrl.searchParams.get("contentId"));
+  const contentTypeId = boundedText(requestUrl.searchParams.get("contentTypeId"), "", 20);
+  const fallbackKeyword = boundedText(requestUrl.searchParams.get("title") || requestUrl.searchParams.get("keyword") || "");
 
   if (!contentId) {
     return json({ ok: false, error: "contentId가 필요합니다." }, { status: 400, cacheControl: "no-store" });

@@ -2,6 +2,8 @@ const DEFAULT_OWNER = "kimssi1201-ux";
 const DEFAULT_REPO = "codex-animal";
 const DEFAULT_BRANCH = "main";
 const ARTICLES_PATH = "jeju-travel-news/assets/articles.js";
+const DEFAULT_TIMEOUT_MS = 10000;
+const MAX_BODY_LENGTH = 2 * 1024 * 1024;
 
 function json(data, init = {}) {
   const headers = new Headers(init.headers || {});
@@ -60,18 +62,18 @@ function requireConfig(env, request) {
   };
 }
 
-function sanitizeString(value, fallback = "") {
-  return String(value || fallback).trim();
+function sanitizeString(value, fallback = "", maxLength = 2000) {
+  return String(value || fallback).trim().slice(0, maxLength);
 }
 
-function sanitizeList(value) {
+function sanitizeList(value, maxItems = 50, maxLength = 2000) {
   if (!Array.isArray(value)) return [];
-  return value.map((item) => sanitizeString(item)).filter(Boolean);
+  return value.slice(0, maxItems).map((item) => sanitizeString(item, "", maxLength)).filter(Boolean);
 }
 
 function sanitizeArticle(value = {}) {
-  const title = sanitizeString(value.title);
-  const slug = sanitizeString(value.slug)
+  const title = sanitizeString(value.title, "", 200);
+  const slug = sanitizeString(value.slug, "", 120)
     .toLowerCase()
     .replace(/[^a-z0-9가-힣-]+/g, "-")
     .replace(/-+/g, "-")
@@ -100,9 +102,9 @@ function sanitizeArticle(value = {}) {
 }
 
 function sanitizePayload(payload = {}) {
-  const categories = sanitizeList(payload.categories);
+  const categories = sanitizeList(payload.categories, 30, 80);
   const articles = Array.isArray(payload.articles)
-    ? payload.articles.map(sanitizeArticle).filter(Boolean)
+    ? payload.articles.slice(0, 100).map(sanitizeArticle).filter(Boolean)
     : [];
   const unique = new Set();
 
@@ -134,17 +136,25 @@ function utf8Base64(value) {
 }
 
 async function githubJson(url, token, init = {}) {
-  const response = await fetch(url, {
-    ...init,
-    headers: {
-      accept: "application/vnd.github+json",
-      authorization: `Bearer ${token}`,
-      "content-type": "application/json",
-      "x-github-api-version": "2022-11-28",
-      "user-agent": "moneyarchive-admin",
-      ...(init.headers || {})
-    }
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
+  let response;
+  try {
+    response = await fetch(url, {
+      ...init,
+      signal: controller.signal,
+      headers: {
+        accept: "application/vnd.github+json",
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+        "x-github-api-version": "2022-11-28",
+        "user-agent": "moneyarchive-admin",
+        ...(init.headers || {})
+      }
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
   const text = await response.text();
   let payload = {};
   try {
@@ -164,7 +174,9 @@ export async function onRequestPost({ request, env }) {
 
   let payload;
   try {
-    payload = sanitizePayload(await request.json());
+    const text = await request.text();
+    if (text.length > MAX_BODY_LENGTH) throw new Error("요청 본문이 너무 큽니다.");
+    payload = sanitizePayload(JSON.parse(text));
   } catch (error) {
     return json({ ok: false, message: error.message }, { status: 400 });
   }
