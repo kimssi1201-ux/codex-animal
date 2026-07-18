@@ -283,7 +283,7 @@ export const articles = [
     "slug": "rainy-day-indoor-jeju",
     "category": "계절 코스",
     "region": "제주 전역",
-    "image": "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1200&q=82",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/50/3553250_image2_1.jpg",
     "summary": "비바람이 강한 날에도 무리 없이 갈 수 있는 박물관, 시장, 카페 중심 실내 코스입니다.",
     "date": "2026-07-08",
     "course": [
@@ -312,7 +312,7 @@ export const articles = [
     "slug": "east-jeju-2days",
     "category": "계절 코스",
     "region": "제주 동부",
-    "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=82",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/00/3354600_image2_1.jpg",
     "summary": "성산, 우도, 함덕, 비자림을 1박 2일로 나누어 여유 있게 도는 동쪽 대표 코스입니다.",
     "date": "2026-07-08",
     "course": [
@@ -429,7 +429,7 @@ export const articles = [
     "slug": "jeju-stay-location-guide",
     "category": "숙소",
     "region": "제주 전역",
-    "image": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=82",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/83/2876783_image2_1.jpg",
     "summary": "판매 유도 없이 여행 동선 기준으로 제주시, 서귀포, 동부, 서부 숙소 위치를 비교합니다.",
     "date": "2026-07-08",
     "course": [
@@ -516,7 +516,7 @@ export const articles = [
     "slug": "saryeoni-forest-road-check",
     "category": "계절 코스",
     "region": "제주 중산간 · 조천",
-    "image": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=82",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/91/3541991_image2_1.jpg",
     "summary": "제주 숲길 대표 코스인 사려니숲길을 걷기 전에 알아둘 교통, 복장, 소요 시간을 정리했습니다.",
     "date": "2026-07-08",
     "course": [
@@ -922,7 +922,7 @@ export const articles = [
     "slug": "jeju-city-stay-route-guide",
     "category": "숙소",
     "region": "제주시 · 공항권",
-    "image": "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1200&q=82",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/82/3089182_image2_1.jpg",
     "summary": "늦은 도착, 짧은 일정, 대중교통 여행자에게 맞는 제주시 숙소권 동선을 정리했습니다.",
     "date": "2026-07-08",
     "course": [
@@ -951,7 +951,7 @@ export const articles = [
     "slug": "seogwipo-stay-route-guide",
     "category": "숙소",
     "region": "서귀포 · 시내권",
-    "image": "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=82",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/45/3569245_image2_1.jpg",
     "summary": "폭포, 시장, 남쪽 해안을 중심으로 여행할 때 서귀포 숙소권이 편한 이유를 정리했습니다.",
     "date": "2026-07-08",
     "course": [
@@ -1627,7 +1627,7 @@ export const articles = [
     "slug": "hamdeok-stay-location-guide",
     "category": "숙소",
     "region": "제주 동부 · 조천",
-    "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=82",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/57/4086557_image2_1.jpg",
     "summary": "함덕해변 근처 숙소를 잡을 때 좋은 점과 불편한 점, 추천 여행 유형을 정리했습니다.",
     "date": "2026-07-10",
     "course": [
@@ -1657,7 +1657,7 @@ export const articles = [
     "slug": "aewol-stay-location-guide",
     "category": "숙소",
     "region": "제주 서부 · 애월",
-    "image": "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=1200&q=82",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/06/4077606_image2_1.jpg",
     "summary": "애월 숙소를 고를 때 봐야 할 해안도로 접근성, 주차, 서쪽 여행 동선을 정리했습니다.",
     "date": "2026-07-10",
     "course": [
@@ -1687,7 +1687,7 @@ export const articles = [
     "slug": "seongsan-stay-location-guide",
     "category": "숙소",
     "region": "제주 동부 · 성산",
-    "image": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=82",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/82/2944282_image2_1.bmp",
     "summary": "성산일출봉, 우도, 섭지코지를 중심으로 숙소를 잡을 때의 장단점을 정리했습니다.",
     "date": "2026-07-10",
     "course": [
@@ -1717,7 +1717,7 @@ export const articles = [
     "slug": "jungmun-stay-location-guide",
     "category": "숙소",
     "region": "제주 서귀포 · 중문",
-    "image": "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1200&q=82",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/85/4074085_image2_1.jpg",
     "summary": "중문관광단지 숙소를 고를 때 가족 여행자가 봐야 할 이동, 식사, 관광지 접근성을 정리했습니다.",
     "date": "2026-07-10",
     "course": [
@@ -1747,7 +1747,7 @@ export const articles = [
     "slug": "spring-jeju-canola-blossom-route",
     "category": "계절 코스",
     "region": "제주 전역 · 봄 여행",
-    "image": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=1200&q=82",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/69/3588469_image2_1.jpg",
     "summary": "봄 제주에서 유채꽃과 바다를 함께 보기 좋은 드라이브 동선과 방문 팁입니다.",
     "date": "2026-07-10",
     "course": [

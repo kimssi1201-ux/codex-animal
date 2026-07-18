@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260718-images-6";
+import { articles, categories } from "./articles.js?v=20260718-images-7";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260718-images-6";
+const tourismDataVersion = "20260718-images-7";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -14,6 +14,15 @@ const articleThumbnailCache = new Map();
 const articleThumbnailRequests = new Map();
 const publicNow = Date.now();
 const officialImageSlugs = new Set([
+  "jeju-stay-location-guide",
+  "jeju-city-stay-route-guide",
+  "seogwipo-stay-route-guide",
+  "hamdeok-stay-location-guide",
+  "aewol-stay-location-guide",
+  "seongsan-stay-location-guide",
+  "jungmun-stay-location-guide",
+  "rainy-day-indoor-jeju",
+  "east-jeju-2days",
   "seongsan-sunrise-course",
   "hyeopjae-half-day",
   "hamdeok-cafe-street",
@@ -24,6 +33,7 @@ const officialImageSlugs = new Set([
   "seopjikoji-coastal-walk-guide",
   "bijarim-forest-walk-guide",
   "saryeoni-forest-road-check",
+  "spring-jeju-canola-blossom-route",
   "yongmeori-coast-visit-check",
   "jeongbang-waterfall-guide",
   "cheonjiyeon-night-walk-course",
