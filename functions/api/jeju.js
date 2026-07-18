@@ -20,7 +20,7 @@ const CONTENT_TYPE_LABELS = {
 };
 
 const CATEGORY_REQUESTS = {
-  "전체": { endpoint: "searchKeyword2", keyword: "제주", allowedTypes: ["12", "14", "15", "25", "32", "39"] },
+  "전체": { endpoint: "searchKeyword2", keyword: "제주", allowedTypes: ["12", "14", "15", "25", "32", "38", "39"] },
   "가볼 만한 곳": { endpoint: "searchKeyword2", contentTypeId: "12", keyword: "제주" },
   "맛집": { endpoint: "searchKeyword2", contentTypeId: "39", keyword: "제주" },
   "카페": { endpoint: "searchKeyword2", contentTypeId: "39", keyword: "카페" },

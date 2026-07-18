@@ -51,13 +51,19 @@ const officialImageSlugs = new Set([
   "hallasan-arboretum-walk-guide"
 ]);
 const articleImageKeywordOverrides = new Map([
+  ["aewol-coastal-drive", "애월해안도로"],
+  ["rainy-day-indoor-jeju", "제주도립미술관"],
+  ["east-jeju-2days", "함덕해수욕장"],
+  ["west-jeju-cafe-tour", "협재해수욕장"],
   ["seongsan-sunrise-course", "성산일출봉"],
   ["hyeopjae-half-day", "협재해수욕장"],
   ["hamdeok-cafe-street", "함덕해수욕장"],
   ["udo-day-trip", "우도"],
-  ["seogwipo-olle-market-food", "서귀포 매일올레시장"],
+  ["seogwipo-olle-market-food", "올레시장"],
   ["sangumburi-autumn-course", "산굼부리"],
   ["hallasan-beginner-trail", "한라산"],
+  ["family-friendly-jeju", "아쿠아플라넷 제주"],
+  ["jeju-accommodation-location", "함덕해수욕장"],
   ["seopjikoji-coastal-walk-guide", "섭지코지"],
   ["bijarim-forest-walk-guide", "비자림"],
   ["saryeoni-forest-road-check", "사려니숲길"],
@@ -69,8 +75,25 @@ const articleImageKeywordOverrides = new Map([
   ["pyoseon-beach-family-guide", "표선해수욕장"],
   ["jeju-stone-park-rainy-day-course", "제주돌문화공원"],
   ["dongmun-market-evening-food-route", "동문시장"],
+  ["jeju-black-pork-street-check", "흑돼지거리"],
+  ["jeju-city-accommodation-route", "한라수목원"],
+  ["seogwipo-accommodation-route", "천지연폭포"],
   ["lee-jung-seop-street-walk-guide", "이중섭거리"],
   ["jeju-43-peace-park-guide", "제주4.3평화공원"],
+  ["hangmong-historic-site-guide", "항몽유적지"],
+  ["arte-museum-jeju-indoor-guide", "아르떼뮤지엄 제주"],
+  ["sehwa-five-day-market-food-route", "세화해변"],
+  ["mosulpo-port-seafood-route", "모슬포항"],
+  ["jocheon-breakfast-brunch-route", "함덕해수욕장"],
+  ["aewol-sunset-cafe-route", "애월해안도로"],
+  ["andok-tea-dessert-cafe-route", "오설록"],
+  ["hamdeok-stay-location-guide", "함덕해수욕장"],
+  ["aewol-stay-location-guide", "애월해안도로"],
+  ["seongsan-stay-location-guide", "성산일출봉"],
+  ["jungmun-stay-location-guide", "중문관광단지"],
+  ["spring-jeju-canola-blossom-route", "성산일출봉"],
+  ["summer-jeju-beach-swim-check", "협재해수욕장"],
+  ["winter-jeju-camellia-snow-route", "카멜리아힐"],
   ["nohyung-supermarket-indoor-guide", "노형수퍼마켙"],
   ["hallasan-arboretum-walk-guide", "한라수목원"]
 ]);
@@ -908,7 +931,7 @@ function renderCategoryView(places = []) {
 }
 
 function shouldUseOfficialImage(article) {
-  return officialImageSlugs.has(article.slug);
+  return officialImageSlugs.has(article.slug) || /images\.unsplash\.com/i.test(String(article.image || ""));
 }
 
 function articleImageKeywords(article) {
@@ -956,7 +979,8 @@ function articleImageUsedByOtherArticle(image, currentSlug) {
 }
 
 function setOfficialArticleImage(article, image) {
-  if (!image || articleImageUsedByOtherArticle(image, article.slug)) return false;
+  const hasGenericImage = /images\.unsplash\.com/i.test(String(article.image || ""));
+  if (!image || (!hasGenericImage && articleImageUsedByOtherArticle(image, article.slug))) return false;
   articleThumbnailCache.set(article.slug, normalizeImageUrl(image));
   return true;
 }
@@ -971,7 +995,9 @@ function matchArticleImagePlace(article, places = []) {
       const title = normalizeText(place.title);
       const placeCategory = normalizeText(place.category);
       if (!title) return { place, score: 0 };
-      if (articleImageUsedByOtherArticle(place.image, article.slug)) return { place, score: 0 };
+      if (!/images\.unsplash\.com/i.test(String(article.image || "")) && articleImageUsedByOtherArticle(place.image, article.slug)) {
+        return { place, score: 0 };
+      }
       if (category !== "맛집" && placeCategory.includes("음식점")) return { place, score: 0 };
       const score = keywords.reduce((best, keyword) => {
         if (!keyword || !title.includes(keyword)) return best;
@@ -1922,10 +1948,11 @@ function articleSeoDescription(article) {
 function renderRelated(article) {
   const relatedBox = $("#relatedArticles");
   if (!relatedBox) return;
-  const related = articles
+  const related = publicArticles
     .filter((item) => item.slug !== article.slug && (item.category === article.category || item.region === article.region))
     .slice(0, 4);
   relatedBox.innerHTML = related.map(newsCard).join("");
+  hydrateArticleThumbnails();
 }
 
 function renderInlineOfficialShell(article) {
@@ -2074,6 +2101,7 @@ function renderStaticDetail(detail) {
   hydrateStaticOfficialInfo(article);
   loadContextualMyRealTrip(myrealtripContext, "#articleMyRealTripGrid");
   renderRelated(article);
+  hydrateArticleThumbnails();
 }
 
 async function renderSpotDetail(detail, spot) {
