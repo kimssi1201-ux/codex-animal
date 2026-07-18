@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260714-admin-1";
+import { articles, categories } from "./articles.js?v=20260718-nearby-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260714-admin-1";
+const tourismDataVersion = "20260718-nearby-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const airportCache = new Map();
@@ -644,10 +644,10 @@ function renderVisualGallery() {
   `;
 }
 
-function detailGalleryArticles(article, limit = 6) {
+function detailNearbyArticles(article, limit = 4) {
   const nearby = (article.nearbySpots || []).map(normalizeText).filter(Boolean);
   const regionHead = normalizeText(String(article.region || "").split("·")[0]);
-  const scored = articles
+  const scored = publicArticles
     .filter((item) => item.slug !== article.slug)
     .map((item) => {
       const target = normalizeText([item.title, item.region, ...(item.course || [])].join(" "));
@@ -662,13 +662,31 @@ function detailGalleryArticles(article, limit = 6) {
   return uniqueByImage([...preferred, ...fallback]).slice(0, limit);
 }
 
-function renderArticleGallery(article) {
-  const items = detailGalleryArticles(article);
-  if (!items.length) return "";
+function nearbyTravelCard(article) {
   return `
-    <section class="article-gallery-section">
-      <h2>함께 볼 만한 사진</h2>
-      <div class="article-gallery-grid">${items.map(galleryCard).join("")}</div>
+    <a class="nearby-travel-card" href="${articleUrl(article)}">
+      <span class="nearby-travel-thumb">${articleImageTag(article)}</span>
+      <span class="nearby-travel-copy">
+        <span class="nearby-travel-meta">${escapeHtml([article.category, article.region].filter(Boolean).join(" · "))}</span>
+        <strong>${escapeHtml(article.title)}</strong>
+        <em>${escapeHtml(article.summary)}</em>
+      </span>
+    </a>
+  `;
+}
+
+function renderNearbyTravelRecommendations(article) {
+  const items = detailNearbyArticles(article);
+  if (!items.length) return "";
+  const nearbyText = (article.nearbySpots || []).slice(0, 3).join(", ");
+  return `
+    <section class="nearby-travel-section">
+      <div class="nearby-travel-head">
+        <p class="section-kicker">NEARBY</p>
+        <h2>근처 여행지 추천</h2>
+        ${nearbyText ? `<p>${escapeHtml(nearbyText)}와 함께 묶어 보기 좋은 주변 코스입니다.</p>` : ""}
+      </div>
+      <div class="nearby-travel-grid">${items.map(nearbyTravelCard).join("")}</div>
     </section>
   `;
 }
@@ -1989,7 +2007,7 @@ function renderStaticDetail(detail) {
       <h1>${escapeHtml(article.title)}</h1>
       <p class="summary">${escapeHtml(article.summary)}</p>
       <table class="info-table article-info-table"><tbody id="articleInfoRows">${staticInfoRows(article)}</tbody></table>
-      ${renderArticleGallery(article)}
+      ${renderNearbyTravelRecommendations(article)}
       ${renderInlineOfficialShell(article)}
       ${renderAudienceSection(article)}
       ${renderPlanningSection(article)}
@@ -2007,7 +2025,7 @@ function renderStaticDetail(detail) {
         </ul>
       </section>
       <section>
-        <h2>주변 추천</h2>
+        <h2>주변 장소 바로가기</h2>
         <div class="spot-tags">${(article.nearbySpots || []).map((spot) => `<a href="${escapeHtml(spotUrl(spot, article.slug))}">${escapeHtml(spot)}</a>`).join("")}</div>
       </section>
       <section class="mrt-section article-mrt-section" aria-labelledby="articleMyRealTripTitle">

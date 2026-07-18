@@ -1085,20 +1085,90 @@ main, .site-footer {
 .article-note-block p + p {
   margin-top: 2px;
 }
-.article-gallery-section {
+.nearby-travel-section {
   display: grid;
-  gap: 10px;
+  gap: 12px;
+  padding: 16px 0 4px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
-.article-gallery-grid {
+.nearby-travel-head {
+  display: grid;
+  gap: 5px;
+}
+.nearby-travel-head h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.3;
+}
+.nearby-travel-head p {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.55;
+}
+.nearby-travel-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
-.article-gallery-grid .gallery-card img {
-  aspect-ratio: 1.18 / 1;
+.nearby-travel-card {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
 }
-.article-gallery-grid .gallery-card strong {
-  font-size: 13px;
+.nearby-travel-card:hover {
+  border-color: #bdd3c9;
+  background: #f8fbfa;
+}
+.nearby-travel-thumb {
+  display: block;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #eef2ef;
+}
+.nearby-travel-thumb img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1.18 / 1;
+  object-fit: cover;
+}
+.nearby-travel-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.nearby-travel-meta {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+.nearby-travel-copy strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.nearby-travel-copy em {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 .course-list, .check-list {
   display: grid;
@@ -2955,6 +3025,19 @@ body {
 
 /* Mobile recommendation list */
 @media (max-width: 560px) {
+  .nearby-travel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nearby-travel-card {
+    grid-template-columns: 104px minmax(0, 1fr);
+    padding: 9px;
+  }
+
+  .nearby-travel-head h2 {
+    font-size: 20px;
+  }
+
   .recommend-news-row {
     gap: 0;
     padding: 0 0 18px;
