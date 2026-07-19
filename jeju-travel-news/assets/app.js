@@ -358,6 +358,175 @@ const languageCatalog = {
   }
 };
 
+const articleCopyCatalog = {
+  ko: {
+    labels: { region: "지역", address: "주소", parking: "주차", hours: "운영시간", fee: "입장료" },
+    nearbyTitle: "근처 여행지 추천",
+    nearbyDescription: (spots) => `${spots}와 함께 묶어 보기 좋은 주변 코스입니다.`,
+    officialTitle: "공식 확인 정보",
+    officialDescription: (spot) => `${spot}의 운영시간, 주차, 요금 정보를 본문에서 바로 확인합니다.`,
+    bodyTitle: "본문 정보",
+    bodyLead: "읽기 전 핵심",
+    bodySections: ["여행 포인트", "추천 동선", "머무는 시간과 이동 팁", "방문 전 확인"],
+    audienceTitle: "이런 사람에게 추천",
+    planningTitle: "권장 동선",
+    routeTitle: "여행 코스 요약",
+    checklistTitle: "방문 전 체크포인트",
+    nearbyTagsTitle: "주변 장소 바로가기",
+    relatedTitle: "관련 글",
+    checkItems: ["운영시간과 입장료는 현장 사정에 따라 달라질 수 있습니다.", "해변과 오름은 바람, 비, 안개 예보를 먼저 확인하세요.", "주차장이 혼잡하면 가까운 대체 코스를 준비하는 편이 좋습니다."],
+    summary: (title, region, category) => `${title}을 중심으로 ${region}에서 ${category} 여행을 준비할 때 필요한 동선과 방문 정보를 정리했습니다.`,
+    content: (title, region, route, nearby, category) => [
+      `${title}은 ${region}에서 ${category} 일정을 잡을 때 주변 흐름까지 함께 살펴보기 좋은 여행지입니다. 주차, 이동 시간, 식사나 카페까지 같이 계산하면 여행 피로를 줄일 수 있습니다.`,
+      `추천 동선은 ${route} 순서입니다. 시간이 짧다면 핵심 장소 두세 곳만 고르고, 여유가 있다면 ${nearby}까지 같은 권역으로 묶어 움직이는 편이 자연스럽습니다.`,
+      `사진을 찍는 시간과 목적지까지 걷는 시간을 일정에 포함하세요. 아이나 부모님과 함께라면 화장실, 휴식 지점, 그늘 여부를 먼저 확인하면 이동이 편합니다.`,
+      "출발 전에는 날씨, 공식 운영시간, 입장 마감과 주차 공지를 다시 확인하세요. 야외 일정은 강풍이나 비가 예보되면 실내 카페와 박물관을 대체 코스로 준비하는 것이 좋습니다."
+    ],
+    parking: "방문 전 공식 주차 안내와 공영 주차장 위치를 확인하세요. 성수기와 주말에는 도보 이동 시간을 함께 계산하는 편이 좋습니다.",
+    fee: "무료 또는 유료 구간이 있을 수 있으므로 방문 전 공식 안내와 현장 요금을 확인하세요.",
+    hours: "운영시간과 입장 마감은 계절, 날씨, 현장 사정에 따라 달라질 수 있습니다.",
+    audienceItems: (region, category) => [`${region}에서 ${category} 중심 일정을 잡고 싶은 여행자`, "주차, 운영시간, 입장료를 먼저 확인하고 싶은 초행 여행자", "한 곳과 주변 장소를 자연스럽게 묶어 여행하고 싶은 사람"],
+    planningRows: (first, last, pace) => [["추천 체류", "반나절 이상"], ["시작 지점", first], ["마무리 지점", last], ["동선 팁", pace]]
+  },
+  en: {
+    labels: { region: "Region", address: "Address", parking: "Parking", hours: "Opening hours", fee: "Admission" },
+    nearbyTitle: "Nearby places to visit",
+    nearbyDescription: (spots) => `Easy nearby stops to pair with ${spots}.`,
+    officialTitle: "Official information",
+    officialDescription: (spot) => `Check opening hours, parking and fees for ${spot} here.`,
+    bodyTitle: "Trip notes",
+    bodyLead: "Key points at a glance",
+    bodySections: ["Trip focus", "Suggested route", "Timing and transport tips", "Before you go"],
+    audienceTitle: "Recommended for",
+    planningTitle: "Suggested itinerary",
+    routeTitle: "Route summary",
+    checklistTitle: "Before-you-go checklist",
+    nearbyTagsTitle: "Nearby place links",
+    relatedTitle: "Related stories",
+    checkItems: ["Opening hours and admission may change with local conditions.", "Check wind, rain and fog forecasts before beach or oreum visits.", "When parking is busy, prepare a nearby alternative and allow extra walking time."],
+    summary: (title, region, category) => `A practical guide to planning a ${category.toLowerCase()} trip around ${title} in ${region}.`,
+    content: (title, region, route, nearby, category) => [
+      `${title} is a useful ${category.toLowerCase()} stop to pair with other places in ${region}. Planning parking, travel time and a meal or cafe break together can make the day much easier.`,
+      `The suggested route is ${route}. On a short schedule, choose two or three key stops. With more time, add ${nearby} within the same area instead of crossing the island.`,
+      `Leave room for photos and the walk from parking to the main site. Families and older travelers should check restrooms, shade and resting points before setting out.`,
+      "Before leaving, confirm the weather, official opening hours, last admission and parking notices. For strong wind or rain, keep an indoor cafe or museum as a backup plan."
+    ],
+    parking: "Check the official parking notice and nearby public parking before visiting. On weekends and in peak season, include walking time in your plan.",
+    fee: "Some areas may be free while others charge a fee. Confirm the official notice and current price before visiting.",
+    hours: "Opening hours and last admission may change by season, weather and local conditions.",
+    audienceItems: (region, category) => [`Travelers planning a ${category.toLowerCase()} day in ${region}`, "First-time visitors who want to check parking, hours and admission first", "Anyone who wants to connect one main stop with nearby places"],
+    planningRows: (first, last, pace) => [["Suggested stay", "Half day or longer"], ["Start", first], ["Finish", last], ["Route tip", pace]]
+  },
+  ja: {
+    labels: { region: "エリア", address: "住所", parking: "駐車", hours: "営業時間", fee: "入場料" },
+    nearbyTitle: "周辺のおすすめスポット",
+    nearbyDescription: (spots) => `${spots}と一緒に回りやすい周辺コースです。`,
+    officialTitle: "公式情報",
+    officialDescription: (spot) => `${spot}の営業時間、駐車場、料金を確認できます。`,
+    bodyTitle: "本文情報",
+    bodyLead: "先に見るポイント",
+    bodySections: ["旅のポイント", "おすすめルート", "滞在時間と移動のコツ", "訪問前の確認"],
+    audienceTitle: "こんな方におすすめ",
+    planningTitle: "おすすめ行程",
+    routeTitle: "旅行コース概要",
+    checklistTitle: "訪問前チェック",
+    nearbyTagsTitle: "周辺スポットへのリンク",
+    relatedTitle: "関連記事",
+    checkItems: ["営業時間と入場料は現地状況により変わる場合があります。", "ビーチやオルムへ行く前に風、雨、霧の予報を確認してください。", "駐車場が混雑する場合は近くの代替コースと徒歩時間を準備しましょう。"],
+    summary: (title, region, category) => `${region}で${title}を中心に${category}旅行を楽しむための動線と訪問情報をまとめました。`,
+    content: (title, region, route, nearby, category) => [
+      `${title}は${region}で${category}の予定を組むとき、周辺の流れも一緒に考えやすい場所です。駐車、移動時間、食事やカフェをまとめて計画すると無理がありません。`,
+      `おすすめの順番は${route}です。短い日程なら主要な二、三か所に絞り、時間があれば${nearby}まで同じエリアで回ると移動が楽です。`,
+      `写真を撮る時間と駐車場から歩く時間も予定に入れてください。家族旅行ではトイレ、休憩場所、日陰の有無を先に確認すると安心です。`,
+      "出発前に天気、公式の営業時間、最終入場、駐車場のお知らせを確認しましょう。風や雨が強い日はカフェや博物館を代替コースにすると便利です。"
+    ],
+    parking: "訪問前に公式の駐車案内と公共駐車場を確認してください。週末や繁忙期は徒歩時間も含めて計画しましょう。",
+    fee: "無料の場所でも一部施設は有料の場合があります。訪問前に公式案内と最新料金を確認してください。",
+    hours: "営業時間と最終入場は季節、天候、現地事情により変わる場合があります。",
+    audienceItems: (region, category) => [`${region}で${category}中心の予定を組みたい方`, "駐車、営業時間、料金を先に確認したい初めての旅行者", "一つの場所と周辺スポットを一緒に回りたい方"],
+    planningRows: (first, last, pace) => [["滞在時間", "半日以上"], ["スタート", first], ["ゴール", last], ["ルートのコツ", pace]]
+  },
+  zh: {
+    labels: { region: "地区", address: "地址", parking: "停车", hours: "开放时间", fee: "门票" },
+    nearbyTitle: "附近旅行地推荐",
+    nearbyDescription: (spots) => `适合与${spots}一起安排的周边路线。`,
+    officialTitle: "官方信息",
+    officialDescription: (spot) => `在这里查看${spot}的开放时间、停车和费用信息。`,
+    bodyTitle: "正文信息",
+    bodyLead: "阅读前重点",
+    bodySections: ["旅行重点", "推荐路线", "停留时间与交通提示", "出发前确认"],
+    audienceTitle: "适合这些旅行者",
+    planningTitle: "建议行程",
+    routeTitle: "旅行路线摘要",
+    checklistTitle: "出行前检查",
+    nearbyTagsTitle: "附近地点链接",
+    relatedTitle: "相关文章",
+    checkItems: ["开放时间和门票可能因现场情况而变化。", "前往海滩或火山丘前请确认风、雨和雾的预报。", "停车场拥挤时，请准备附近替代路线并预留步行时间。"],
+    summary: (title, region, category) => `整理了在${region}以${title}为中心体验${category}旅行时需要的路线和实用信息。`,
+    content: (title, region, route, nearby, category) => [
+      `${title}适合在${region}安排${category}行程时与周边景点一起游览。把停车、移动时间、用餐或咖啡馆休息一起计划，行程会更轻松。`,
+      `推荐路线为${route}。时间较短时选择两到三个重点地点；时间充足时，可在同一区域加入${nearby}，避免一天横跨整座岛。`,
+      `请把拍照时间和从停车处步行的时间也算进计划。带孩子或长辈出行时，建议提前确认卫生间、休息处和遮阳位置。`,
+      "出发前再次确认天气、官方开放时间、停止入场时间和停车公告。遇到强风或下雨时，可将咖啡馆或博物馆作为备用路线。"
+    ],
+    parking: "出发前请确认官方停车信息和附近公共停车场。周末及旺季要把步行时间一起算入行程。",
+    fee: "部分区域免费，部分设施可能收费。出发前请确认官方说明和最新价格。",
+    hours: "开放时间和停止入场时间可能因季节、天气和现场情况而变化。",
+    audienceItems: (region, category) => [`想在${region}安排${category}行程的旅行者`, "希望先确认停车、开放时间和门票的初次游客", "想把主要景点和附近地点一起安排的旅行者"],
+    planningRows: (first, last, pace) => [["建议停留", "半天以上"], ["起点", first], ["终点", last], ["路线提示", pace]]
+  }
+};
+
+const articleTermTranslations = {
+  en: {
+    "하도해변": "Hado Beach", "더마파크": "The Ma Park", "제주현대미술관": "Jeju Museum of Contemporary Art", "성산일출봉": "Seongsan Ilchulbong", "협재해수욕장": "Hyeopjae Beach", "함덕해수욕장": "Hamdeok Beach", "우도": "Udo", "애월": "Aewol", "서귀포": "Seogwipo", "제주시": "Jeju City", "오설록": "Osulloc", "비자림": "Bijarim Forest", "사려니숲길": "Saryeoni Forest Road", "섭지코지": "Seopjikoji", "용머리해안": "Yongmeori Coast", "정방폭포": "Jeongbang Waterfall", "천지연폭포": "Cheonjiyeon Waterfall", "월정리해변": "Woljeongri Beach", "김녕해수욕장": "Gimnyeong Beach", "표선해수욕장": "Pyoseon Beach", "동문시장": "Dongmun Market", "산굼부리": "Sangumburi", "한라산": "Hallasan", "제주": "Jeju", "동쪽": "East", "서쪽": "West", "북동부": "Northeast", "서남부": "Southwest", "전역": "Islandwide", "중산간": "Mid-mountain", "조용한": "Quiet", "바다": "Coast", "코스": "Route", "여행": "Travel", "일출": "Sunrise", "반나절": "Half-day", "카페 거리": "Cafe Street", "당일치기": "Day Trip", "드라이브": "Drive", "먹거리": "Food", "가을": "Autumn", "억새": "Silver Grass", "비 오는 날": "Rainy Day", "실내": "Indoor", "1박 2일": "2-Day", "투어": "Tour", "초보": "Beginner", "등산": "Hike", "가족과 가기 좋은": "Family-friendly", "숙소 위치 고르는 법": "Where to Stay", "산책": "Walk", "가이드": "Guide", "정보": "Guide", "체크": "Checklist", "방문 전": "Before You Go", "노을": "Sunset", "야간": "Night", "저녁": "Evening" },
+  ja: {
+    "하도해변": "ハドビーチ", "더마파크": "ザ・マパーク", "제주현대미술관": "済州現代美術館", "성산일출봉": "城山日出峰", "협재해수욕장": "挟才海水浴場", "함덕해수욕장": "咸徳海水浴場", "우도": "牛島", "애월": "涯月", "서귀포": "西帰浦", "제주시": "済州市", "오설록": "オソルロク", "비자림": "榧子林", "사려니숲길": "サリョニ森道", "섭지코지": "ソプチコジ", "용머리해안": "龍頭海岸", "정방폭포": "正房瀑布", "천지연폭포": "天地淵瀑布", "월정리해변": "月汀里ビーチ", "김녕해수욕장": "金寧ビーチ", "표선해수욕장": "表善ビーチ", "동문시장": "東門市場", "산굼부리": "サングムブリ", "한라산": "漢拏山", "제주": "済州", "동쪽": "東部", "서쪽": "西部", "북동부": "北東部", "서남부": "南西部", "전역": "島全域", "중산간": "中山間", "조용한": "静かな", "바다": "海", "코스": "コース", "여행": "旅行", "일출": "日の出", "반나절": "半日", "카페 거리": "カフェ通り", "당일치기": "日帰り", "드라이브": "ドライブ", "먹거리": "グルメ", "가을": "秋", "억새": "ススキ", "비 오는 날": "雨の日", "실내": "屋内", "1박 2일": "1泊2日", "투어": "ツアー", "초보": "初心者", "등산": "登山", "가족과 가기 좋은": "家族向け", "숙소 위치 고르는 법": "宿泊エリアの選び方", "산책": "散策", "가이드": "ガイド", "정보": "情報", "체크": "チェック", "방문 전": "訪問前", "노을": "夕日", "야간": "夜間", "저녁": "夕食" },
+  zh: {
+    "하도해변": "下道海滩", "더마파크": "德马公园", "제주현대미술관": "济州现代美术馆", "성산일출봉": "城山日出峰", "협재해수욕장": "协才海水浴场", "함덕해수욕장": "咸德海水浴场", "우도": "牛岛", "애월": "涯月", "서귀포": "西归浦", "제주시": "济州市", "오설록": "O'Sulloc", "비자림": "榧子林森林", "사려니숲길": "思连伊森林路", "섭지코지": "涉地可支", "용머리해안": "龙头海岸", "정방폭포": "正房瀑布", "천지연폭포": "天地渊瀑布", "월정리해변": "月汀里海滩", "김녕해수욕장": "金宁海水浴场", "표선해수욕장": "表善海水浴场", "동문시장": "东门市场", "산굼부리": "山君不离", "한라산": "汉拏山", "제주": "济州", "동쪽": "东部", "서쪽": "西部", "북동부": "东北部", "서남부": "西南部", "전역": "全岛", "중산간": "中山地区", "조용한": "安静的", "바다": "海边", "코스": "路线", "여행": "旅行", "일출": "日出", "반나절": "半日", "카페 거리": "咖啡馆街", "당일치기": "一日游", "드라이브": "自驾", "먹거리": "美食", "가을": "秋季", "억새": "芒草", "비 오는 날": "雨天", "실내": "室内", "1박 2일": "两天一夜", "투어": "游览", "초보": "初学者", "등산": "登山", "가족과 가기 좋은": "适合家庭", "숙소 위치 고르는 법": "住宿区域选择", "산책": "散步", "가이드": "指南", "정보": "信息", "체크": "检查", "방문 전": "出行前", "노을": "日落", "야간": "夜间", "저녁": "晚餐" }
+};
+
+function getArticleCopy() {
+  return articleCopyCatalog[currentLanguage] || articleCopyCatalog.ko;
+}
+
+function translateArticleText(value) {
+  const text = String(value || "");
+  if (currentLanguage === "ko") return text;
+  return Object.entries(articleTermTranslations[currentLanguage] || {})
+    .sort(([left], [right]) => right.length - left.length)
+    .reduce((result, [source, translated]) => result.replaceAll(source, translated), text);
+}
+
+function localizedArticleTitle(article) {
+  return translateArticleText(article.title);
+}
+
+function localizedArticle(article) {
+  if (currentLanguage === "ko") return article;
+  const copy = getArticleCopy();
+  const title = localizedArticleTitle(article);
+  const region = translateArticleText(article.region);
+  const category = categoryLabel(article.category);
+  const course = (article.course || []).map(translateArticleText);
+  const nearby = (article.nearbySpots || []).map(translateArticleText);
+  const route = course.slice(0, 5).join(" → ") || title;
+  const nearbyText = nearby.slice(0, 3).join(", ") || region;
+  return {
+    ...article,
+    title,
+    summary: copy.summary(title, region, category),
+    region,
+    address: translateArticleText(article.address),
+    parking: copy.parking,
+    fee: copy.fee,
+    operatingHours: copy.hours,
+    course,
+    nearbySpots: nearby,
+    content: copy.content(title, region, route, nearbyText, category)
+  };
+}
+
 function getLanguagePack() {
   return languageCatalog[currentLanguage] || languageCatalog.ko;
 }
@@ -393,6 +562,7 @@ const dataI18nKeys = {
 };
 
 function languageUiText(key, fallback = "") {
+  if (key === "article.related") return getArticleCopy().relatedTitle;
   const uiKey = dataI18nKeys[key] || key;
   if (uiKey === "loading") {
     return currentLanguage === "ko" ? "불러오는 중" : currentLanguage === "ja" ? "読み込み中" : currentLanguage === "zh" ? "加载中" : "Loading";
@@ -453,7 +623,11 @@ function applyLanguage(language = currentLanguage) {
     renderCategoryNews();
     renderVisualGallery();
   }
-  document.title = `${pack.ui.brandName} | ${pack.ui.julyTitle}`;
+  const detail = $("#articleDetail");
+  if (detail && !params.get("contentId") && !params.get("spot") && detail.dataset.language !== currentLanguage) {
+    renderStaticDetail(detail);
+  }
+  if ($("#newsFeedList")) document.title = `${pack.ui.brandName} | ${pack.ui.julyTitle}`;
 }
 
 function bindLanguageSwitch() {
@@ -826,19 +1000,20 @@ function thumbnailForArticle(article, useOfficialImage = false) {
 }
 
 function articleImageTag(article, className = "") {
-  return imageTag(thumbnailForArticle(article, true), article.title, className, `data-article-thumb="${escapeHtml(article.slug)}"`);
+  return imageTag(thumbnailForArticle(article, true), localizedArticleTitle(article), className, `data-article-thumb="${escapeHtml(article.slug)}"`);
 }
 
 function recommendedCard(article, isLead = false) {
+  const view = localizedArticle(article);
   return `
     <article class="recommend-card${isLead ? " is-lead" : ""}">
       <a href="${articleUrl(article)}">
         ${articleImageTag(article)}
         <span class="recommend-content">
           <span class="recommend-label">${escapeHtml(categoryLabel(article.category))}</span>
-          <strong>${escapeHtml(article.title)}</strong>
-          ${isLead ? `<p>${escapeHtml(article.summary)}</p>` : ""}
-          <em>${escapeHtml([article.date, article.region].filter(Boolean).join(" · "))}</em>
+          <strong>${escapeHtml(view.title)}</strong>
+          ${isLead ? `<p>${escapeHtml(view.summary)}</p>` : ""}
+          <em>${escapeHtml([article.date, view.region].filter(Boolean).join(" · "))}</em>
         </span>
       </a>
     </article>
@@ -846,59 +1021,64 @@ function recommendedCard(article, isLead = false) {
 }
 
 function sectionArticleCard(article) {
+  const view = localizedArticle(article);
   return `
     <article class="section-card">
       <a href="${articleUrl(article)}">
         <span class="section-thumb">${articleImageTag(article)}</span>
         <span class="section-card-label">${escapeHtml(categoryLabel(article.category))}</span>
-        <h3>${escapeHtml(article.title)}</h3>
-        <p>${escapeHtml(article.summary)}</p>
+        <h3>${escapeHtml(view.title)}</h3>
+        <p>${escapeHtml(view.summary)}</p>
       </a>
     </article>
   `;
 }
 
 function leadArticleCard(article) {
+  const view = localizedArticle(article);
   return `
     <a class="news-lead" href="${articleUrl(article)}">
       <span class="lead-thumb">${articleImageTag(article)}</span>
-      <strong>${escapeHtml(article.title)}</strong>
-      <span>${metaLine([categoryLabel(article.category), article.region, article.date])}</span>
+      <strong>${escapeHtml(view.title)}</strong>
+      <span>${metaLine([categoryLabel(article.category), view.region, article.date])}</span>
     </a>
   `;
 }
 
 function pickArticleCard(article) {
+  const view = localizedArticle(article);
   return `
     <a class="pick-card" href="${articleUrl(article)}">
       <span class="pick-thumb">${articleImageTag(article)}</span>
-      <strong>${escapeHtml(article.title)}</strong>
+      <strong>${escapeHtml(view.title)}</strong>
     </a>
   `;
 }
 
 function rowArticleCard(article) {
+  const view = localizedArticle(article);
   return `
     <a class="news-row" href="${articleUrl(article)}">
       <span class="row-thumb">${articleImageTag(article)}</span>
       <span>
-        <strong>${escapeHtml(article.title)}</strong>
-        <em>${escapeHtml([categoryLabel(article.category), article.region, article.date].filter(Boolean).join(" · "))}</em>
+        <strong>${escapeHtml(view.title)}</strong>
+        <em>${escapeHtml([categoryLabel(article.category), view.region, article.date].filter(Boolean).join(" · "))}</em>
       </span>
     </a>
   `;
 }
 
 function newsCard(article) {
+  const view = localizedArticle(article);
   return `
     <article class="news-feed-card">
       <a class="news-thumb" href="${articleUrl(article)}">
         ${articleImageTag(article)}
       </a>
       <div class="news-copy">
-        <div class="meta">${metaLine([categoryLabel(article.category), article.region])}</div>
-        <h2><a href="${articleUrl(article)}">${escapeHtml(article.title)}</a></h2>
-        <p>${escapeHtml(article.summary)}</p>
+        <div class="meta">${metaLine([categoryLabel(article.category), view.region])}</div>
+        <h2><a href="${articleUrl(article)}">${escapeHtml(view.title)}</a></h2>
+        <p>${escapeHtml(view.summary)}</p>
       </div>
     </article>
   `;
@@ -915,18 +1095,20 @@ function uniqueByImage(items) {
 }
 
 function galleryCard(article) {
+  const view = localizedArticle(article);
   return `
     <a class="gallery-card" href="${articleUrl(article)}">
       ${articleImageTag(article)}
       <span>${escapeHtml(categoryLabel(article.category))}</span>
-      <strong>${escapeHtml(article.title)}</strong>
+      <strong>${escapeHtml(view.title)}</strong>
     </a>
   `;
 }
 
 function visualGalleryCard(article) {
+  const view = localizedArticle(article);
   return `
-    <a class="visual-gallery-card" href="${articleUrl(article)}" aria-label="${escapeHtml(article.title)}">
+    <a class="visual-gallery-card" href="${articleUrl(article)}" aria-label="${escapeHtml(view.title)}">
       ${articleImageTag(article)}
     </a>
   `;
@@ -965,19 +1147,21 @@ function detailNearbyArticles(article, limit = 4) {
 }
 
 function nearbyTravelCard(article) {
+  const view = localizedArticle(article);
   return `
     <a class="nearby-travel-card" href="${articleUrl(article)}">
       <span class="nearby-travel-thumb">${articleImageTag(article)}</span>
       <span class="nearby-travel-copy">
         <span class="nearby-travel-meta">${escapeHtml([categoryLabel(article.category), article.region].filter(Boolean).join(" · "))}</span>
-        <strong>${escapeHtml(article.title)}</strong>
-        <em>${escapeHtml(article.summary)}</em>
+        <strong>${escapeHtml(view.title)}</strong>
+        <em>${escapeHtml(view.summary)}</em>
       </span>
     </a>
   `;
 }
 
 function renderNearbyTravelRecommendations(article) {
+  const copy = getArticleCopy();
   const items = detailNearbyArticles(article);
   if (!items.length) return "";
   const nearbyText = (article.nearbySpots || []).slice(0, 3).join(", ");
@@ -985,8 +1169,8 @@ function renderNearbyTravelRecommendations(article) {
     <section class="nearby-travel-section">
       <div class="nearby-travel-head">
         <p class="section-kicker">NEARBY</p>
-        <h2>근처 여행지 추천</h2>
-        ${nearbyText ? `<p>${escapeHtml(nearbyText)}와 함께 묶어 보기 좋은 주변 코스입니다.</p>` : ""}
+        <h2>${escapeHtml(copy.nearbyTitle)}</h2>
+        ${nearbyText ? `<p>${escapeHtml(copy.nearbyDescription(translateArticleText(nearbyText)))}</p>` : ""}
       </div>
       <div class="nearby-travel-grid">${items.map(nearbyTravelCard).join("")}</div>
     </section>
@@ -2069,12 +2253,13 @@ function usefulInfoValue(value) {
 }
 
 function articleInfoRows(article, place = {}) {
+  const labels = getArticleCopy().labels;
   return rowsFromPairs([
-    ["지역", article.region],
-    ["주소", usefulInfoValue(place.address) || article.address],
-    ["주차", usefulInfoValue(place.parking) || article.parking],
-    ["운영시간", usefulInfoValue(place.operatingHours) || article.operatingHours],
-    ["입장료", usefulInfoValue(place.fee) || article.fee]
+    [labels.region, article.region],
+    [labels.address, usefulInfoValue(place.address) || article.address],
+    [labels.parking, usefulInfoValue(place.parking) || article.parking],
+    [labels.hours, usefulInfoValue(place.operatingHours) || article.operatingHours],
+    [labels.fee, usefulInfoValue(place.fee) || article.fee]
   ]);
 }
 
@@ -2100,6 +2285,7 @@ function articleOfficialKeyword(article) {
 }
 
 function articleBodySections(article) {
+  const copy = getArticleCopy();
   const course = (article.course || []).filter(Boolean);
   const nearby = (article.nearbySpots || []).filter(Boolean);
   const firstCourse = course[0] || article.title;
@@ -2111,30 +2297,39 @@ function articleBodySections(article) {
   const intro = baseContent[0] || `${article.title}은 ${article.region || "제주"}에서 일정에 넣기 좋은 ${article.category || "여행지"}입니다.`;
   const localTip = baseContent[1] || `${article.region || "제주"} 권역은 날씨와 교통 상황에 따라 체감 이동 시간이 달라질 수 있으니 여유 시간을 두고 움직이는 편이 좋습니다.`;
 
+  if (currentLanguage !== "ko") {
+    return copy.bodySections.map((title, index) => ({
+      title,
+      paragraphs: [baseContent[index] || copy.content(article.title, article.region, routeText, nearbyText, categoryLabel(article.category))[index]]
+    }));
+  }
+
   return [
     {
-      title: "여행 포인트",
+      title: copy.bodySections[0],
       paragraphs: [
         intro,
-        `${article.title}은 한 장소만 빠르게 보고 이동하기보다 주변 흐름을 함께 잡을 때 만족도가 높습니다. ${article.category || "여행"} 일정이라면 사진을 찍는 시간, 식사 시간, 주차장에서 목적지까지 걷는 시간을 같이 계산해 두세요.`
+        currentLanguage === "ko"
+          ? `${article.title}은 한 장소만 빠르게 보고 이동하기보다 주변 흐름을 함께 잡을 때 만족도가 높습니다. ${article.category || "여행"} 일정이라면 사진을 찍는 시간, 식사 시간, 주차장에서 목적지까지 걷는 시간을 같이 계산해 두세요.`
+          : `${article.title} is easier to enjoy when nearby stops are planned together instead of treating it as a quick stop. Include photo time, meals and the walk from parking to the destination in your ${categoryLabel(article.category) || "trip"} plan.`
       ]
     },
     {
-      title: "추천 동선",
+      title: copy.bodySections[1],
       paragraphs: [
         `기본 동선은 ${routeText} 순서로 잡으면 무리 없이 이어집니다. 시작 지점은 ${firstCourse}, 중간에 여유를 두고 볼 곳은 ${secondCourse}, 마무리 지점은 ${lastCourse}로 생각하면 전체 흐름이 단순해집니다.`,
         `일정이 짧다면 모든 장소를 다 넣기보다 핵심 2~3곳만 고르는 편이 낫습니다. 반대로 반나절 이상 시간이 있다면 ${nearbyText}까지 묶어 같은 권역 안에서 천천히 움직이는 구성이 좋습니다.`
       ]
     },
     {
-      title: "머무는 시간과 이동 팁",
+      title: copy.bodySections[2],
       paragraphs: [
         localTip,
         `렌터카 이동이라면 주차 위치를 먼저 확인하세요. ${article.parking} 도보 이동이 길어질 수 있는 날에는 목적지 바로 앞 주차만 고집하지 말고 가까운 공영 주차장이나 대체 코스를 함께 보는 편이 편합니다.`
       ]
     },
     {
-      title: "방문 전 확인",
+      title: copy.bodySections[3],
       paragraphs: [
         `운영시간과 입장료는 계절, 날씨, 현장 사정에 따라 달라질 수 있습니다. ${article.operatingHours} ${article.fee} 출발 전에는 지도 위치와 공식 안내를 한 번 더 확인하는 것이 안전합니다.`,
         `해변, 오름, 숲길처럼 야외 비중이 큰 일정은 바람과 비 예보에 영향을 많이 받습니다. 아이와 함께 가거나 부모님을 모시고 간다면 화장실, 그늘, 편의점, 식사 장소를 먼저 확인하고 이동하세요.`
@@ -2144,11 +2339,13 @@ function articleBodySections(article) {
 }
 
 function articleReadableLead(article) {
+  const copy = getArticleCopy();
   const course = (article.course || []).filter(Boolean);
   const firstCourse = course[0] || article.title;
   const lastCourse = course[course.length - 1] || article.region || article.title;
   const nearby = (article.nearbySpots || []).filter(Boolean);
   const nearbyText = nearby.length ? `${nearby.slice(0, 3).join(", ")}까지` : "주변 코스까지";
+  if (currentLanguage !== "ko") return copy.content(article.title, article.region, course.slice(0, 5).join(" → ") || article.title, nearby.slice(0, 3).join(", ") || article.region, categoryLabel(article.category))[0];
   return `${firstCourse}에서 시작해 ${lastCourse}로 이어지는 흐름을 기준으로 정리했습니다. ${article.region || "제주"} 권역에서 ${article.category || "여행"} 일정을 잡을 때 필요한 동선, 체류 시간, 방문 전 확인 사항을 함께 보세요. 여유가 있으면 ${nearbyText} 묶어 보면 좋습니다.`;
 }
 
@@ -2156,9 +2353,9 @@ function renderArticleBodySection(article) {
   return `
     <section class="article-readable-section">
       <div class="section-kicker">TRAVEL NOTE</div>
-      <h2>본문 정보</h2>
+      <h2>${escapeHtml(getArticleCopy().bodyTitle)}</h2>
       <div class="readable-lead">
-        <strong>읽기 전 핵심</strong>
+        <strong>${escapeHtml(getArticleCopy().bodyLead)}</strong>
         <p>${escapeHtml(articleReadableLead(article))}</p>
       </div>
       <div class="article-note-list">
@@ -2174,34 +2371,33 @@ function renderArticleBodySection(article) {
 }
 
 function articleAudienceItems(article) {
+  const copy = getArticleCopy();
   const region = article.region || "제주";
-  const category = article.category || "여행지";
-  return [
-    `${region} 권역에서 ${category} 중심 일정을 잡고 싶은 여행자`,
-    "주차, 운영시간, 입장료를 먼저 확인하고 움직이고 싶은 초행 여행자",
-    "한 곳만 보고 끝내기보다 주변 장소까지 자연스럽게 묶고 싶은 여행자"
-  ];
+  const category = categoryLabel(article.category || "여행지");
+  return copy.audienceItems(region, category);
 }
 
 function articlePlanningRows(article) {
+  const copy = getArticleCopy();
   const course = (article.course || []).filter(Boolean);
   const first = course[0] || article.title;
   const last = course[course.length - 1] || article.region;
   const duration = course.length >= 4 ? "반나절 이상" : "1~2시간";
   const pace = course.length >= 4 ? "장소를 모두 넣기보다 핵심 2~3곳을 먼저 정하세요." : "주변 추천 한두 곳만 더해도 일정이 자연스럽습니다.";
 
-  return [
-    ["추천 체류", duration],
-    ["시작 지점", first],
-    ["마무리 지점", last],
-    ["동선 팁", pace]
-  ];
+  if (currentLanguage === "ko") return [["추천 체류", duration], ["시작 지점", first], ["마무리 지점", last], ["동선 팁", pace]];
+  const localizedPace = currentLanguage === "en"
+    ? "Choose two or three key stops instead of fitting everything in."
+    : currentLanguage === "ja"
+      ? "すべて詰め込まず、主要な二、三か所を選びましょう。"
+      : "不要安排所有地点，优先选择两到三个重点。";
+  return copy.planningRows(first, last, localizedPace);
 }
 
 function renderAudienceSection(article) {
   return `
     <section class="template-card">
-      <h2>이런 사람에게 추천</h2>
+      <h2>${escapeHtml(getArticleCopy().audienceTitle)}</h2>
       <ul class="recommend-list">
         ${articleAudienceItems(article).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
       </ul>
@@ -2212,7 +2408,7 @@ function renderAudienceSection(article) {
 function renderPlanningSection(article) {
   return `
     <section class="template-card">
-      <h2>권장 동선</h2>
+      <h2>${escapeHtml(getArticleCopy().planningTitle)}</h2>
       <dl class="planning-grid">
         ${articlePlanningRows(article).map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
       </dl>
@@ -2239,12 +2435,14 @@ function updateMeta(title, description) {
 }
 
 function articleSeoTitle(article) {
-  const suffix = "주차 운영시간 입장료 코스 정리";
+  const suffix = currentLanguage === "ko" ? "주차 운영시간 입장료 코스 정리" : currentLanguage === "ja" ? "駐車場 営業時間 料金 コースガイド" : currentLanguage === "zh" ? "停车 开放时间 门票 路线指南" : "Parking Hours Fees Route Guide";
   return article.title.includes("주차") ? article.title : `${article.title} ${suffix}`;
 }
 
 function articleSeoDescription(article) {
-  return `${article.summary} 주소, 주차, 운영시간, 입장료, 추천 동선과 주변 여행지를 함께 정리했습니다.`;
+  if (currentLanguage === "ko") return `${article.summary} 주소, 주차, 운영시간, 입장료, 추천 동선과 주변 여행지를 함께 정리했습니다.`;
+  const copy = getArticleCopy();
+  return `${article.summary} ${copy.bodyTitle}, ${copy.labels.address}, ${copy.labels.parking}, ${copy.labels.hours}, ${copy.labels.fee} and nearby routes are included.`;
 }
 
 function renderRelated(article) {
@@ -2258,33 +2456,48 @@ function renderRelated(article) {
 }
 
 function renderInlineOfficialShell(article) {
+  const copy = getArticleCopy();
   const spot = articleOfficialKeyword(article);
   return `
     <section class="map-card official-inline-card" id="articleOfficialInfo" aria-live="polite">
-      <h2>공식 확인 정보</h2>
-      <p>${escapeHtml(spot)}의 운영시간, 주차, 요금 정보를 본문에서 바로 확인합니다.</p>
-      <div class="official-inline-status">공식 관광정보를 불러오는 중입니다.</div>
+      <h2>${escapeHtml(copy.officialTitle)}</h2>
+      <p>${escapeHtml(copy.officialDescription(translateArticleText(spot)))}</p>
+      <div class="official-inline-status">${currentLanguage === "ko" ? "공식 관광정보를 불러오는 중입니다." : currentLanguage === "ja" ? "公式観光情報を読み込んでいます。" : currentLanguage === "zh" ? "正在加载官方旅游信息。" : "Loading official tourism information."}</div>
     </section>
   `;
 }
 
 function officialActionButtons(place, fallbackKeyword = "") {
+  const labels = currentLanguage === "ko"
+    ? ["공식 안내", "지도에서 보기", "전화하기"]
+    : currentLanguage === "ja"
+      ? ["公式案内", "地図で見る", "電話する"]
+      : currentLanguage === "zh"
+        ? ["官方说明", "在地图中查看", "拨打电话"]
+        : ["Official site", "View on map", "Call"];
   const homepage = safeExternalUrl(place.homepageUrl || place.homepage);
   const map = mapUrl(place) || mapSearchUrl(place.title || place.address || fallbackKeyword);
   const phone = phoneUrl(place.tel);
   return [
-    homepage ? `<a class="primary-link" href="${escapeHtml(homepage)}" target="_blank" rel="noreferrer">공식 안내</a>` : "",
-    map ? `<a class="primary-link" href="${escapeHtml(map)}" target="_blank" rel="noreferrer">지도에서 보기</a>` : "",
-    phone ? `<a class="primary-link is-secondary" href="${escapeHtml(phone)}">전화하기</a>` : ""
+    homepage ? `<a class="primary-link" href="${escapeHtml(homepage)}" target="_blank" rel="noreferrer">${labels[0]}</a>` : "",
+    map ? `<a class="primary-link" href="${escapeHtml(map)}" target="_blank" rel="noreferrer">${labels[1]}</a>` : "",
+    phone ? `<a class="primary-link is-secondary" href="${escapeHtml(phone)}">${labels[2]}</a>` : ""
   ].filter(Boolean).join("");
 }
 
 function officialInlineFacts(place, keyword) {
+  const labels = currentLanguage === "ko"
+    ? ["공식 명칭", "분류", "문의", "휴무일"]
+    : currentLanguage === "ja"
+      ? ["正式名称", "分類", "問い合わせ", "休業日"]
+      : currentLanguage === "zh"
+        ? ["官方名称", "分类", "咨询", "休息日"]
+        : ["Official name", "Category", "Contact", "Closed days"];
   const facts = [
-    ["공식 명칭", normalizeText(place.title) !== normalizeText(keyword) ? place.title : ""],
-    ["분류", place.category],
-    ["문의", usefulInfoValue(place.tel)],
-    ["휴무일", usefulInfoValue(place.restDate)]
+    [labels[0], normalizeText(place.title) !== normalizeText(keyword) ? translateArticleText(place.title) : ""],
+    [labels[1], translateArticleText(place.category)],
+    [labels[2], usefulInfoValue(place.tel)],
+    [labels[3], translateArticleText(usefulInfoValue(place.restDate))]
   ].filter(([, value]) => usefulInfoValue(value));
 
   if (!facts.length) return "";
@@ -2297,29 +2510,31 @@ function officialInlineFacts(place, keyword) {
 }
 
 function renderOfficialInlineContent(place, keyword) {
+  const copy = getArticleCopy();
   const buttons = officialActionButtons(place, keyword);
   const facts = officialInlineFacts(place, keyword);
   return `
-    <h2>방문 전 확인</h2>
-    <p>상단 기본 정보에 공식 관광정보를 반영했습니다. 출발 전에는 최신 공지와 지도 위치만 한 번 더 확인하세요.</p>
+    <h2>${escapeHtml(copy.checklistTitle)}</h2>
+    <p>${currentLanguage === "ko" ? "상단 기본 정보에 공식 관광정보를 반영했습니다. 출발 전에는 최신 공지와 지도 위치만 한 번 더 확인하세요." : currentLanguage === "ja" ? "基本情報に公式観光情報を反映しています。出発前に最新のお知らせと地図をもう一度確認してください。" : currentLanguage === "zh" ? "基本信息已加入官方旅游资料。出发前请再次确认最新公告和地图位置。" : "Official tourism information is reflected above. Check the latest notice and map location before leaving."}</p>
     ${facts}
     ${buttons ? `<div class="detail-link-row">${buttons}</div>` : ""}
-    <p class="source-note">자료 출처: 한국관광공사 관광정보. 운영시간과 요금은 현장 사정에 따라 달라질 수 있습니다.</p>
+    <p class="source-note">${currentLanguage === "ko" ? "자료 출처: 한국관광공사 관광정보. 운영시간과 요금은 현장 사정에 따라 달라질 수 있습니다." : currentLanguage === "ja" ? "出典：韓国観光公社の観光情報。営業時間と料金は現地状況により変わる場合があります。" : currentLanguage === "zh" ? "资料来源：韩国旅游发展局旅游信息。开放时间和费用可能因现场情况而变化。" : "Source: Korea Tourism Organization. Hours and fees may change with local conditions."}</p>
   `;
 }
 
 function renderOfficialInlineFallback(article, keyword) {
+  const copy = getArticleCopy();
   const map = mapSearchUrl(`${keyword || article.title} ${article.address || "제주"}`);
   return `
-    <h2>방문 전 확인</h2>
-    <p>공식 상세값을 불러오지 못했습니다. 상단 기본 정보를 기준으로 보고, 출발 전 지도 위치와 현장 안내를 확인하세요.</p>
+    <h2>${escapeHtml(copy.checklistTitle)}</h2>
+    <p>${currentLanguage === "ko" ? "공식 상세값을 불러오지 못했습니다. 상단 기본 정보를 기준으로 보고, 출발 전 지도 위치와 현장 안내를 확인하세요." : currentLanguage === "ja" ? "公式の詳細情報を読み込めませんでした。基本情報を確認し、出発前に地図と現地案内を確認してください。" : currentLanguage === "zh" ? "无法加载官方详细信息。请参考基本信息，并在出发前确认地图和现场信息。" : "Official details could not be loaded. Use the basic information above and check the map and local notice before leaving."}</p>
     <div class="detail-link-row">
-      <a class="primary-link" href="${escapeHtml(map)}" target="_blank" rel="noreferrer">지도에서 보기</a>
+      <a class="primary-link" href="${escapeHtml(map)}" target="_blank" rel="noreferrer">${currentLanguage === "ko" ? "지도에서 보기" : currentLanguage === "ja" ? "地図で見る" : currentLanguage === "zh" ? "在地图中查看" : "View on map"}</a>
     </div>
   `;
 }
 
-async function hydrateStaticOfficialInfo(article) {
+async function hydrateStaticOfficialInfo(article, displayArticle = localizedArticle(article)) {
   const container = $("#articleOfficialInfo");
   if (!container) return;
   const keyword = articleOfficialKeyword(article);
@@ -2345,7 +2560,7 @@ async function hydrateStaticOfficialInfo(article) {
       ...placeFromList,
       ...detailItem
     };
-    updateArticleInfoTable(article, place);
+    updateArticleInfoTable(displayArticle, place);
     container.innerHTML = renderOfficialInlineContent(place, keyword);
   } catch (error) {
     container.innerHTML = renderOfficialInlineFallback(article, keyword);
@@ -2360,47 +2575,56 @@ function renderStaticDetail(detail) {
     detail.innerHTML = `<div class="detail-loading">현재 공개된 제주 여행 글이 없습니다.</div>`;
     return;
   }
+  const view = localizedArticle(article);
+  const copy = getArticleCopy();
   const myrealtripContext = myrealtripContextFromArticle(article);
-  updateMeta(articleSeoTitle(article), articleSeoDescription(article));
+  const productDescription = currentLanguage === "ko"
+    ? `${myrealtripContext.keyword} 기준으로 관련 투어, 숙소, 액티비티를 보여줍니다.`
+    : currentLanguage === "ja"
+      ? `${translateArticleText(myrealtripContext.keyword)}を基準に関連ツアー、宿泊、アクティビティを表示します。`
+      : currentLanguage === "zh"
+        ? `根据${translateArticleText(myrealtripContext.keyword)}显示相关游览、住宿和活动。`
+        : `Related tours, stays and activities for ${translateArticleText(myrealtripContext.keyword)}.`;
+  updateMeta(articleSeoTitle(view), articleSeoDescription(view));
   detail.innerHTML = `
-    ${imageTag(thumbnailForArticle(article, true), article.title, "detail-hero", `data-article-thumb="${escapeHtml(article.slug)}"`)}
+    ${imageTag(thumbnailForArticle(article, true), view.title, "detail-hero", `data-article-thumb="${escapeHtml(article.slug)}"`)}
     <div class="detail-body">
-      <div class="meta">${metaLine([article.category, article.region, article.date])}</div>
-      <h1>${escapeHtml(article.title)}</h1>
-      <p class="summary">${escapeHtml(article.summary)}</p>
-      <table class="info-table article-info-table"><tbody id="articleInfoRows">${staticInfoRows(article)}</tbody></table>
+      <div class="meta">${metaLine([categoryLabel(article.category), view.region, article.date])}</div>
+      <h1>${escapeHtml(view.title)}</h1>
+      <p class="summary">${escapeHtml(view.summary)}</p>
+      <table class="info-table article-info-table"><tbody id="articleInfoRows">${staticInfoRows(view)}</tbody></table>
       ${renderNearbyTravelRecommendations(article)}
       ${renderInlineOfficialShell(article)}
-      ${renderAudienceSection(article)}
-      ${renderPlanningSection(article)}
-      ${renderArticleBodySection(article)}
+      ${renderAudienceSection(view)}
+      ${renderPlanningSection(view)}
+      ${renderArticleBodySection(view)}
       <section>
-        <h2>여행 코스 요약</h2>
-        <ol class="course-list">${(article.course || []).map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
+        <h2>${escapeHtml(copy.routeTitle)}</h2>
+        <ol class="course-list">${(view.course || []).map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
       </section>
       <section>
-        <h2>방문 전 체크포인트</h2>
+        <h2>${escapeHtml(copy.checklistTitle)}</h2>
         <ul class="check-list">
-          <li>운영시간과 입장료는 현장 사정에 따라 달라질 수 있습니다.</li>
-          <li>해변과 오름은 바람, 비, 안개 예보를 먼저 확인하세요.</li>
-          <li>주차장이 혼잡하면 가까운 대체 코스를 준비하는 편이 좋습니다.</li>
+          ${copy.checkItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
         </ul>
       </section>
       <section>
-        <h2>주변 장소 바로가기</h2>
-        <div class="spot-tags">${(article.nearbySpots || []).map((spot) => `<a href="${escapeHtml(spotUrl(spot, article.slug))}">${escapeHtml(spot)}</a>`).join("")}</div>
+        <h2>${escapeHtml(copy.nearbyTagsTitle)}</h2>
+        <div class="spot-tags">${(article.nearbySpots || []).map((spot, index) => `<a href="${escapeHtml(spotUrl(spot, article.slug))}">${escapeHtml(view.nearbySpots[index] || spot)}</a>`).join("")}</div>
       </section>
       <section class="mrt-section article-mrt-section" aria-labelledby="articleMyRealTripTitle">
         <div class="section-heading">
           <p class="eyebrow">MYREALTRIP</p>
-          <h2 id="articleMyRealTripTitle">${escapeHtml(myrealtripContext.label)} 여행 상품</h2>
-          <p>${escapeHtml(myrealtripContext.keyword)} 기준으로 관련 투어, 숙소, 액티비티를 보여줍니다.</p>
+          <h2 id="articleMyRealTripTitle">${escapeHtml(translateArticleText(myrealtripContext.label))} ${escapeHtml(getLanguagePack().ui.productTitle)}</h2>
+          <p>${escapeHtml(productDescription)}</p>
         </div>
         <div class="mrt-grid" id="articleMyRealTripGrid"></div>
       </section>
     </div>
   `;
-  hydrateStaticOfficialInfo(article);
+  detail.dataset.language = currentLanguage;
+  myrealtripRequestKeys.delete("#articleMyRealTripGrid");
+  hydrateStaticOfficialInfo(article, view);
   loadContextualMyRealTrip(myrealtripContext, "#articleMyRealTripGrid");
   renderRelated(article);
   hydrateArticleThumbnails();
@@ -2481,10 +2705,18 @@ function renderOfficialLinks(place) {
   const links = officialActionButtons(place);
 
   if (!links) return "";
+  const title = currentLanguage === "ko" ? "공식 확인 링크" : currentLanguage === "ja" ? "公式リンク" : currentLanguage === "zh" ? "官方链接" : "Official links";
+  const description = currentLanguage === "ko"
+    ? "운영시간, 입장료, 휴무일은 변경될 수 있으니 출발 전 공식 안내를 한 번 더 확인하세요."
+    : currentLanguage === "ja"
+      ? "営業時間、料金、休業日は変わる場合があるため、出発前に公式案内を確認してください。"
+      : currentLanguage === "zh"
+        ? "开放时间、门票和休息日可能变化，出发前请再次确认官方说明。"
+        : "Opening hours, fees and closed days can change. Check the official notice before leaving.";
   return `
     <section class="map-card">
-      <h2>공식 확인 링크</h2>
-      <p>운영시간, 입장료, 휴무일은 변경될 수 있으니 출발 전 공식 안내를 한 번 더 확인하세요.</p>
+      <h2>${title}</h2>
+      <p>${description}</p>
       <div class="detail-link-row">${links}</div>
     </section>
   `;
