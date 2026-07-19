@@ -492,6 +492,12 @@ const articleRegionTranslations = {
   zh: { "동부": "东部", "서부": "西部", "성산": "城山", "구좌": "旧左", "한림": "翰林", "조천": "朝天", "안덕": "安德", "중문": "中文", "탑동": "塔洞", "원도심": "旧市区", "천지동": "天地洞", "하효동": "下孝洞", "표선": "表善" }
 };
 
+const articleExtraTranslations = {
+  en: { "가족 여행": "Family Trip", "가족": "Family", "공연": "Performance", "식사": "Meal", "아침식사": "Breakfast", "브런치": "Brunch", "전시": "Exhibition", "역사": "History", "건축": "Architecture", "숙소": "Stay", "위치": "Location", "고르는 법": "How to Choose", "거리": "Street", "주변": "Nearby", "방문": "Visit", "시간": "Time", "물빛": "Water Color", "보기 좋은": "Best Time to See", "차와": "Tea and", "디저트": "Dessert", "유채꽃": "Canola Flowers", "동백": "Camellia", "눈꽃": "Snow Flowers", "수퍼마켙": "Supermarket", "박물관": "Museum", "시장": "Market", "해안": "Coast", "숲길": "Forest Road", "평화공원": "Peace Park", "마을": "Village", "포구": "Port", "폭포": "Waterfall", "공원": "Park", "해산물": "Seafood", "지질트레일": "Geotrail", "둘레길": "Loop Trail" },
+  ja: { "가족 여행": "家族旅行", "가족": "家族", "공연": "公演", "식사": "食事", "아침식사": "朝食", "브런치": "ブランチ", "전시": "展示", "역사": "歴史", "건축": "建築", "숙소": "宿泊", "위치": "場所", "고르는 법": "選び方", "거리": "通り", "주변": "周辺", "방문": "訪問", "시간": "時間", "물빛": "海の色", "보기 좋은": "見頃", "차와": "お茶と", "디저트": "デザート", "유채꽃": "菜の花", "동백": "椿", "눈꽃": "雪景色", "수퍼마켙": "スーパーマーケット", "박물관": "博物館", "시장": "市場", "해안": "海岸", "숲길": "森の道", "평화공원": "平和公園", "마을": "村", "포구": "港", "폭포": "滝", "공원": "公園", "해산물": "海鮮", "지질트레일": "ジオトレイル", "둘레길": "周回路" },
+  zh: { "가족 여행": "家庭旅行", "가족": "家庭", "공연": "演出", "식사": "用餐", "아침식사": "早餐", "브런치": "早午餐", "전시": "展览", "역사": "历史", "건축": "建筑", "숙소": "住宿", "위치": "位置", "고르는 법": "选择方法", "거리": "街道", "주변": "周边", "방문": "访问", "시간": "时间", "물빛": "海水颜色", "보기 좋은": "适合观赏的时间", "차와": "茶和", "디저트": "甜点", "유채꽃": "油菜花", "동백": "山茶花", "눈꽃": "雪景", "수퍼마켙": "超市", "박물관": "博物馆", "시장": "市场", "해안": "海岸", "숲길": "森林路", "평화공원": "和平公园", "마을": "村庄", "포구": "港口", "폭포": "瀑布", "공원": "公园", "해산물": "海鲜", "지질트레일": "地质步道", "둘레길": "环线步道" }
+};
+
 function getArticleCopy() {
   return articleCopyCatalog[currentLanguage] || articleCopyCatalog.ko;
 }
@@ -499,7 +505,7 @@ function getArticleCopy() {
 function translateArticleText(value) {
   const text = String(value || "");
   if (currentLanguage === "ko") return text;
-  const terms = { ...(articleTermTranslations[currentLanguage] || {}), ...(articleRegionTranslations[currentLanguage] || {}) };
+  const terms = { ...(articleTermTranslations[currentLanguage] || {}), ...(articleRegionTranslations[currentLanguage] || {}), ...(articleExtraTranslations[currentLanguage] || {}) };
   return Object.entries(terms)
     .sort(([left], [right]) => right.length - left.length)
     .reduce((result, [source, translated]) => result.replaceAll(source, translated), text);
