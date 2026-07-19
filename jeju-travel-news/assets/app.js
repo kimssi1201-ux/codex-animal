@@ -219,6 +219,255 @@ const myrealtripFallbackItems = [
   }
 ];
 
+const languageCatalog = {
+  ko: {
+    htmlLang: "ko",
+    ui: {
+      brandName: "제주여행뉴스",
+      brandTagline: "제주 여행 정보 뉴스",
+      menu: "메뉴 열기",
+      list: "목록",
+      news: "제주 여행 뉴스",
+      products: "여행 상품",
+      check: "방문 전 체크",
+      recommended: "추천 기사",
+      julyTitle: "제주 여행 가이드",
+      latest: "최신 글",
+      places: "가볼 만한 곳",
+      photoGallery: "사진으로 보는 제주",
+      photoCountSuffix: "장",
+      more: "더보기 +",
+      faqTitle: "이용 가이드",
+      footerTagline: "제주 여행 선택을 돕는 뉴스 포털",
+      footerDescription: "제주 관광지, 해변, 오름, 맛집, 카페, 숙소 위치와 방문 준비 정보를 뉴스 피드로 정리합니다.",
+      flightTitle: "제주 항공권 최저가 조회",
+      stayTitle: "제주 숙소 상품 조회",
+      tnaTitle: "제주 투어·티켓 상품 조회",
+      productTitle: "제주 여행 상품·제휴 추천",
+      visitTitle: "방문 전 체크",
+      travelDesk: "여행 준비"
+    },
+    categories: { "가볼 만한 곳": "가볼 만한 곳", "맛집": "맛집", "카페": "카페", "숙소": "숙소", "해변": "해변", "오름": "오름", "계절 코스": "계절 코스" },
+    todayKeywords: ["제주 가볼만한 곳", "제주 해변", "제주 맛집", "카페 투어", "오름 산책", "계절 코스", "숙소 위치", "비 오는 날"],
+    faq: [
+      ["제주여행뉴스에서는 무엇을 먼저 보면 좋나요?", "추천 기사를 먼저 보고, 관심 있는 카테고리를 고르면 됩니다. 처음 방문이라면 가볼 만한 곳, 해변, 계절 코스 순서로 보는 편이 쉽습니다."],
+      ["관광지 정보는 어디에서 확인하나요?", "뉴스 피드 안의 장소 카드를 열면 주소, 분류, 위치 확인 링크를 볼 수 있습니다. 운영시간과 요금은 방문 직전 공식 안내를 다시 확인하세요."],
+      ["상품이나 광고 영역이 있나요?", "제주 여행 정보를 해치지 않는 범위에서 여행 준비에 필요한 상품 영역을 함께 운영합니다." ]
+    ],
+    visitCheck: [["운영시간", "폭포, 박물관, 유료 관광지는 입장 마감 시간이 다를 수 있습니다."], ["날씨", "오름과 해변은 바람, 안개, 우천 예보에 따라 체감 난이도가 달라집니다."], ["주차", "성수기에는 목적지 바로 앞보다 주변 공영 주차장과 도보 이동을 함께 보세요."], ["동선", "동쪽, 서쪽, 서귀포권을 하루에 모두 묶기보다 한 권역 중심으로 잡는 편이 편합니다."]],
+    footerGroups: [["제주 여행", ["가볼 만한 곳", "해변", "오름", "계절 코스"]], ["여행 준비", ["방문 전 체크", "숙소 위치", "비 오는 날", "가족 여행"]], ["지역", ["제주시", "서귀포", "성산", "애월"]], ["언어", ["한국어", "English", "日本語", "中文"]]]
+  },
+  en: {
+    htmlLang: "en",
+    ui: {
+      brandName: "Jeju Travel News",
+      brandTagline: "Jeju travel information",
+      menu: "Open menu",
+      list: "List",
+      news: "Jeju Travel News",
+      products: "Travel Picks",
+      check: "Before You Go",
+      recommended: "Featured Stories",
+      julyTitle: "Jeju Travel Guide",
+      latest: "Latest Stories",
+      places: "Places to Visit",
+      photoGallery: "Jeju in Photos",
+      photoCountSuffix: " photos",
+      more: "View more +",
+      faqTitle: "Visitor Guide",
+      footerTagline: "A practical guide to planning Jeju trips",
+      footerDescription: "Jeju attractions, beaches, oreum trails, food, cafes, stays and practical travel notes in one news feed.",
+      flightTitle: "Find Jeju Flight Deals",
+      stayTitle: "Find Jeju Stays",
+      tnaTitle: "Find Jeju Tours & Tickets",
+      productTitle: "Jeju Travel Picks",
+      visitTitle: "Before You Go",
+      travelDesk: "Trip Planning"
+    },
+    categories: { "가볼 만한 곳": "Places to Visit", "맛집": "Food", "카페": "Cafes", "숙소": "Stays", "해변": "Beaches", "오름": "Oreum Trails", "계절 코스": "Seasonal Routes" },
+    todayKeywords: ["Jeju places", "Jeju beaches", "Jeju food", "Cafe tours", "Oreum walks", "Seasonal routes", "Stay areas", "Rainy-day ideas"],
+    faq: [["What should I read first?", "Start with the featured stories, then choose a category that matches your trip. Places, beaches and seasonal routes are a simple starting point."], ["Where can I check place details?", "Open a place card to see its address, category and map link. Confirm opening hours and fees with the official source before visiting."], ["Does the site include products or ads?", "Travel preparation product areas may appear alongside the information feed."]],
+    visitCheck: [["Opening hours", "Waterfalls, museums and paid attractions may stop entry earlier than closing time."], ["Weather", "Wind, fog and rain can change the difficulty of oreum and beach visits."], ["Parking", "During busy periods, compare public parking and walking distance before driving in."], ["Route", "A single region per day is usually easier than crossing the whole island."]],
+    footerGroups: [["Jeju Travel", ["Places to Visit", "Beaches", "Oreum Trails", "Seasonal Routes"]], ["Trip Planning", ["Before You Go", "Stay Areas", "Rainy-day Ideas", "Family Trips"]], ["Regions", ["Jeju City", "Seogwipo", "Seongsan", "Aewol"]], ["Language", ["한국어", "English", "日本語", "中文"]]]
+  },
+  ja: {
+    htmlLang: "ja",
+    ui: {
+      brandName: "済州旅行ニュース",
+      brandTagline: "済州旅行情報ニュース",
+      menu: "メニューを開く",
+      list: "一覧",
+      news: "済州旅行ニュース",
+      products: "旅行商品",
+      check: "訪問前チェック",
+      recommended: "おすすめ記事",
+      julyTitle: "済州旅行ガイド",
+      latest: "最新記事",
+      places: "おすすめスポット",
+      photoGallery: "写真で見る済州",
+      photoCountSuffix: "枚",
+      more: "もっと見る +",
+      faqTitle: "利用ガイド",
+      footerTagline: "済州旅行の計画を助ける情報ポータル",
+      footerDescription: "済州の観光地、ビーチ、オルム、グルメ、カフェ、宿泊情報をまとめています。",
+      flightTitle: "済州航空券を検索",
+      stayTitle: "済州の宿泊施設を検索",
+      tnaTitle: "済州ツアー・チケットを検索",
+      productTitle: "済州旅行おすすめ",
+      visitTitle: "訪問前チェック",
+      travelDesk: "旅行準備"
+    },
+    categories: { "가볼 만한 곳": "観光スポット", "맛집": "グルメ", "카페": "カフェ", "숙소": "宿泊", "해변": "ビーチ", "오름": "オルム", "계절 코스": "季節コース" },
+    todayKeywords: ["済州おすすめ", "済州ビーチ", "済州グルメ", "カフェ巡り", "オルム散歩", "季節コース", "宿泊エリア", "雨の日旅行"],
+    faq: [["まず何を見ればいいですか？", "おすすめ記事を見てから、興味のあるカテゴリーを選んでください。"], ["詳細情報はどこで確認できますか？", "場所カードを開くと住所、カテゴリー、地図リンクを確認できます。訪問前に公式案内も確認してください。"], ["商品や広告はありますか？", "旅行準備に役立つ商品情報が表示される場合があります。"]],
+    visitCheck: [["営業時間", "滝や博物館、有料施設は入場締切が異なる場合があります。"], ["天気", "風、霧、雨によってオルムやビーチの歩きやすさが変わります。"], ["駐車", "繁忙期は公共駐車場と徒歩距離も確認してください。"], ["ルート", "一日に一つのエリアを中心にすると移動が楽です。"]],
+    footerGroups: [["済州旅行", ["観光スポット", "ビーチ", "オルム", "季節コース"]], ["旅行準備", ["訪問前チェック", "宿泊エリア", "雨の日旅行", "家族旅行"]], ["地域", ["済州市", "西帰浦", "城山", "涯月"]], ["言語", ["한국어", "English", "日本語", "中文"]]]
+  },
+  zh: {
+    htmlLang: "zh-CN",
+    ui: {
+      brandName: "济州旅行新闻",
+      brandTagline: "济州旅行资讯",
+      menu: "打开菜单",
+      list: "列表",
+      news: "济州旅行新闻",
+      products: "旅行产品",
+      check: "出行前检查",
+      recommended: "推荐文章",
+      julyTitle: "济州旅行指南",
+      latest: "最新文章",
+      places: "值得去的地方",
+      photoGallery: "照片中的济州",
+      photoCountSuffix: "张",
+      more: "查看更多 +",
+      faqTitle: "使用指南",
+      footerTagline: "帮助规划济州旅行的信息门户",
+      footerDescription: "整理济州景点、海滩、火山丘、美食、咖啡馆、住宿和出行提示。",
+      flightTitle: "查询济州机票",
+      stayTitle: "查询济州住宿",
+      tnaTitle: "查询济州 tours 和门票",
+      productTitle: "济州旅行推荐",
+      visitTitle: "出行前检查",
+      travelDesk: "旅行准备"
+    },
+    categories: { "가볼 만한 곳": "值得去的地方", "맛집": "美食", "카페": "咖啡馆", "숙소": "住宿", "해변": "海滩", "오름": "火山丘", "계절 코스": "季节路线" },
+    todayKeywords: ["济州景点", "济州海滩", "济州美食", "咖啡馆之旅", "火山丘散步", "季节路线", "住宿区域", "雨天旅行"],
+    faq: [["应该先看什么？", "先浏览推荐文章，再选择符合行程的分类。"], ["在哪里查看地点详情？", "打开地点卡片即可查看地址、分类和地图链接。出发前请再次确认官方信息。"], ["网站有商品或广告吗？", "页面可能会显示与旅行准备相关的商品信息。"]],
+    visitCheck: [["开放时间", "瀑布、博物馆和收费景点可能提前停止入场。"], ["天气", "风、雾和雨会影响火山丘及海滩的行走难度。"], ["停车", "旺季请同时确认公共停车场和步行距离。"], ["路线", "每天集中游览一个区域通常更轻松。"]],
+    footerGroups: [["济州旅行", ["值得去的地方", "海滩", "火山丘", "季节路线"]], ["旅行准备", ["出行前检查", "住宿区域", "雨天旅行", "家庭旅行"]], ["地区", ["济州市", "西归浦", "城山", "涯月"]], ["语言", ["한국어", "English", "日本語", "中文"]]]
+  }
+};
+
+function getLanguagePack() {
+  return languageCatalog[currentLanguage] || languageCatalog.ko;
+}
+
+function categoryLabel(category) {
+  return getLanguagePack().categories[category] || category;
+}
+
+function savedLanguage() {
+  try {
+    const value = localStorage.getItem("jeju-language");
+    return languageCatalog[value] ? value : "ko";
+  } catch (error) {
+    return "ko";
+  }
+}
+
+let currentLanguage = savedLanguage();
+
+const dataI18nKeys = {
+  "brand.name": "brandName",
+  "brand.tagline": "brandTagline",
+  "nav.menu": "menu",
+  "nav.list": "list",
+  "nav.news": "news",
+  "nav.myrealtrip": "products",
+  "nav.check": "check",
+  "july.title": "julyTitle",
+  "july.loading": "loading",
+  "faq.title": "faqTitle",
+  "footer.tagline": "footerTagline",
+  "footer.description": "footerDescription"
+};
+
+function languageUiText(key, fallback = "") {
+  const uiKey = dataI18nKeys[key] || key;
+  if (uiKey === "loading") {
+    return currentLanguage === "ko" ? "불러오는 중" : currentLanguage === "ja" ? "読み込み中" : currentLanguage === "zh" ? "加载中" : "Loading";
+  }
+  return getLanguagePack().ui[uiKey] || fallback;
+}
+
+function applyLanguage(language = currentLanguage) {
+  if (!languageCatalog[language]) language = "ko";
+  currentLanguage = language;
+  try {
+    localStorage.setItem("jeju-language", currentLanguage);
+  } catch (error) {
+    // Storage can be unavailable in private browsing; the current page still updates.
+  }
+
+  const pack = getLanguagePack();
+  document.documentElement.lang = pack.htmlLang;
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    const translated = languageUiText(node.dataset.i18n, node.textContent);
+    if (translated) node.textContent = translated;
+  });
+
+  const textTargets = [
+    ["#july .feed-heading .eyebrow", pack.ui.recommended],
+    ["#feedListTitle", pack.ui.latest],
+    ["#flightTitle", pack.ui.flightTitle],
+    ["#stayTitle", pack.ui.stayTitle],
+    ["#tnaTitle", pack.ui.tnaTitle],
+    ["#myrealtripTitle", pack.ui.productTitle],
+    ["#visitCheckTitle", pack.ui.visitTitle],
+    ["#travelToolsTitle", pack.ui.travelDesk]
+  ];
+  textTargets.forEach(([selector, text]) => {
+    const node = $(selector);
+    if (node && text) node.textContent = text;
+  });
+
+  const languageSwitch = $("#languageSwitch");
+  if (languageSwitch) {
+    languageSwitch.setAttribute("aria-label", currentLanguage === "ko" ? "언어 선택" : currentLanguage === "ja" ? "言語選択" : currentLanguage === "zh" ? "语言选择" : "Choose language");
+    languageSwitch.querySelectorAll("[data-lang]").forEach((button) => {
+      const isActive = button.dataset.lang === currentLanguage;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+  }
+
+  if ($("#newsFeedList")) {
+    renderPrimaryNav();
+    renderTabs();
+    renderRecommended();
+    renderFeed();
+    renderTodayKeywords();
+    renderFaq();
+    renderVisitCheck();
+    renderFooter();
+    renderCategoryNews();
+    renderVisualGallery();
+  }
+  document.title = `${pack.ui.brandName} | ${pack.ui.julyTitle}`;
+}
+
+function bindLanguageSwitch() {
+  const languageSwitch = $("#languageSwitch");
+  if (!languageSwitch || languageSwitch.dataset.bound === "true") return;
+  languageSwitch.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-lang]");
+    if (!button) return;
+    event.preventDefault();
+    applyLanguage(button.dataset.lang);
+  });
+  languageSwitch.dataset.bound = "true";
+}
+
 function escapeHtml(value) {
   return String(value || "")
     .replaceAll("&", "&amp;")
@@ -586,7 +835,7 @@ function recommendedCard(article, isLead = false) {
       <a href="${articleUrl(article)}">
         ${articleImageTag(article)}
         <span class="recommend-content">
-          <span class="recommend-label">${escapeHtml(article.category)}</span>
+          <span class="recommend-label">${escapeHtml(categoryLabel(article.category))}</span>
           <strong>${escapeHtml(article.title)}</strong>
           ${isLead ? `<p>${escapeHtml(article.summary)}</p>` : ""}
           <em>${escapeHtml([article.date, article.region].filter(Boolean).join(" · "))}</em>
@@ -601,7 +850,7 @@ function sectionArticleCard(article) {
     <article class="section-card">
       <a href="${articleUrl(article)}">
         <span class="section-thumb">${articleImageTag(article)}</span>
-        <span class="section-card-label">${escapeHtml(article.category)}</span>
+        <span class="section-card-label">${escapeHtml(categoryLabel(article.category))}</span>
         <h3>${escapeHtml(article.title)}</h3>
         <p>${escapeHtml(article.summary)}</p>
       </a>
@@ -614,7 +863,7 @@ function leadArticleCard(article) {
     <a class="news-lead" href="${articleUrl(article)}">
       <span class="lead-thumb">${articleImageTag(article)}</span>
       <strong>${escapeHtml(article.title)}</strong>
-      <span>${metaLine([article.category, article.region, article.date])}</span>
+      <span>${metaLine([categoryLabel(article.category), article.region, article.date])}</span>
     </a>
   `;
 }
@@ -634,7 +883,7 @@ function rowArticleCard(article) {
       <span class="row-thumb">${articleImageTag(article)}</span>
       <span>
         <strong>${escapeHtml(article.title)}</strong>
-        <em>${escapeHtml([article.category, article.region, article.date].filter(Boolean).join(" · "))}</em>
+        <em>${escapeHtml([categoryLabel(article.category), article.region, article.date].filter(Boolean).join(" · "))}</em>
       </span>
     </a>
   `;
@@ -647,7 +896,7 @@ function newsCard(article) {
         ${articleImageTag(article)}
       </a>
       <div class="news-copy">
-        <div class="meta">${metaLine([article.category, article.region])}</div>
+        <div class="meta">${metaLine([categoryLabel(article.category), article.region])}</div>
         <h2><a href="${articleUrl(article)}">${escapeHtml(article.title)}</a></h2>
         <p>${escapeHtml(article.summary)}</p>
       </div>
@@ -669,7 +918,7 @@ function galleryCard(article) {
   return `
     <a class="gallery-card" href="${articleUrl(article)}">
       ${articleImageTag(article)}
-      <span>${escapeHtml(article.category)}</span>
+      <span>${escapeHtml(categoryLabel(article.category))}</span>
       <strong>${escapeHtml(article.title)}</strong>
     </a>
   `;
@@ -687,11 +936,11 @@ function renderVisualGallery() {
   const gallery = $("#visualGallery");
   if (!gallery) return;
   const items = uniqueByImage(visibleArticles().slice(1)).slice(0, 8);
-  const title = activeCategory === categories[0] ? "사진으로 보는 제주" : `${activeCategory} 사진`;
+  const title = activeCategory === categories[0] ? getLanguagePack().ui.photoGallery : `${categoryLabel(activeCategory)} ${getLanguagePack().ui.photoGallery}`;
   gallery.innerHTML = `
     <div class="visual-gallery-head">
       <h2>${escapeHtml(title)}</h2>
-      <span>${items.length}장</span>
+      <span>${items.length}${escapeHtml(getLanguagePack().ui.photoCountSuffix)}</span>
     </div>
     <div class="visual-gallery-grid">${items.map(visualGalleryCard).join("")}</div>
   `;
@@ -720,7 +969,7 @@ function nearbyTravelCard(article) {
     <a class="nearby-travel-card" href="${articleUrl(article)}">
       <span class="nearby-travel-thumb">${articleImageTag(article)}</span>
       <span class="nearby-travel-copy">
-        <span class="nearby-travel-meta">${escapeHtml([article.category, article.region].filter(Boolean).join(" · "))}</span>
+        <span class="nearby-travel-meta">${escapeHtml([categoryLabel(article.category), article.region].filter(Boolean).join(" · "))}</span>
         <strong>${escapeHtml(article.title)}</strong>
         <em>${escapeHtml(article.summary)}</em>
       </span>
@@ -771,7 +1020,7 @@ function renderTabs() {
       const count = publicArticles.filter((article) => article.category === category).length;
       return `
       <button type="button" class="${category === activeCategory ? "is-active" : ""}" data-category="${escapeHtml(category)}">
-        <span>${escapeHtml(category)}</span>
+        <span>${escapeHtml(categoryLabel(category))}</span>
         <b>${count}</b>
       </button>
     `;
@@ -786,30 +1035,30 @@ function renderPrimaryNav() {
   nav.innerHTML = links
     .map((item) => `
       <a class="${item.active ? "is-active" : ""}" href="#july" data-category="${escapeHtml(item.category)}">
-        ${escapeHtml(item.category)}
+        ${escapeHtml(categoryLabel(item.category))}
       </a>
     `)
     .join("");
 }
 
 function renderTodayKeywords() {
-  if ($(".today-keyword-bar")) return;
   const header = $(".site-header");
   if (!header) return;
-  const bar = document.createElement("nav");
+  const bar = $(".today-keyword-bar") || document.createElement("nav");
   bar.className = "today-keyword-bar";
-  bar.setAttribute("aria-label", "오늘의 여행 키워드");
+  bar.setAttribute("aria-label", currentLanguage === "ko" ? "오늘의 여행 키워드" : "Travel keywords");
+  if (!bar.parentElement) header.after(bar);
+  const keywords = getLanguagePack().todayKeywords;
   bar.innerHTML = `
     <div class="today-keyword-inner">
-      <strong>JEJU NOW</strong>
+      <strong>${currentLanguage === "ko" ? "JEJU NOW" : "JEJU NOW"}</strong>
       <div>
-        ${todayKeywords.map((item) => `
-          <a href="#july" data-category="${escapeHtml(item.category)}">${escapeHtml(item.label)}</a>
+        ${todayKeywords.map((item, index) => `
+          <a href="#july" data-category="${escapeHtml(item.category)}">${escapeHtml(keywords[index] || item.label)}</a>
         `).join("")}
       </div>
     </div>
   `;
-  header.after(bar);
 }
 
 function compactTravelSearchSections() {
@@ -935,7 +1184,7 @@ function renderFeed(places = null) {
   const feedCount = $("#feedCount");
   const feedTitle = $("#feedListTitle");
   if (feedCount) feedCount.textContent = "더보기 +";
-  if (feedTitle) feedTitle.textContent = activeCategory === categories[0] ? "가볼만한 곳" : activeCategory;
+  if (feedTitle) feedTitle.textContent = activeCategory === categories[0] ? getLanguagePack().ui.places : categoryLabel(activeCategory);
   if (status) {
     status.hidden = true;
     status.textContent = "";
@@ -1171,11 +1420,12 @@ function hydrateArticleThumbnails() {
 function renderCategoryNews() {
   const wrapper = $("#categoryNewsSections");
   if (!wrapper) return;
+  const pack = getLanguagePack();
   const sections = [
     {
       id: "latest-news",
       eyebrow: "LATEST",
-      title: "최신 여행뉴스",
+      title: currentLanguage === "ko" ? "최신 여행뉴스" : pack.ui.latest,
       items: publicArticles.slice(0, 6)
     },
     ...categories
@@ -1183,7 +1433,7 @@ function renderCategoryNews() {
       .map((category) => ({
         id: `category-${encodeURIComponent(category)}`,
         eyebrow: "TRAVEL",
-        title: category,
+        title: categoryLabel(category),
         items: publicArticles.filter((article) => article.category === category).slice(0, 6)
       }))
   ];
@@ -1197,7 +1447,7 @@ function renderCategoryNews() {
           <div class="portal-section-head">
             <span>${escapeHtml(section.eyebrow)}</span>
             <h2>${escapeHtml(section.title)}</h2>
-            <a href="#july" data-category="${escapeHtml(section.title)}">더보기 +</a>
+            <a href="#july" data-category="${escapeHtml(section.items?.[0]?.category || section.title)}">${escapeHtml(pack.ui.more)}</a>
           </div>
           <div class="section-card-grid">${items.map(sectionArticleCard).join("")}</div>
         </section>
@@ -1210,11 +1460,11 @@ function renderCategoryNews() {
 function renderFaq() {
   const list = $("#faqList");
   if (!list) return;
-  list.innerHTML = faqItems
-    .map((item) => `
+  list.innerHTML = getLanguagePack().faq
+    .map(([question, answer]) => `
       <details class="faq-item">
-        <summary>${escapeHtml(item.question)}</summary>
-        <p>${escapeHtml(item.answer)}</p>
+        <summary>${escapeHtml(question)}</summary>
+        <p>${escapeHtml(answer)}</p>
       </details>
     `)
     .join("");
@@ -1223,11 +1473,11 @@ function renderFaq() {
 function renderVisitCheck() {
   const grid = $("#visitCheckGrid");
   if (!grid) return;
-  grid.innerHTML = visitCheckItems
-    .map((item) => `
+  grid.innerHTML = getLanguagePack().visitCheck
+    .map(([title, text]) => `
       <article class="visit-check-card">
-        <strong>${escapeHtml(item.title)}</strong>
-        <p>${escapeHtml(item.text)}</p>
+        <strong>${escapeHtml(title)}</strong>
+        <p>${escapeHtml(text)}</p>
       </article>
     `)
     .join("");
@@ -1684,12 +1934,12 @@ function bindTnaSearch() {
 function renderFooter() {
   const footer = $("#footerLinks");
   if (!footer) return;
-  footer.innerHTML = footerGroups
-    .map((group) => `
-      <nav aria-label="${escapeHtml(group.title)}">
-        <h2>${escapeHtml(group.title)}</h2>
+  footer.innerHTML = getLanguagePack().footerGroups
+    .map(([title, links]) => `
+      <nav aria-label="${escapeHtml(title)}">
+        <h2>${escapeHtml(title)}</h2>
         <ul>
-          ${group.links.map((link) => `<li><a href="#top">${escapeHtml(link)}</a></li>`).join("")}
+          ${links.map((link) => `<li><a href="#top">${escapeHtml(link)}</a></li>`).join("")}
         </ul>
       </nav>
     `)
@@ -2314,3 +2564,5 @@ bindImageFallbacks();
 bindHeader();
 renderHome();
 renderDetail();
+bindLanguageSwitch();
+applyLanguage(currentLanguage);

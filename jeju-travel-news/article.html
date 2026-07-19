@@ -6,7 +6,7 @@
   <meta name="description" content="제주여행뉴스 상세 기사">
   <meta name="theme-color" content="#ffffff">
   <title>제주여행뉴스</title>
-  <link rel="stylesheet" href="assets/styles.css?v=20260718-coupang-1">
+  <link rel="stylesheet" href="assets/styles.css?v=20260719-language-1">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -14,11 +14,19 @@
     <a class="brand" href="./" aria-label="제주여행뉴스 홈">
       <span class="brand-mark" aria-hidden="true">JN</span>
       <span>
-        <strong>제주여행뉴스</strong>
-        <small>제주 여행 정보 뉴스</small>
+        <strong data-i18n="brand.name">제주여행뉴스</strong>
+        <small data-i18n="brand.tagline">제주 여행 정보 뉴스</small>
       </span>
     </a>
-    <a class="list-link" href="./">목록</a>
+    <div class="detail-header-actions">
+      <div class="language-switch" id="languageSwitch" aria-label="언어 선택">
+        <button type="button" data-lang="ko">KR</button>
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="ja">JP</button>
+        <button type="button" data-lang="zh">CN</button>
+      </div>
+      <a class="list-link" href="./" data-i18n="nav.list">목록</a>
+    </div>
   </header>
 
   <main class="article-page" id="top">
@@ -43,6 +51,6 @@
     </aside>
   </main>
 
-  <script type="module" src="assets/app.js?v=20260718-images-12"></script>
+  <script type="module" src="assets/app.js?v=20260719-language-1"></script>
 </body>
 </html>

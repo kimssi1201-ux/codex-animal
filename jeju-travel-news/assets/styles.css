@@ -107,7 +107,25 @@ button { font: inherit; cursor: pointer; }
   min-height: 34px;
   font-size: 11px;
 }
-.language-switch button:first-child {
+
+.detail-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 0;
+}
+
+.detail-header-actions .language-switch {
+  display: flex;
+  width: auto;
+  padding: 0;
+}
+
+.detail-header-actions .language-switch button {
+  padding: 4px 3px;
+}
+.language-switch button.is-active {
   border-color: var(--green);
   background: var(--green);
   color: #fff;
