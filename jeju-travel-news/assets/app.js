@@ -486,6 +486,12 @@ const articleTermTranslations = {
     "하도해변": "下道海滩", "더마파크": "德马公园", "제주현대미술관": "济州现代美术馆", "성산일출봉": "城山日出峰", "협재해수욕장": "协才海水浴场", "함덕해수욕장": "咸德海水浴场", "우도": "牛岛", "애월": "涯月", "서귀포": "西归浦", "제주시": "济州市", "오설록": "O'Sulloc", "비자림": "榧子林森林", "사려니숲길": "思连伊森林路", "섭지코지": "涉地可支", "용머리해안": "龙头海岸", "정방폭포": "正房瀑布", "천지연폭포": "天地渊瀑布", "월정리해변": "月汀里海滩", "김녕해수욕장": "金宁海水浴场", "표선해수욕장": "表善海水浴场", "동문시장": "东门市场", "산굼부리": "山君不离", "한라산": "汉拏山", "제주": "济州", "동쪽": "东部", "서쪽": "西部", "북동부": "东北部", "서남부": "西南部", "전역": "全岛", "중산간": "中山地区", "조용한": "安静的", "바다": "海边", "코스": "路线", "여행": "旅行", "일출": "日出", "반나절": "半日", "카페 거리": "咖啡馆街", "당일치기": "一日游", "드라이브": "自驾", "먹거리": "美食", "가을": "秋季", "억새": "芒草", "비 오는 날": "雨天", "실내": "室内", "1박 2일": "两天一夜", "투어": "游览", "초보": "初学者", "등산": "登山", "가족과 가기 좋은": "适合家庭", "숙소 위치 고르는 법": "住宿区域选择", "산책": "散步", "가이드": "指南", "정보": "信息", "체크": "检查", "방문 전": "出行前", "노을": "日落", "야간": "夜间", "저녁": "晚餐" }
 };
 
+const articleRegionTranslations = {
+  en: { "동부": "East", "서부": "West", "성산": "Seongsan", "구좌": "Gujwa", "한림": "Hallim", "조천": "Jocheon", "안덕": "Andeok", "중문": "Jungmun", "탑동": "Tapdong", "원도심": "Old Downtown", "천지동": "Cheonji-dong", "하효동": "Hahyo-dong", "표선": "Pyoseon" },
+  ja: { "동부": "東部", "서부": "西部", "성산": "城山", "구좌": "旧左", "한림": "翰林", "조천": "朝天", "안덕": "安徳", "중문": "中文", "탑동": "塔洞", "원도심": "旧市街", "천지동": "天地洞", "하효동": "下孝洞", "표선": "表善" },
+  zh: { "동부": "东部", "서부": "西部", "성산": "城山", "구좌": "旧左", "한림": "翰林", "조천": "朝天", "안덕": "安德", "중문": "中文", "탑동": "塔洞", "원도심": "旧市区", "천지동": "天地洞", "하효동": "下孝洞", "표선": "表善" }
+};
+
 function getArticleCopy() {
   return articleCopyCatalog[currentLanguage] || articleCopyCatalog.ko;
 }
@@ -493,7 +499,8 @@ function getArticleCopy() {
 function translateArticleText(value) {
   const text = String(value || "");
   if (currentLanguage === "ko") return text;
-  return Object.entries(articleTermTranslations[currentLanguage] || {})
+  const terms = { ...(articleTermTranslations[currentLanguage] || {}), ...(articleRegionTranslations[currentLanguage] || {}) };
+  return Object.entries(terms)
     .sort(([left], [right]) => right.length - left.length)
     .reduce((result, [source, translated]) => result.replaceAll(source, translated), text);
 }
@@ -1695,7 +1702,7 @@ function renderMyRealTrip(items = [], mode = "loading", context = {}, gridSelect
   const label = cleanTravelKeyword(context.label || context.keyword || "제주");
   const heading = grid.closest(".mrt-section")?.querySelector(".section-heading h2");
   if (heading && gridSelector === "#myrealtripGrid") {
-    heading.textContent = `${label} 여행 상품·제휴 추천`;
+    heading.textContent = currentLanguage === "ko" ? `${label} 여행 상품·제휴 추천` : `${translateArticleText(label)} ${getLanguagePack().ui.productTitle}`;
   }
 
   if (mode === "ready" && items.length) {
@@ -2442,6 +2449,8 @@ function articleSeoTitle(article) {
 function articleSeoDescription(article) {
   if (currentLanguage === "ko") return `${article.summary} 주소, 주차, 운영시간, 입장료, 추천 동선과 주변 여행지를 함께 정리했습니다.`;
   const copy = getArticleCopy();
+  if (currentLanguage === "ja") return `${article.summary} ${copy.bodyTitle}、${copy.labels.address}、${copy.labels.parking}、${copy.labels.hours}、${copy.labels.fee}と周辺ルートをまとめています。`;
+  if (currentLanguage === "zh") return `${article.summary} 整理了${copy.bodyTitle}、${copy.labels.address}、${copy.labels.parking}、${copy.labels.hours}、${copy.labels.fee}及附近路线。`;
   return `${article.summary} ${copy.bodyTitle}, ${copy.labels.address}, ${copy.labels.parking}, ${copy.labels.hours}, ${copy.labels.fee} and nearby routes are included.`;
 }
 
