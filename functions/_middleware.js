@@ -1,5 +1,5 @@
 const SITE_URL = "https://www.moneyarchive.kr";
-const ADS_TXT = "google.com, pub-8468106244002167, DIRECT, f08c47fec0942fa0\n";
+const ADS_TXT = "google.com, pub-5751319666030430, DIRECT, f08c47fec0942fa0\n";
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -53,7 +53,7 @@ export async function onRequest(context) {
   }
 
   let html = await response.text();
-  html = html.replace(/ca-pub-\d+/g, "ca-pub-8468106244002167");
+  html = html.replace(/ca-pub-\d+/g, "ca-pub-5751319666030430");
 
   if (!html.includes('rel="canonical"') && !html.includes("rel='canonical'")) {
     const canonical = `${SITE_URL}${url.pathname === "/" ? "/" : url.pathname.replace(/\/index\.html$/i, "")}`;
