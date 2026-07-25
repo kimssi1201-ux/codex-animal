@@ -244,6 +244,8 @@ const languageCatalog = {
       stayTitle: "제주 숙소 상품 조회",
       tnaTitle: "제주 투어·티켓 상품 조회",
       productTitle: "제주 여행 상품·제휴 추천",
+      coupangDisclosure: "광고·제휴 안내: 이 글에는 쿠팡 파트너스 링크가 포함되어 있으며, 링크를 통해 상품을 구매하면 운영자에게 일정액의 수수료가 지급됩니다.",
+      myrealtripDisclosure: "광고·제휴 안내: 이 영역에는 마이리얼트립 제휴 링크가 포함될 수 있으며, 링크를 통해 상품을 예약·구매하면 운영자에게 수수료가 지급될 수 있습니다.",
       visitTitle: "방문 전 체크",
       travelDesk: "여행 준비"
     },
@@ -281,6 +283,8 @@ const languageCatalog = {
       stayTitle: "Find Jeju Stays",
       tnaTitle: "Find Jeju Tours & Tickets",
       productTitle: "Jeju Travel Picks",
+      coupangDisclosure: "Advertising and affiliate disclosure: This article may include Coupang Partners links. We may receive a commission when you purchase through a link.",
+      myrealtripDisclosure: "Advertising and affiliate disclosure: This area may include MyRealTrip affiliate links. We may receive a commission when you book or purchase through a link.",
       visitTitle: "Before You Go",
       travelDesk: "Trip Planning"
     },
@@ -314,6 +318,8 @@ const languageCatalog = {
       stayTitle: "済州の宿泊施設を検索",
       tnaTitle: "済州ツアー・チケットを検索",
       productTitle: "済州旅行おすすめ",
+      coupangDisclosure: "広告・アフィリエイトのお知らせ：この記事にはCoupang Partnersのリンクが含まれる場合があります。リンク経由の購入により運営者が手数料を受け取ることがあります。",
+      myrealtripDisclosure: "広告・アフィリエイトのお知らせ：このエリアにはMyRealTripのアフィリエイトリンクが含まれる場合があります。リンク経由の予約・購入により運営者が手数料を受け取ることがあります。",
       visitTitle: "訪問前チェック",
       travelDesk: "旅行準備"
     },
@@ -347,6 +353,8 @@ const languageCatalog = {
       stayTitle: "查询济州住宿",
       tnaTitle: "查询济州 tours 和门票",
       productTitle: "济州旅行推荐",
+      coupangDisclosure: "广告与联盟说明：本文可能包含Coupang Partners链接。通过链接购买商品后，运营者可能获得一定佣金。",
+      myrealtripDisclosure: "广告与联盟说明：此区域可能包含MyRealTrip联盟链接。通过链接预订或购买商品后，运营者可能获得佣金。",
       visitTitle: "出行前检查",
       travelDesk: "旅行准备"
     },
@@ -567,6 +575,8 @@ const dataI18nKeys = {
   "nav.news": "news",
   "nav.myrealtrip": "products",
   "nav.check": "check",
+  "affiliate.coupang": "coupangDisclosure",
+  "affiliate.myrealtrip": "myrealtripDisclosure",
   "july.title": "julyTitle",
   "july.loading": "loading",
   "faq.title": "faqTitle",
@@ -2632,6 +2642,7 @@ function renderStaticDetail(detail) {
           <p class="eyebrow">MYREALTRIP</p>
           <h2 id="articleMyRealTripTitle">${escapeHtml(translateArticleText(myrealtripContext.label))} ${escapeHtml(getLanguagePack().ui.productTitle)}</h2>
           <p>${escapeHtml(productDescription)}</p>
+          <p class="affiliate-disclosure">${escapeHtml(getLanguagePack().ui.myrealtripDisclosure)}</p>
         </div>
         <div class="mrt-grid" id="articleMyRealTripGrid"></div>
       </section>
