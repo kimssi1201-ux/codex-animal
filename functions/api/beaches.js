@@ -5,6 +5,20 @@ const MAX_ROWS = 30;
 const MAX_PAGE = 10;
 const TIMEOUT_MS = 9000;
 
+const KMA_BEACH_STATIONS = [
+  { code: "344", title: "신양섭지코지 해수욕장", aliases: ["신양섭지코지", "섭지코지"] },
+  { code: "347", title: "중문ㆍ색달 해수욕장", aliases: ["중문색달", "중문색달해수욕장"] },
+  { code: "342", title: "표선해비치", aliases: ["표선해비치", "표선해수욕장"] },
+  { code: "343", title: "화순금모래 해수욕장", aliases: ["화순금모래", "화순금모래해수욕장"] },
+  { code: "345", title: "곽지과물 해수욕장", aliases: ["곽지과물", "곽지과물해수욕장"] },
+  { code: "355", title: "금능으뜸원 해수욕장", aliases: ["금능으뜸원", "금능해수욕장"] },
+  { code: "354", title: "김녕성세기 해수욕장", aliases: ["김녕성세기", "김녕해수욕장"] },
+  { code: "349", title: "삼양검은모래 해수욕장", aliases: ["삼양검은모래", "삼양해수욕장"] },
+  { code: "348", title: "이호테우 해수욕장", aliases: ["이호테우", "이호해수욕장"] },
+  { code: "352", title: "함덕서우봉 해수욕장", aliases: ["함덕서우봉", "함덕해수욕장"] },
+  { code: "346", title: "협재 해수욕장", aliases: ["협재", "협재해수욕장"] }
+];
+
 function json(data, init = {}) {
   const headers = new Headers(init.headers || {});
   headers.set("content-type", "application/json; charset=utf-8");
@@ -39,6 +53,17 @@ function text(value, maxLength = 300) {
   return String(value ?? "").trim().slice(0, maxLength);
 }
 
+function compactBeachName(value) {
+  return text(value, 100).replace(/[\sㆍ·().]/g, "");
+}
+
+function findKmaStation(title) {
+  const compactTitle = compactBeachName(title);
+  return KMA_BEACH_STATIONS.find((station) =>
+    station.aliases.some((alias) => compactTitle.includes(compactBeachName(alias)))
+  ) || null;
+}
+
 function numberOrEmpty(value) {
   const number = Number(value);
   return Number.isFinite(number) ? number : "";
@@ -64,11 +89,13 @@ function asItems(payload) {
 }
 
 function normalizeItem(item) {
+  const title = text(item.sta_nm, 100);
+  const weatherStation = findKmaStation(title);
   return {
     number: text(item.num, 20),
     sido: text(item.sido_nm, 50),
     district: text(item.gugun_nm, 80),
-    title: text(item.sta_nm, 100),
+    title,
     width: numberOrEmpty(item.beach_wid),
     length: numberOrEmpty(item.beach_len),
     feature: text(item.beach_knd, 100),
@@ -77,7 +104,9 @@ function normalizeItem(item) {
     image: normalizeImage(item.beach_img),
     emergencyPhone: text(item.link_tel, 100),
     latitude: text(item.lat, 30),
-    longitude: text(item.lon, 30)
+    longitude: text(item.lon, 30),
+    weatherCode: weatherStation?.code || "",
+    weatherTitle: weatherStation?.title || ""
   };
 }
 

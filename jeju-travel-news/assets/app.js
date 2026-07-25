@@ -1,12 +1,14 @@
-import { articles, categories } from "./articles.js?v=20260726-beach-api-1";
+import { articles, categories } from "./articles.js?v=20260726-kma-weather-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260726-beach-api-1";
+const tourismDataVersion = "20260726-kma-weather-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const beachInfoCache = new Map();
+const beachWeatherCache = new Map();
+const beachWeatherRequests = new Map();
 const airportCache = new Map();
 const regionCache = new Map();
 const tnaCategoryCache = new Map();
@@ -145,6 +147,7 @@ let activeCategory = categories[0] || "전체";
 const filterCategories = categories.filter((category) => category !== categories[0]);
 let officialRequestId = 0;
 let beachInfoRequestId = 0;
+let beachWeatherObserver = null;
 let articleThumbnailObserver = null;
 const observedArticleThumbs = new WeakSet();
 
@@ -383,7 +386,19 @@ const beachInfoCopyCatalog = {
     map: "지도 보기",
     source: "공식 안내",
     unit: "m",
-    sourceNote: "자료 출처: 해양수산부 해수욕장정보 서비스. 운영시간, 입수 가능 여부와 편의시설은 현장 공지를 함께 확인하세요."
+    sourceNote: "자료 출처: 해양수산부 해수욕장정보 서비스와 기상청 전국 해수욕장 날씨 조회서비스. 운영시간, 입수 가능 여부와 편의시설은 현장 공지를 함께 확인하세요.",
+    weatherTitle: "기상청 현재 정보",
+    weatherLoading: "날씨 정보를 확인하는 중입니다.",
+    weatherUnavailable: "현재 확인할 수 있는 날씨 정보가 없습니다.",
+    weatherStationMissing: "기상청 지점 정보가 없습니다.",
+    temperature: "기온",
+    rain: "강수",
+    wind: "바람",
+    wave: "파고",
+    waterTemperature: "수온",
+    sunrise: "일출",
+    sunset: "일몰",
+    weatherSource: "기상청 공식 데이터"
   },
   en: {
     eyebrow: "MINISTRY OF OCEANS DATA",
@@ -399,7 +414,19 @@ const beachInfoCopyCatalog = {
     map: "Open map",
     source: "Official source",
     unit: "m",
-    sourceNote: "Source: Ministry of Oceans and Fisheries beach information service. Confirm swimming hours, access and facilities on site."
+    sourceNote: "Sources: Ministry of Oceans and Fisheries beach information service and KMA nationwide beach weather service. Confirm swimming hours, access and facilities on site.",
+    weatherTitle: "KMA current conditions",
+    weatherLoading: "Checking beach weather.",
+    weatherUnavailable: "Current weather is not available.",
+    weatherStationMissing: "No KMA station is mapped.",
+    temperature: "Temp",
+    rain: "Rain",
+    wind: "Wind",
+    wave: "Wave",
+    waterTemperature: "Water",
+    sunrise: "Sunrise",
+    sunset: "Sunset",
+    weatherSource: "Official KMA data"
   },
   ja: {
     eyebrow: "海洋水産部公式情報",
@@ -415,7 +442,19 @@ const beachInfoCopyCatalog = {
     map: "地図を見る",
     source: "公式案内",
     unit: "m",
-    sourceNote: "出典：海洋水産部ビーチ情報サービス。遊泳時間、立入区域、施設は現地案内も確認してください。"
+    sourceNote: "出典：海洋水産部ビーチ情報サービス、気象庁全国ビーチ天気サービス。遊泳時間、立入区域、施設は現地案内も確認してください。",
+    weatherTitle: "気象庁の現在情報",
+    weatherLoading: "ビーチの天気を確認しています。",
+    weatherUnavailable: "現在の天気情報を取得できません。",
+    weatherStationMissing: "気象庁の観測地点がありません。",
+    temperature: "気温",
+    rain: "降水",
+    wind: "風",
+    wave: "波高",
+    waterTemperature: "水温",
+    sunrise: "日の出",
+    sunset: "日の入り",
+    weatherSource: "気象庁公式データ"
   },
   zh: {
     eyebrow: "海洋水产部官方信息",
@@ -431,7 +470,19 @@ const beachInfoCopyCatalog = {
     map: "查看地图",
     source: "官方说明",
     unit: "m",
-    sourceNote: "资料来源：海洋水产部海滩信息服务。开放时间、下水区域和设施请同时确认现场公告。"
+    sourceNote: "资料来源：海洋水产部海滩信息服务、韩国气象厅全国海滩天气服务。开放时间、下水区域和设施请同时确认现场公告。",
+    weatherTitle: "韩国气象厅当前信息",
+    weatherLoading: "正在确认海滩天气。",
+    weatherUnavailable: "目前没有可用的天气信息。",
+    weatherStationMissing: "没有对应的气象厅观测点。",
+    temperature: "气温",
+    rain: "降水",
+    wind: "风",
+    wave: "浪高",
+    waterTemperature: "水温",
+    sunrise: "日出",
+    sunset: "日落",
+    weatherSource: "韩国气象厅官方数据"
   }
 };
 
@@ -1500,6 +1551,105 @@ function beachNumber(value, copy) {
   return `${Number.isInteger(number) ? number : number.toFixed(1)}${copy.unit}`;
 }
 
+function weatherTime(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  return digits.length === 4 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : String(value || "");
+}
+
+function weatherNumber(value, suffix = "") {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return "";
+  return `${Number.isInteger(number) ? number : number.toFixed(1)}${suffix}`;
+}
+
+function renderBeachWeatherNode(node, data = null) {
+  if (!node) return;
+  const copy = getBeachInfoCopy();
+  if (!node.dataset.weatherCode) {
+    node.innerHTML = `<p class="beach-weather-status">${escapeHtml(copy.weatherStationMissing)}</p>`;
+    return;
+  }
+  if (!data) {
+    node.innerHTML = `<p class="beach-weather-status">${escapeHtml(copy.weatherLoading)}</p>`;
+    return;
+  }
+  if (!data.ok) {
+    node.innerHTML = `<p class="beach-weather-status">${escapeHtml(data.error || copy.weatherUnavailable)}</p>`;
+    return;
+  }
+
+  const forecast = data.forecast;
+  const main = forecast
+    ? [weatherNumber(forecast.temperature, "°C"), forecast.label].filter(Boolean).join(" · ")
+    : copy.weatherUnavailable;
+  const details = [];
+  if (forecast?.rain) details.push(`${copy.rain} ${forecast.rain === "강수없음" ? "없음" : forecast.rain}`);
+  if (Number.isFinite(Number(forecast?.windSpeed))) details.push(`${copy.wind} ${weatherNumber(forecast.windSpeed, "m/s")}`);
+  if (data.wave?.value) details.push(`${copy.wave} ${data.wave.value}m`);
+  if (data.waterTemperature?.value) details.push(`${copy.waterTemperature} ${data.waterTemperature.value}°C`);
+  if (data.sun?.sunrise || data.sun?.sunset) {
+    details.push(`${copy.sunrise} ${weatherTime(data.sun?.sunrise)} · ${copy.sunset} ${weatherTime(data.sun?.sunset)}`);
+  }
+  const forecastTime = forecast ? `${forecast.date.slice(4, 6)}.${forecast.date.slice(6, 8)} ${weatherTime(forecast.time)}` : "";
+  node.innerHTML = `
+    <div class="beach-weather-heading">
+      <strong>${escapeHtml(copy.weatherTitle)}</strong>
+      <span>${escapeHtml(forecastTime || copy.weatherSource)}</span>
+    </div>
+    <p class="beach-weather-main">${escapeHtml(main)}</p>
+    ${details.length ? `<p class="beach-weather-meta">${escapeHtml(details.join(" · "))}</p>` : ""}
+    <p class="beach-weather-source">${escapeHtml(copy.weatherSource)}</p>
+  `;
+}
+
+async function loadBeachWeatherNode(node) {
+  if (!node) return;
+  const code = node.dataset.weatherCode;
+  if (!code) {
+    renderBeachWeatherNode(node);
+    return;
+  }
+  if (beachWeatherCache.has(code)) {
+    renderBeachWeatherNode(node, beachWeatherCache.get(code));
+    return;
+  }
+
+  renderBeachWeatherNode(node, null);
+  if (!beachWeatherRequests.has(code)) {
+    const request = fetch(`/api/beach-weather?beach_num=${encodeURIComponent(code)}&v=${encodeURIComponent(tourismDataVersion)}`, {
+      headers: { accept: "application/json" }
+    })
+      .then(async (response) => {
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload.ok) throw new Error(payload.error || "날씨 정보를 불러오지 못했습니다.");
+        return payload;
+      })
+      .catch((error) => ({ ok: false, error: error instanceof Error ? error.message : "날씨 정보를 불러오지 못했습니다." }));
+    beachWeatherRequests.set(code, request);
+  }
+  const data = await beachWeatherRequests.get(code);
+  if (data?.ok) beachWeatherCache.set(code, data);
+  renderBeachWeatherNode(node, data);
+  beachWeatherRequests.delete(code);
+}
+
+function hydrateBeachWeather() {
+  const nodes = [...document.querySelectorAll("[data-beach-weather]")];
+  if (beachWeatherObserver) beachWeatherObserver.disconnect();
+  if (!nodes.length) return;
+  if (!("IntersectionObserver" in window)) {
+    nodes.forEach((node) => loadBeachWeatherNode(node));
+    return;
+  }
+  beachWeatherObserver = new IntersectionObserver((entries) => {
+    entries.filter((entry) => entry.isIntersecting).forEach((entry) => {
+      beachWeatherObserver.unobserve(entry.target);
+      loadBeachWeatherNode(entry.target);
+    });
+  }, { rootMargin: "240px 0px" });
+  nodes.forEach((node) => beachWeatherObserver.observe(node));
+}
+
 function beachInfoCard(item) {
   const copy = getBeachInfoCopy();
   const mapLink = item.latitude && item.longitude
@@ -1517,6 +1667,7 @@ function beachInfoCard(item) {
           <div><dt>${escapeHtml(copy.length)}</dt><dd>${escapeHtml(beachNumber(item.length, copy))}</dd></div>
           <div><dt>${escapeHtml(copy.emergency)}</dt><dd>${escapeHtml(item.emergencyPhone || "공식 정보 확인 필요")}</dd></div>
         </dl>
+        <div class="beach-weather" data-beach-weather="${escapeHtml(item.weatherCode || "")}"></div>
         <div class="beach-info-actions">
           ${mapLink ? `<a href="${escapeHtml(mapLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(copy.map)}</a>` : ""}
           ${sourceLink ? `<a href="${escapeHtml(sourceLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(copy.source)}</a>` : ""}
@@ -1536,6 +1687,7 @@ function renderBeachInfo(items = [], loading = false) {
   grid.innerHTML = items.length
     ? items.map(beachInfoCard).join("") + `<p class="source-note beach-info-note">${escapeHtml(copy.sourceNote)}</p>`
     : loading ? "" : `<p class="empty-state">${escapeHtml(copy.empty)}</p>`;
+  hydrateBeachWeather();
 }
 
 async function loadBeachInfo() {
