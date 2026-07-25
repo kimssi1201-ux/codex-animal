@@ -1,4 +1,4 @@
-import { articles, categories } from "./articles.js?v=20260718-images-12";
+import { articles, categories } from "./articles.js?v=20260725-beach-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
