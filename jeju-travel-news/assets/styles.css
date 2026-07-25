@@ -493,7 +493,7 @@ main, .site-footer {
   font-weight: 900;
 }
 
-.mrt-section, .flight-section, .stay-section, .tna-section, .travel-tools-section, .coupang-affiliate-section, .visit-check-section, .category-news-wrapper, .faq-section, .article-page {
+.mrt-section, .flight-section, .stay-section, .tna-section, .travel-tools-section, .coupang-affiliate-section, .visit-check-section, .beach-info-section, .category-news-wrapper, .faq-section, .article-page {
   padding: 4px 12px 24px;
 }
 .mrt-section {
@@ -588,6 +588,104 @@ main, .site-footer {
 }
 .visit-check-section {
   padding-top: 8px;
+}
+.beach-info-section {
+  padding-top: 14px;
+  border-top: 8px solid #edf2ef;
+  border-bottom: 8px solid #edf2ef;
+  background: #fff;
+}
+.beach-info-status {
+  margin: -2px 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+.beach-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.beach-info-card {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+}
+.beach-info-image {
+  min-height: 218px;
+  background: #edf3ef;
+}
+.beach-info-copy {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-width: 0;
+  padding: 13px 12px;
+}
+.beach-info-copy .meta {
+  overflow: hidden;
+  color: var(--green);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.beach-info-copy h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.beach-info-facts {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+}
+.beach-info-facts div {
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr);
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.beach-info-facts dt {
+  color: var(--muted);
+  font-weight: 800;
+}
+.beach-info-facts dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.beach-info-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 5px;
+}
+.beach-info-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 9px;
+  border: 1px solid #d6e4dc;
+  border-radius: 999px;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 900;
+}
+.source-note {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+.beach-info-note {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
 }
 .category-news-section {
   margin-top: 16px;
@@ -1621,6 +1719,7 @@ main, .site-footer {
   .tna-section,
   .travel-tools-section,
   .visit-check-section,
+  .beach-info-section,
   .category-news-wrapper,
   .faq-section,
   .article-page {
@@ -1684,6 +1783,15 @@ main, .site-footer {
   }
   .visit-check-grid {
     grid-template-columns: 1fr;
+  }
+  .beach-info-grid {
+    grid-template-columns: 1fr;
+  }
+  .beach-info-card {
+    grid-template-columns: 104px minmax(0, 1fr);
+  }
+  .beach-info-image {
+    min-height: 190px;
   }
   .footer-grid {
     grid-template-columns: 1fr;

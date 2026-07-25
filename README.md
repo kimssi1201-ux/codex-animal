@@ -11,6 +11,7 @@
 - `feed.xml`, `sitemap.xml`, `robots.txt`, `ads.txt`
 - `jeju-travel-news/` - 제주여행뉴스 정적 페이지
 - `functions/api/jeju.js` - 제주 관광정보 서버 함수
+- `functions/api/beaches.js` - 해양수산부 제주 해수욕장 정보 서버 함수
 - `admin/` - 포스트 관리 화면
 - `functions/api/admin-posts.js` - 관리자 GitHub 저장 함수
 
@@ -28,6 +29,8 @@ Cloudflare Pages 환경변수에 한국관광공사 서비스 키를 저장합�
 - 함께 지원하는 이름: `KTO_SERVICE_KEY`, `TOUR_API_KEY`, `SERVICE_KEY`
 
 브라우저 JS에는 키를 넣지 않고, 제주 페이지는 `/api/jeju` 서버 함수만 호출합니다.
+
+해수욕장 기본정보를 사용하려면 Cloudflare Pages 환경변수에 `OCEANS_BEACH_API_KEY`를 저장합니다. 인증키는 브라우저나 GitHub 저장소에 넣지 않고 `/api/beaches` 서버 함수에서만 사용합니다.
 
 ## 관리자
 

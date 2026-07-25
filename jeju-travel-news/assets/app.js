@@ -3,9 +3,10 @@ import { articles, categories } from "./articles.js?v=20260725-beach-1";
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260718-images-12";
+const tourismDataVersion = "20260726-beach-api-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
+const beachInfoCache = new Map();
 const airportCache = new Map();
 const regionCache = new Map();
 const tnaCategoryCache = new Map();
@@ -143,6 +144,7 @@ const publicArticles = articles.filter(isPublicArticle);
 let activeCategory = categories[0] || "전체";
 const filterCategories = categories.filter((category) => category !== categories[0]);
 let officialRequestId = 0;
+let beachInfoRequestId = 0;
 let articleThumbnailObserver = null;
 const observedArticleThumbs = new WeakSet();
 
@@ -366,6 +368,73 @@ const languageCatalog = {
   }
 };
 
+const beachInfoCopyCatalog = {
+  ko: {
+    eyebrow: "해양수산부 공식 정보",
+    title: "제주 해수욕장 정보",
+    description: "해양수산부 공개정보를 기준으로 제주 해수욕장의 규모, 해변 특징과 비상 연락처를 정리했습니다.",
+    loading: "해수욕장 정보를 불러오는 중입니다.",
+    empty: "현재 불러올 해수욕장 정보가 없습니다.",
+    district: "지역",
+    width: "해변 폭",
+    length: "해변 길이",
+    feature: "해변 특징",
+    emergency: "비상 연락처",
+    map: "지도 보기",
+    source: "공식 안내",
+    unit: "m",
+    sourceNote: "자료 출처: 해양수산부 해수욕장정보 서비스. 운영시간, 입수 가능 여부와 편의시설은 현장 공지를 함께 확인하세요."
+  },
+  en: {
+    eyebrow: "MINISTRY OF OCEANS DATA",
+    title: "Jeju beach information",
+    description: "Beach size, shoreline features and emergency contacts from the Ministry of Oceans and Fisheries dataset.",
+    loading: "Loading beach information.",
+    empty: "No beach information is available right now.",
+    district: "Area",
+    width: "Beach width",
+    length: "Beach length",
+    feature: "Beach type",
+    emergency: "Emergency contact",
+    map: "Open map",
+    source: "Official source",
+    unit: "m",
+    sourceNote: "Source: Ministry of Oceans and Fisheries beach information service. Confirm swimming hours, access and facilities on site."
+  },
+  ja: {
+    eyebrow: "海洋水産部公式情報",
+    title: "済州ビーチ情報",
+    description: "海洋水産部の公開情報をもとに、ビーチの規模、特徴、緊急連絡先をまとめました。",
+    loading: "ビーチ情報を読み込んでいます。",
+    empty: "現在利用できるビーチ情報がありません。",
+    district: "地域",
+    width: "ビーチ幅",
+    length: "海岸の長さ",
+    feature: "特徴",
+    emergency: "緊急連絡先",
+    map: "地図を見る",
+    source: "公式案内",
+    unit: "m",
+    sourceNote: "出典：海洋水産部ビーチ情報サービス。遊泳時間、立入区域、施設は現地案内も確認してください。"
+  },
+  zh: {
+    eyebrow: "海洋水产部官方信息",
+    title: "济州海滩信息",
+    description: "根据海洋水产部公开数据，整理济州海滩规模、海滩特点和紧急联系方式。",
+    loading: "正在加载海滩信息。",
+    empty: "目前没有可用的海滩信息。",
+    district: "地区",
+    width: "海滩宽度",
+    length: "海岸长度",
+    feature: "海滩特点",
+    emergency: "紧急联系方式",
+    map: "查看地图",
+    source: "官方说明",
+    unit: "m",
+    sourceNote: "资料来源：海洋水产部海滩信息服务。开放时间、下水区域和设施请同时确认现场公告。"
+  }
+};
+
 const articleCopyCatalog = {
   ko: {
     labels: { region: "지역", address: "주소", parking: "주차", hours: "운영시간", fee: "입장료" },
@@ -567,6 +636,20 @@ function savedLanguage() {
 
 let currentLanguage = savedLanguage();
 
+function getBeachInfoCopy() {
+  return beachInfoCopyCatalog[currentLanguage] || beachInfoCopyCatalog.ko;
+}
+
+function renderBeachInfoHeading() {
+  const copy = getBeachInfoCopy();
+  const eyebrow = $("#beachInfoEyebrow");
+  const title = $("#beachInfoTitle");
+  const description = $("#beachInfoDescription");
+  if (eyebrow) eyebrow.textContent = copy.eyebrow;
+  if (title) title.textContent = copy.title;
+  if (description) description.textContent = copy.description;
+}
+
 const dataI18nKeys = {
   "brand.name": "brandName",
   "brand.tagline": "brandTagline",
@@ -645,6 +728,8 @@ function applyLanguage(language = currentLanguage) {
     renderFooter();
     renderCategoryNews();
     renderVisualGallery();
+    renderBeachInfoHeading();
+    renderBeachInfo(beachInfoCache.get("제주") || []);
   }
   const detail = $("#articleDetail");
   if (detail && !params.get("contentId") && !params.get("spot") && detail.dataset.language !== currentLanguage) {
@@ -1399,6 +1484,92 @@ function renderFeed(places = null) {
   hydrateArticleThumbnails();
 }
 
+function beachImageForItem(item) {
+  if (item.image) return item.image;
+  const keyword = normalizeText(item.title);
+  const match = publicArticles.find((article) => {
+    const haystack = normalizeText([article.title, article.region, ...(article.course || [])].join(" "));
+    return keyword && (haystack.includes(keyword) || keyword.includes(normalizeText(article.title)));
+  });
+  return match?.image || fallbackImage;
+}
+
+function beachNumber(value, copy) {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number <= 0) return "공식 정보 확인 필요";
+  return `${Number.isInteger(number) ? number : number.toFixed(1)}${copy.unit}`;
+}
+
+function beachInfoCard(item) {
+  const copy = getBeachInfoCopy();
+  const mapLink = item.latitude && item.longitude
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${item.latitude},${item.longitude}`)}`
+    : "";
+  const sourceLink = safeExternalUrl(item.sourceUrl);
+  return `
+    <article class="beach-info-card">
+      <div class="beach-info-image">${imageTag(beachImageForItem(item), item.title)}</div>
+      <div class="beach-info-copy">
+        <p class="meta">${escapeHtml([item.district, item.feature].filter(Boolean).join(" · ") || copy.title)}</p>
+        <h3>${escapeHtml(item.title)}</h3>
+        <dl class="beach-info-facts">
+          <div><dt>${escapeHtml(copy.width)}</dt><dd>${escapeHtml(beachNumber(item.width, copy))}</dd></div>
+          <div><dt>${escapeHtml(copy.length)}</dt><dd>${escapeHtml(beachNumber(item.length, copy))}</dd></div>
+          <div><dt>${escapeHtml(copy.emergency)}</dt><dd>${escapeHtml(item.emergencyPhone || "공식 정보 확인 필요")}</dd></div>
+        </dl>
+        <div class="beach-info-actions">
+          ${mapLink ? `<a href="${escapeHtml(mapLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(copy.map)}</a>` : ""}
+          ${sourceLink ? `<a href="${escapeHtml(sourceLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(copy.source)}</a>` : ""}
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderBeachInfo(items = [], loading = false) {
+  const grid = $("#beachInfoGrid");
+  const status = $("#beachInfoStatus");
+  if (!grid || !status) return;
+  const copy = getBeachInfoCopy();
+  status.textContent = loading ? copy.loading : "";
+  status.hidden = !loading;
+  grid.innerHTML = items.length
+    ? items.map(beachInfoCard).join("") + `<p class="source-note beach-info-note">${escapeHtml(copy.sourceNote)}</p>`
+    : loading ? "" : `<p class="empty-state">${escapeHtml(copy.empty)}</p>`;
+}
+
+async function loadBeachInfo() {
+  if (activeCategory !== "해변" || !$("#beachInfoGrid")) return;
+  const requestId = ++beachInfoRequestId;
+  const cacheKey = "제주";
+  if (beachInfoCache.has(cacheKey)) {
+    renderBeachInfo(beachInfoCache.get(cacheKey));
+    return;
+  }
+
+  renderBeachInfo([], true);
+  try {
+    const query = new URLSearchParams({ sido: cacheKey, rows: "30", v: tourismDataVersion });
+    const response = await fetch(`/api/beaches?${query.toString()}`, { headers: { accept: "application/json" } });
+    const payload = await response.json();
+    if (!response.ok || !payload.ok) throw new Error(payload.error || "해수욕장 정보를 불러오지 못했습니다.");
+    beachInfoCache.set(cacheKey, payload.items || []);
+  } catch (error) {
+    beachInfoCache.set(cacheKey, []);
+  }
+  if (requestId === beachInfoRequestId && activeCategory === "해변") {
+    renderBeachInfo(beachInfoCache.get(cacheKey) || []);
+  }
+}
+
+function updateBeachInfoVisibility() {
+  const section = $("#beachInfo");
+  if (!section) return;
+  const visible = activeCategory === "해변";
+  section.hidden = !visible;
+  if (visible) loadBeachInfo();
+}
+
 function renderRecommended() {
   const row = $("#recommendedArticles");
   if (!row) return;
@@ -1423,6 +1594,7 @@ function renderCategoryView(places = []) {
     renderVisualGallery();
   }
   renderFeed(places);
+  updateBeachInfoVisibility();
   loadContextualMyRealTrip(myrealtripContextFromHome());
 }
 
