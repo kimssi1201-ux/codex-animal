@@ -1,14 +1,16 @@
-import { articles, categories } from "./articles.js?v=20260726-kma-weather-1";
+import { articles, categories } from "./articles.js?v=20260726-beach-images-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260726-kma-weather-1";
+const tourismDataVersion = "20260726-beach-images-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const beachInfoCache = new Map();
 const beachWeatherCache = new Map();
 const beachWeatherRequests = new Map();
+const beachImageCache = new Map();
+const beachImageRequests = new Map();
 const airportCache = new Map();
 const regionCache = new Map();
 const tnaCategoryCache = new Map();
@@ -126,6 +128,34 @@ const articleImageFallbacks = new Map([
   ["spring-jeju-canola-blossom-route", "https://tong.visitkorea.or.kr/cms/resource/69/3588469_image2_1.jpg"]
 ]);
 
+const beachImageFallbacks = new Map([
+  ["344", "https://tong.visitkorea.or.kr/cms/resource/02/3024202_image2_1.jpg"],
+  ["347", "https://tong.visitkorea.or.kr/cms/resource/13/3552513_image2_1.jpg"],
+  ["342", "https://tong.visitkorea.or.kr/cms/resource/01/3034601_image2_1.jpg"],
+  ["343", "https://tong.visitkorea.or.kr/cms/resource/52/3023852_image2_1.jpg"],
+  ["345", "https://tong.visitkorea.or.kr/cms/resource/30/3053130_image2_1.jpg"],
+  ["355", "https://tong.visitkorea.or.kr/cms/resource_photo/09/3515409_image2_1.jpg"],
+  ["354", "https://tong.visitkorea.or.kr/cms/resource/91/3480191_image2_1.jpg"],
+  ["349", "https://tong.visitkorea.or.kr/cms/resource/20/3039520_image2_1.jpeg"],
+  ["348", "https://tong.visitkorea.or.kr/cms/resource/66/3354566_image2_1.jpg"],
+  ["352", "https://tong.visitkorea.or.kr/cms/resource/00/3354600_image2_1.jpg"],
+  ["346", "https://tong.visitkorea.or.kr/cms/resource/66/3096066_image2_1.jpg"]
+]);
+
+const beachImageQueries = new Map([
+  ["344", [{ keyword: "신양", category: "가볼 만한 곳" }, { keyword: "섭지코지", category: "가볼 만한 곳" }]],
+  ["347", [{ keyword: "중문색달", category: "해변" }, { keyword: "중문", category: "해변" }]],
+  ["342", [{ keyword: "표선", category: "해변" }]],
+  ["343", [{ keyword: "화순", category: "해변" }]],
+  ["345", [{ keyword: "곽지", category: "해변" }]],
+  ["355", [{ keyword: "금능", category: "해변" }]],
+  ["354", [{ keyword: "김녕", category: "해변" }]],
+  ["349", [{ keyword: "삼양", category: "해변" }]],
+  ["348", [{ keyword: "이호", category: "해변" }]],
+  ["352", [{ keyword: "함덕", category: "해변" }]],
+  ["346", [{ keyword: "협재", category: "해변" }]]
+]);
+
 function articlePublishTime(article) {
   const value = article.publishAt || article.date || "";
   const time = Date.parse(value);
@@ -147,6 +177,7 @@ let activeCategory = categories[0] || "전체";
 const filterCategories = categories.filter((category) => category !== categories[0]);
 let officialRequestId = 0;
 let beachInfoRequestId = 0;
+let beachImageObserver = null;
 let beachWeatherObserver = null;
 let articleThumbnailObserver = null;
 const observedArticleThumbs = new WeakSet();
@@ -1536,13 +1567,81 @@ function renderFeed(places = null) {
 }
 
 function beachImageForItem(item) {
-  if (item.image) return item.image;
-  const keyword = normalizeText(item.title);
-  const match = publicArticles.find((article) => {
-    const haystack = normalizeText([article.title, article.region, ...(article.course || [])].join(" "));
-    return keyword && (haystack.includes(keyword) || keyword.includes(normalizeText(article.title)));
-  });
-  return match?.image || fallbackImage;
+  return item.image || beachImageFallbacks.get(String(item.weatherCode || "")) || fallbackImage;
+}
+
+function beachImageCandidateScore(code, candidate) {
+  const title = normalizeText(candidate?.title);
+  const queries = beachImageQueries.get(String(code)) || [];
+  if (!title || !candidate?.image || !/(해수욕장|해변|비치)/.test(candidate.title || "")) return 0;
+  return queries.reduce((best, query) => {
+    const keyword = normalizeText(query.keyword);
+    if (!keyword || !title.includes(keyword)) return best;
+    if (title === keyword) return Math.max(best, 110);
+    if (title.startsWith(keyword)) return Math.max(best, 100);
+    return Math.max(best, 85);
+  }, 0);
+}
+
+function bestBeachImage(code, items = []) {
+  return items
+    .map((item) => ({ item, score: beachImageCandidateScore(code, item) }))
+    .filter(({ item, score }) => score > 0 && safeExternalUrl(item.image))
+    .sort((a, b) => b.score - a.score)[0]?.item?.image || "";
+}
+
+async function fetchBeachImage(code) {
+  const queries = beachImageQueries.get(String(code)) || [];
+  for (const queryParams of queries) {
+    try {
+      const query = new URLSearchParams({
+        keyword: queryParams.keyword,
+        category: queryParams.category,
+        v: tourismDataVersion
+      });
+      const response = await fetch(`/api/jeju?${query.toString()}`, { headers: { accept: "application/json" } });
+      const payload = await response.json();
+      if (!response.ok || !payload?.ok) continue;
+      const image = safeExternalUrl(bestBeachImage(code, payload.items || []));
+      if (image) return image;
+    } catch (error) {
+      // The verified per-beach fallback remains visible when the tourism API is unavailable.
+    }
+  }
+  return beachImageFallbacks.get(String(code)) || "";
+}
+
+async function loadBeachImageNode(node) {
+  if (!node) return;
+  const code = String(node.dataset.beachImage || "");
+  if (!code) return;
+  if (beachImageCache.has(code)) {
+    node.src = normalizeImageUrl(beachImageCache.get(code));
+    return;
+  }
+  if (!beachImageRequests.has(code)) beachImageRequests.set(code, fetchBeachImage(code));
+  const image = await beachImageRequests.get(code);
+  beachImageRequests.delete(code);
+  if (!image) return;
+  beachImageCache.set(code, image);
+  node.src = normalizeImageUrl(image);
+}
+
+function hydrateBeachImages() {
+  const images = [...document.querySelectorAll("img[data-beach-image]")];
+  if (beachImageObserver) beachImageObserver.disconnect();
+  if (!images.length) return;
+  if (!("IntersectionObserver" in window)) {
+    images.forEach((image) => loadBeachImageNode(image));
+    return;
+  }
+  beachImageObserver = new IntersectionObserver((entries) => {
+    entries.filter((entry) => entry.isIntersecting).forEach((entry) => {
+      beachImageObserver.unobserve(entry.target);
+      loadBeachImageNode(entry.target);
+    });
+  }, { rootMargin: "300px 0px" });
+  images.forEach((image) => beachImageObserver.observe(image));
 }
 
 function beachNumber(value, copy) {
@@ -1652,13 +1751,14 @@ function hydrateBeachWeather() {
 
 function beachInfoCard(item) {
   const copy = getBeachInfoCopy();
+  const imageKey = String(item.weatherCode || item.title || "");
   const mapLink = item.latitude && item.longitude
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${item.latitude},${item.longitude}`)}`
     : "";
   const sourceLink = safeExternalUrl(item.sourceUrl);
   return `
     <article class="beach-info-card">
-      <div class="beach-info-image">${imageTag(beachImageForItem(item), item.title)}</div>
+      <div class="beach-info-image">${imageTag(beachImageForItem(item), item.title, "", `data-beach-image="${escapeHtml(imageKey)}"`)}</div>
       <div class="beach-info-copy">
         <p class="meta">${escapeHtml([item.district, item.feature].filter(Boolean).join(" · ") || copy.title)}</p>
         <h3>${escapeHtml(item.title)}</h3>
@@ -1687,6 +1787,7 @@ function renderBeachInfo(items = [], loading = false) {
   grid.innerHTML = items.length
     ? items.map(beachInfoCard).join("") + `<p class="source-note beach-info-note">${escapeHtml(copy.sourceNote)}</p>`
     : loading ? "" : `<p class="empty-state">${escapeHtml(copy.empty)}</p>`;
+  hydrateBeachImages();
   hydrateBeachWeather();
 }
 
