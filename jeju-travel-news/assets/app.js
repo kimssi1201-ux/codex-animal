@@ -1,9 +1,9 @@
-import { articles, categories } from "./articles.js?v=20260726-beach-images-1";
+import { articles, categories } from "./articles.js?v=20260807-editorial-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
 const fallbackImage = "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg";
-const tourismDataVersion = "20260726-beach-images-1";
+const tourismDataVersion = "20260807-editorial-1";
 const detailPath = window.location.pathname.includes("/jeju-travel-news/") ? "article.html" : "/article.html";
 const officialCache = new Map();
 const beachInfoCache = new Map();
@@ -260,15 +260,18 @@ const languageCatalog = {
     htmlLang: "ko",
     ui: {
       brandName: "제주여행뉴스",
-      brandTagline: "제주 여행 정보 뉴스",
+      brandTagline: "제주를 깊게 읽는 여행 매거진",
+      editorialLine: "제주를 깊게 읽는 여행 매거진",
+      homeIntro: "장소 하나보다 동선과 계절, 주변 이야기를 함께 읽는 제주 여행을 제안합니다.",
+      plan: "여행 준비",
       menu: "메뉴 열기",
       list: "목록",
       news: "제주 여행 뉴스",
       products: "여행 상품",
       check: "방문 전 체크",
-      recommended: "추천 기사",
-      julyTitle: "제주 여행 가이드",
-      latest: "최신 글",
+      recommended: "이번 주 제주",
+      julyTitle: "제주를 깊게 읽는 여행 가이드",
+      latest: "새로 올라온 여행 이야기",
       places: "가볼 만한 곳",
       photoGallery: "사진으로 보는 제주",
       photoCountSuffix: "장",
@@ -299,15 +302,18 @@ const languageCatalog = {
     htmlLang: "en",
     ui: {
       brandName: "Jeju Travel News",
-      brandTagline: "Jeju travel information",
+      brandTagline: "An editorial guide to Jeju",
+      editorialLine: "An editorial guide to Jeju",
+      homeIntro: "Read Jeju through connected routes, seasons and local stories instead of isolated stops.",
+      plan: "Plan your trip",
       menu: "Open menu",
       list: "List",
       news: "Jeju Travel News",
       products: "Travel Picks",
       check: "Before You Go",
-      recommended: "Featured Stories",
-      julyTitle: "Jeju Travel Guide",
-      latest: "Latest Stories",
+      recommended: "This Week in Jeju",
+      julyTitle: "A Deeper Guide to Jeju",
+      latest: "New from Jeju",
       places: "Places to Visit",
       photoGallery: "Jeju in Photos",
       photoCountSuffix: " photos",
@@ -334,15 +340,18 @@ const languageCatalog = {
     htmlLang: "ja",
     ui: {
       brandName: "済州旅行ニュース",
-      brandTagline: "済州旅行情報ニュース",
+      brandTagline: "済州を深く読む旅行マガジン",
+      editorialLine: "済州を深く読む旅行マガジン",
+      homeIntro: "一つの場所だけでなく、動線や季節、周辺の物語までつなげて済州を紹介します。",
+      plan: "旅行準備",
       menu: "メニューを開く",
       list: "一覧",
       news: "済州旅行ニュース",
       products: "旅行商品",
       check: "訪問前チェック",
-      recommended: "おすすめ記事",
-      julyTitle: "済州旅行ガイド",
-      latest: "最新記事",
+      recommended: "今週の済州",
+      julyTitle: "済州を深く楽しむ旅行ガイド",
+      latest: "済州の新着記事",
       places: "おすすめスポット",
       photoGallery: "写真で見る済州",
       photoCountSuffix: "枚",
@@ -369,15 +378,18 @@ const languageCatalog = {
     htmlLang: "zh-CN",
     ui: {
       brandName: "济州旅行新闻",
-      brandTagline: "济州旅行资讯",
+      brandTagline: "深度阅读济州的旅行杂志",
+      editorialLine: "深度阅读济州的旅行杂志",
+      homeIntro: "不只介绍单个景点，也连接路线、季节和周边故事来阅读济州。",
+      plan: "旅行准备",
       menu: "打开菜单",
       list: "列表",
       news: "济州旅行新闻",
       products: "旅行产品",
       check: "出行前检查",
-      recommended: "推荐文章",
-      julyTitle: "济州旅行指南",
-      latest: "最新文章",
+      recommended: "本周济州",
+      julyTitle: "深度济州旅行指南",
+      latest: "济州最新文章",
       places: "值得去的地方",
       photoGallery: "照片中的济州",
       photoCountSuffix: "张",
@@ -735,8 +747,11 @@ function renderBeachInfoHeading() {
 const dataI18nKeys = {
   "brand.name": "brandName",
   "brand.tagline": "brandTagline",
+  "header.editorial": "editorialLine",
+  "home.intro": "homeIntro",
   "nav.menu": "menu",
   "nav.list": "list",
+  "nav.plan": "plan",
   "nav.news": "news",
   "nav.myrealtrip": "products",
   "nav.check": "check",
@@ -756,6 +771,19 @@ function languageUiText(key, fallback = "") {
     return currentLanguage === "ko" ? "불러오는 중" : currentLanguage === "ja" ? "読み込み中" : currentLanguage === "zh" ? "加载中" : "Loading";
   }
   return getLanguagePack().ui[uiKey] || fallback;
+}
+
+function renderEditionDate() {
+  const target = $("#editionDate");
+  if (!target) return;
+  const now = new Date();
+  const locale = currentLanguage === "ja" ? "ja-JP" : currentLanguage === "zh" ? "zh-CN" : currentLanguage === "en" ? "en-US" : "ko-KR";
+  target.dateTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  target.textContent = new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: currentLanguage === "en" ? "short" : "long",
+    day: "numeric"
+  }).format(now);
 }
 
 function applyLanguage(language = currentLanguage) {
@@ -788,6 +816,7 @@ function applyLanguage(language = currentLanguage) {
     const node = $(selector);
     if (node && text) node.textContent = text;
   });
+  renderEditionDate();
 
   const languageSwitch = $("#languageSwitch");
   if (languageSwitch) {
@@ -1284,6 +1313,24 @@ function uniqueByImage(items) {
   });
 }
 
+function homeHeroArticles() {
+  const editorialSlugs = [
+    "seongsan-sunrise-course",
+    "hyeopjae-half-day",
+    "hamdeok-cafe-street",
+    "udo-day-trip"
+  ];
+  const editorialPicks = editorialSlugs
+    .map((slug) => publicArticles.find((article) => article.slug === slug))
+    .filter(Boolean);
+  return uniqueByImage([...editorialPicks, ...publicArticles]).slice(0, 4);
+}
+
+function homeLatestArticles() {
+  const heroSlugs = new Set(homeHeroArticles().map((article) => article.slug));
+  return uniqueByImage(publicArticles.filter((article) => !heroSlugs.has(article.slug))).slice(0, 6);
+}
+
 function galleryCard(article) {
   const view = localizedArticle(article);
   return `
@@ -1533,12 +1580,12 @@ function compactTravelSearchSections() {
   const visitCheck = $("#visitCheck");
   const categoryNews = $("#categoryNews");
   const myrealtrip = $("#myrealtrip");
+  const coupang = $(".coupang-affiliate-section:not(.article-affiliate-section)");
 
   if (main && faq) {
-    if (categoryNews) main.insertBefore(categoryNews, faq);
-    if (visitCheck) main.insertBefore(visitCheck, faq);
-    main.insertBefore(wrapper, faq);
-    if (myrealtrip) main.insertBefore(myrealtrip, faq);
+    [categoryNews, visitCheck, wrapper, myrealtrip, coupang]
+      .filter(Boolean)
+      .forEach((section) => main.insertBefore(section, faq));
   } else {
     ($("#july") || main)?.after(wrapper);
   }
@@ -1550,15 +1597,18 @@ function renderFeed(places = null) {
   if (!feed) return;
 
   const localItems = activeCategory === categories[0]
-    ? publicArticles.filter((article) => article.category === "가볼 만한 곳").slice(0, 9)
+    ? homeLatestArticles()
     : visibleArticles();
   const feedHtml = localItems.map(sectionArticleCard).join("");
 
   feed.innerHTML = feedHtml || `<p class="empty-state">현재 선택한 카테고리의 제주 여행 정보가 없습니다.</p>`;
   const feedCount = $("#feedCount");
   const feedTitle = $("#feedListTitle");
-  if (feedCount) feedCount.textContent = "더보기 +";
-  if (feedTitle) feedTitle.textContent = activeCategory === categories[0] ? getLanguagePack().ui.places : categoryLabel(activeCategory);
+  if (feedCount) {
+    const suffix = currentLanguage === "ko" ? "개 기사" : currentLanguage === "ja" ? "件" : currentLanguage === "zh" ? "篇" : " stories";
+    feedCount.textContent = `${localItems.length}${suffix}`;
+  }
+  if (feedTitle) feedTitle.textContent = activeCategory === categories[0] ? getLanguagePack().ui.latest : categoryLabel(activeCategory);
   if (status) {
     status.hidden = true;
     status.textContent = "";
@@ -1826,7 +1876,9 @@ function updateBeachInfoVisibility() {
 function renderRecommended() {
   const row = $("#recommendedArticles");
   if (!row) return;
-  const picks = visibleArticles().slice(0, 5);
+  const picks = activeCategory === categories[0]
+    ? homeHeroArticles()
+    : uniqueByImage(visibleArticles()).slice(0, 4);
   row.innerHTML = picks
     .map((article, index) => recommendedCard(article, index === 0))
     .join("");
@@ -2053,22 +2105,29 @@ function renderCategoryNews() {
   const wrapper = $("#categoryNewsSections");
   if (!wrapper) return;
   const pack = getLanguagePack();
-  const sections = [
-    {
-      id: "latest-news",
-      eyebrow: "LATEST",
-      title: currentLanguage === "ko" ? "최신 여행뉴스" : pack.ui.latest,
-      items: publicArticles.slice(0, 6)
-    },
-    ...categories
-      .filter((category) => category !== categories[0] && category !== "가볼 만한 곳")
-      .map((category) => ({
+  const reservedArticles = [...homeHeroArticles(), ...homeLatestArticles()];
+  const usedSlugs = new Set(reservedArticles.map((article) => article.slug));
+  const usedImages = new Set(reservedArticles.map((article) => normalizeImageUrl(article.image)).filter(Boolean));
+  const sections = categories
+    .filter((category) => category !== categories[0])
+    .map((category) => {
+      const items = publicArticles
+        .filter((article) => {
+          const image = normalizeImageUrl(article.image);
+          return article.category === category && !usedSlugs.has(article.slug) && image && !usedImages.has(image);
+        })
+        .slice(0, 6);
+      items.forEach((article) => {
+        usedSlugs.add(article.slug);
+        usedImages.add(normalizeImageUrl(article.image));
+      });
+      return {
         id: `category-${encodeURIComponent(category)}`,
-        eyebrow: "TRAVEL",
+        eyebrow: "ISLAND GUIDE",
         title: categoryLabel(category),
-        items: publicArticles.filter((article) => article.category === category).slice(0, 6)
-      }))
-  ];
+        items
+      };
+    });
 
   wrapper.innerHTML = sections
     .map((section) => {
@@ -2672,6 +2731,7 @@ function bindHome() {
 
 function renderHome() {
   if (!$("#newsFeedList")) return;
+  renderEditionDate();
   renderTodayKeywords();
   renderPrimaryNav();
   renderTabs();

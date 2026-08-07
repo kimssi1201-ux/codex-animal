@@ -496,7 +496,7 @@ export const articles = [
     "category": "오름",
     "status": "published",
     "region": "제주 전역",
-    "image": "https://tong.visitkorea.or.kr/cms/resource/91/3481291_image2_1.jpg",
+    "image": "https://tong.visitkorea.or.kr/cms/resource_photo/86/2610186_image2_1.jpg",
     "summary": "제주를 중심으로 주차와 소요 시간, 날씨에 따른 난이도 관련 정보를 확인하기 좋게 정리한 제주 여행 정보입니다.",
     "date": "2026-07-23",
     "course": [
@@ -624,7 +624,7 @@ export const articles = [
     "category": "해변",
     "status": "published",
     "region": "제주 동부 · 구좌",
-    "image": "https://tong.visitkorea.or.kr/cms/resource/74/3347274_image2_1.jpg",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/92/3100092_image2_1.jpg",
     "summary": "하도를 중심으로 바다 산책과 물놀이, 카페 동선 관련 정보를 확인하기 좋게 정리한 제주 여행 정보입니다.",
     "date": "2026-07-19",
     "course": [

@@ -12,38 +12,37 @@
   <meta property="og:url" content="https://www.moneyarchive.kr/jeju-travel-news/">
   <title>제주여행뉴스 | 제주도 여행 정보 뉴스</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/styles.css?v=20260726-beach-images-1">
+  <link rel="stylesheet" href="assets/styles.css?v=20260807-editorial-1">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5751319666030430" crossorigin="anonymous"></script>
 </head>
-<body class="is-loading-news">
+<body class="home-page is-loading-news">
   <header class="site-header">
-    <a class="brand" href="#top" aria-label="제주여행뉴스 홈">
-      <span class="brand-mark" aria-hidden="true">JN</span>
-      <span>
-        <strong data-i18n="brand.name">제주여행뉴스</strong>
-        <small data-i18n="brand.tagline">제주 여행 정보 뉴스</small>
-      </span>
-    </a>
-    <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="primaryNav">
-      <span></span>
-      <span></span>
-      <span class="sr-only" data-i18n="nav.menu">메뉴 열기</span>
-    </button>
-    <nav class="primary-nav" id="primaryNav" aria-label="주요 메뉴">
-      <a href="#july" data-i18n="nav.news">제주 여행 뉴스</a>
-      <a href="#places" data-i18n="nav.places">가볼 만한 곳</a>
-      <a href="#flights">항공권</a>
-      <a href="#stays">숙소</a>
-      <a href="#tourTickets">투어·티켓</a>
-      <a href="#myrealtrip" data-i18n="nav.myrealtrip">여행 상품</a>
-      <a href="#visitCheck" data-i18n="nav.check">방문 전 체크</a>
-    </nav>
-    <div class="language-switch" id="languageSwitch" aria-label="언어 선택">
-      <button type="button" data-lang="ko">KR</button>
-      <button type="button" data-lang="en">EN</button>
-      <button type="button" data-lang="ja">JP</button>
-      <button type="button" data-lang="zh">CN</button>
+    <div class="header-utility">
+      <p class="edition-note"><strong>JEJU JOURNAL</strong><span data-i18n="header.editorial">제주를 깊게 읽는 여행 매거진</span></p>
+      <time class="edition-date" id="editionDate">오늘의 제주</time>
+      <div class="language-switch" id="languageSwitch" aria-label="언어 선택">
+        <button type="button" data-lang="ko">KR</button>
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="ja">JP</button>
+        <button type="button" data-lang="zh">CN</button>
+      </div>
     </div>
+    <div class="masthead-row">
+      <a class="brand" href="./" aria-label="제주여행뉴스 홈">
+        <span class="brand-mark" aria-hidden="true">JN</span>
+        <span>
+          <strong data-i18n="brand.name">제주여행뉴스</strong>
+          <small data-i18n="brand.tagline">제주 여행 정보 뉴스</small>
+        </span>
+      </a>
+      <a class="masthead-shortcut" href="#travelTools" data-i18n="nav.plan">여행 준비</a>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="primaryNav">
+        <span></span>
+        <span></span>
+        <span class="sr-only" data-i18n="nav.menu">메뉴 열기</span>
+      </button>
+    </div>
+    <nav class="primary-nav" id="primaryNav" aria-label="주요 메뉴"></nav>
   </header>
 
   <main id="top">
@@ -53,14 +52,14 @@
 
     <section class="mobile-news-feed" id="july" aria-labelledby="julyTitle">
       <div class="section-heading feed-heading">
-        <p class="eyebrow">추천 기사</p>
-        <h1 id="julyTitle" data-i18n="july.title">제주 여행 가이드</h1>
+        <p class="eyebrow">이번 주 제주</p>
+        <h1 id="julyTitle" data-i18n="july.title">제주를 깊게 읽는 여행 가이드</h1>
+        <p class="feed-deck" data-i18n="home.intro">장소 하나보다 동선과 계절, 주변 이야기를 함께 읽는 제주 여행을 제안합니다.</p>
       </div>
       <div class="section-status" id="julyStatus" data-i18n="july.loading" hidden></div>
       <div class="recommend-news-row" id="recommendedArticles" aria-label="추천 제주 여행 기사"></div>
-      <div class="visual-gallery" id="visualGallery" aria-label="제주 여행 사진 모음"></div>
       <div class="feed-list-heading">
-        <h2 id="feedListTitle">최신 글</h2>
+        <h2 id="feedListTitle">새로 올라온 여행 이야기</h2>
         <span id="feedCount"></span>
       </div>
       <div class="news-list-feed" id="newsFeedList"></div>
@@ -219,6 +218,6 @@
   <noscript>
     <p class="noscript">제주 여행 카드를 보려면 브라우저에서 JavaScript를 켜주세요.</p>
   </noscript>
-  <script type="module" src="assets/app.js?v=20260726-beach-images-1"></script>
+  <script type="module" src="assets/app.js?v=20260807-editorial-1"></script>
 </body>
 </html>
