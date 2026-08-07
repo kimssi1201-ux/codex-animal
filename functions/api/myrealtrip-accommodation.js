@@ -1,3 +1,5 @@
+import { rankAffiliateItems } from "../lib/affiliate-match.js";
+
 const DEFAULT_TIMEOUT_MS = 9000;
 const DEFAULT_MCP_URL = "https://mcp-servers.myrealtrip.com/mcp";
 const DEFAULT_REGION_AUTOCOMPLETE_PATH = "/v1/products/accommodation/region-autocomplete";
@@ -25,7 +27,7 @@ function boundedDate(value, fallback = "") {
 function json(data, init = {}) {
   const headers = new Headers(init.headers || {});
   headers.set("content-type", "application/json; charset=utf-8");
-  headers.set("cache-control", init.cacheControl || "public, max-age=120, s-maxage=300");
+  headers.set("cache-control", init.cacheControl || "no-store");
   return new Response(JSON.stringify(data), {
     status: init.status || 200,
     headers
@@ -177,6 +179,7 @@ function asArray(payload) {
   const candidates = [
     payload?.items,
     payload?.regions,
+    payload?.stays,
     payload?.products,
     payload?.accommodations,
     payload?.hotels,
@@ -185,12 +188,14 @@ function asArray(payload) {
     payload?.productList,
     payload?.result?.items,
     payload?.result?.regions,
+    payload?.result?.stays,
     payload?.result?.products,
     payload?.result?.accommodations,
     payload?.result?.hotels,
     payload?.result?.results,
     payload?.result?.data?.items,
     payload?.result?.data?.regions,
+    payload?.result?.data?.stays,
     payload?.result?.data?.products,
     payload?.result?.data?.accommodations,
     payload?.result?.data?.hotels,
@@ -201,6 +206,7 @@ function asArray(payload) {
     payload?.content?.products,
     payload?.data?.items,
     payload?.data?.regions,
+    payload?.data?.stays,
     payload?.data?.products,
     payload?.data?.accommodations,
     payload?.data?.hotels,
@@ -225,11 +231,13 @@ function normalizeAccommodation(item = {}) {
   const image = firstMappedImage(item, false);
   const price = item.priceText || item.displayPrice || item.priceLabel || item.salePrice || item.price || item.minPrice || "가격 확인";
   return {
-    id: String(item.id || item.productId || item.accommodationId || item.hotelId || ""),
+    id: String(item.id || item.gid || item.productId || item.accommodationId || item.hotelId || ""),
     title: String(item.title || item.name || item.productName || item.hotelName || "숙소 상품"),
-    region: String(item.regionName || item.region || item.location || ""),
+    category: "숙소",
+    region: String(item.description || item.regionName || item.region || item.location || ""),
+    description: String(item.description || ""),
     priceText: String(price),
-    image: String(image),
+    image: String(image || normalizeUrl(item.thumbnailUrl || "")),
     rating: String(item.rating || item.reviewScore || item.starRating || ""),
     url: String(normalizeUrl(item.url || item.link || item.deepLink || item.webUrl || item.shareUrl || ""))
   };
@@ -238,11 +246,12 @@ function normalizeAccommodation(item = {}) {
 function parseMcpContent(payload) {
   const content = payload?.result?.content || [];
   const text = content.find((item) => item?.type === "text")?.text || "";
-  if (!text) return payload?.result?.structuredContent || payload?.result || {};
+  const structured = payload?.result?.structuredContent || {};
+  if (!text) return structured || payload?.result || {};
   try {
-    return JSON.parse(text);
+    return { ...structured, ...JSON.parse(text) };
   } catch (error) {
-    return { text };
+    return { ...structured, text };
   }
 }
 
@@ -286,14 +295,56 @@ function productsFromWidget(widget = {}) {
       return {
         id: "",
         title,
-        region: rating || "마이리얼트립 숙소",
+        category: "숙소",
+        region: "마이리얼트립 숙소",
+        description: "",
         priceText: price || "가격 확인",
         image: firstImage(item),
         rating,
-        url: firstOpenUrl(item)
+        url: normalizeUrl(firstOpenUrl(item))
       };
     })
-    .filter((item) => item.title);
+    .filter((item) => item.title && item.url && !/검색 결과 없음|no results?/i.test(item.title));
+}
+
+function normalizeMcpAccommodations(parsed = {}) {
+  const widgetItems = productsFromWidget(parsed.widget);
+  const structuredItems = asArray(parsed).map(normalizeAccommodation).filter((item) => item.title);
+  if (!structuredItems.length) return widgetItems;
+  return structuredItems.map((item, index) => ({
+    ...item,
+    image: item.image || widgetItems[index]?.image || "",
+    url: item.url || widgetItems[index]?.url || "",
+    priceText: item.priceText || widgetItems[index]?.priceText || "가격 확인",
+    rating: item.rating || widgetItems[index]?.rating || ""
+  }));
+}
+
+function isoDate(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function defaultStayDates() {
+  const checkIn = new Date();
+  checkIn.setUTCDate(checkIn.getUTCDate() + 7);
+  const checkOut = new Date(checkIn);
+  checkOut.setUTCDate(checkOut.getUTCDate() + 1);
+  return { checkIn: isoDate(checkIn), checkOut: isoDate(checkOut) };
+}
+
+function accommodationMatchContext(body = {}) {
+  const region = [body.region, body.regionName, body.keyword || body.query]
+    .map((value) => boundedText(value, "", 80))
+    .filter(Boolean)
+    .join(" ");
+  return {
+    title: boundedText(body.title, "", 140),
+    spot: boundedText(body.spot, "", 80),
+    category: "숙소",
+    region: boundedText(region, "", 240),
+    nearby: boundedText(body.nearby, "", 240),
+    scope: boundedText(body.scope, "home", 20)
+  };
 }
 
 async function callMcpTool(config, name, args) {
@@ -386,17 +437,34 @@ export async function onRequestPost(context) {
       }
 
       const keyword = boundedText(body.keyword || body.query || body.regionName || body.regionId, "제주");
+      const defaults = defaultStayDates();
+      const checkIn = boundedDate(body.checkIn) || defaults.checkIn;
+      const checkOut = boundedDate(body.checkOut) || defaults.checkOut;
+      const limit = boundedInteger(body.limit, 4, 1, 12);
       const parsed = await callMcpTool(config, "searchStays", {
         keyword,
-        checkIn: boundedDate(body.checkIn),
-        checkOut: boundedDate(body.checkOut),
+        checkIn,
+        checkOut,
         adultCount: boundedInteger(body.adults || body.guests || body.adultCount, 2, 1, 9),
         childCount: boundedInteger(body.children || body.childCount, 0, 0, 9),
         isDomestic: true,
-        page: boundedInteger(body.page, 1, 1, MAX_PAGE)
+        page: boundedInteger(body.page, 1, 1, MAX_PAGE),
+        size: Math.max(limit, 12)
       });
-      const items = productsFromWidget(parsed.widget);
-      return json({ ok: true, configured: true, mcp: true, action, items });
+      const contextMatch = accommodationMatchContext(body);
+      const items = rankAffiliateItems(normalizeMcpAccommodations(parsed), contextMatch, {
+        limit,
+        allowUnmatched: contextMatch.scope === "home"
+      });
+      return json({
+        ok: true,
+        configured: true,
+        mcp: true,
+        action,
+        matched: items.length > 0,
+        searchDates: { checkIn, checkOut },
+        items
+      });
     } catch (error) {
       return json({
         ok: false,
@@ -430,11 +498,17 @@ export async function onRequestPost(context) {
       throw new Error(payload?.message || `MyRealTrip accommodation HTTP ${response.status}`);
     }
 
-    const items = isSearch
+    const normalizedItems = isSearch
       ? asArray(payload).map(normalizeAccommodation).filter((item) => item.title)
       : asArray(payload).map(normalizeRegion).filter((item) => item.regionId || item.name);
+    const items = isSearch
+      ? rankAffiliateItems(normalizedItems, accommodationMatchContext(body), {
+          limit: boundedInteger(body.limit, 4, 1, 12),
+          allowUnmatched: body.scope === "home"
+        })
+      : normalizedItems;
 
-    return json({ ok: true, configured: true, action, items });
+    return json({ ok: true, configured: true, action, matched: isSearch ? items.length > 0 : undefined, items });
   } catch (error) {
     return json({
       ok: false,

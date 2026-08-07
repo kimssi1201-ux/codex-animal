@@ -9,6 +9,16 @@
   --shadow: none;
 }
 
+.mrt-date-note {
+  grid-column: 1 / -1;
+  margin: 0 0 4px;
+  color: #5f6864;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+[hidden] { display: none !important; }
+
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {

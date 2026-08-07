@@ -1,3 +1,5 @@
+import { rankAffiliateItems } from "../lib/affiliate-match.js";
+
 const DEFAULT_TIMEOUT_MS = 9000;
 const DEFAULT_MCP_URL = "https://mcp-servers.myrealtrip.com/mcp";
 const MAX_QUERY_LENGTH = 80;
@@ -172,11 +174,12 @@ function firstMappedImage(value, allowGenericUrl = false, seen = new WeakSet()) 
 function parseMcpContent(payload) {
   const content = payload?.result?.content || [];
   const text = content.find((item) => item?.type === "text")?.text || "";
-  if (!text) return payload?.result?.structuredContent || payload?.result || {};
+  const structured = payload?.result?.structuredContent || {};
+  if (!text) return structured || payload?.result || {};
   try {
-    return JSON.parse(text);
+    return { ...structured, ...JSON.parse(text) };
   } catch (error) {
-    return { text };
+    return { ...structured, text };
   }
 }
 
@@ -226,7 +229,7 @@ function productsFromWidget(widget = {}) {
         url: normalizeUrl(firstOpenUrl(item))
       };
     })
-    .filter((item) => item.title);
+    .filter((item) => item.title && item.url && !/검색 결과 없음|no results?/i.test(item.title));
 }
 
 async function mcpSearchItems(config, keyword, limit = 6) {
@@ -258,8 +261,16 @@ async function mcpSearchItems(config, keyword, limit = 6) {
   }
   const parsed = parseMcpContent(payload);
   const explicitItems = asArray(parsed).map(normalizeItem).filter((item) => item.title);
-  if (explicitItems.length) return explicitItems.slice(0, safeLimit);
-  return productsFromWidget(parsed.widget).slice(0, safeLimit);
+  const widgetItems = productsFromWidget(parsed.widget);
+  if (!explicitItems.length) return widgetItems.slice(0, safeLimit);
+  return explicitItems
+    .map((item, index) => ({
+      ...item,
+      image: item.image || widgetItems[index]?.image || "",
+      url: item.url || widgetItems[index]?.url || "",
+      priceText: item.priceText || widgetItems[index]?.priceText || "가격 확인"
+    }))
+    .slice(0, safeLimit);
 }
 
 function addKeyword(value, keyword) {
@@ -310,6 +321,24 @@ function affiliateItems(config, keyword) {
     .filter((item) => item.url);
 }
 
+function matchContext(requestUrl) {
+  return {
+    title: boundedText(requestUrl.searchParams.get("title"), "", 140),
+    spot: boundedText(requestUrl.searchParams.get("spot"), "", 80),
+    category: boundedText(requestUrl.searchParams.get("category"), "가볼 만한 곳", 30),
+    region: boundedText(requestUrl.searchParams.get("region"), "", 80),
+    nearby: boundedText(requestUrl.searchParams.get("nearby"), "", 240),
+    scope: boundedText(requestUrl.searchParams.get("scope"), "home", 20)
+  };
+}
+
+function matchedItems(items, context, limit) {
+  return rankAffiliateItems(items, context, {
+    limit,
+    allowUnmatched: context.scope === "home"
+  });
+}
+
 function asArray(payload) {
   const candidates = [
     payload?.items,
@@ -346,6 +375,8 @@ function normalizeItem(item = {}) {
     id: String(item.id || item.productId || item.offerId || item.uuid || ""),
     title: String(item.title || item.name || item.productName || item.displayName || "제주 여행 상품"),
     category: String(item.category || item.type || item.productType || item.kind || "여행 상품"),
+    region: String(item.regionName || item.region || item.location || item.cityName || item.city || ""),
+    description: String(item.description || item.summary || item.shortDescription || ""),
     priceText: String(item.priceText || item.displayPrice || item.priceLabel || item.salePrice || item.price || "가격 확인"),
     image,
     url: normalizeUrl(item.url || item.link || item.deepLink || item.webUrl || item.shareUrl)
@@ -378,18 +409,21 @@ export async function onRequestGet(context) {
   const targetUrl = buildTargetUrl(config, requestUrl);
   const keyword = boundedText(requestUrl.searchParams.get("keyword"), "제주");
   const limit = boundedInteger(requestUrl.searchParams.get("limit"), 6, 1, MAX_RESULT_LIMIT);
+  const contextMatch = matchContext(requestUrl);
   const fallbackAffiliateItems = affiliateItems(config, keyword);
 
   if (!targetUrl || !config.apiKey) {
     try {
-      const mcpItems = await mcpSearchItems(config, `${keyword} 액티비티`, limit);
-      if (mcpItems.length) {
+      const mcpItems = await mcpSearchItems(config, `${keyword} 액티비티`, MAX_RESULT_LIMIT);
+      const items = matchedItems(mcpItems, contextMatch, limit);
+      if (items.length) {
         return json({
           ok: true,
           configured: true,
           mcp: true,
-          items: mcpItems,
-          totalCount: mcpItems.length,
+          matched: true,
+          items,
+          totalCount: items.length,
           updatedAt: new Date().toISOString()
         });
       }
@@ -397,7 +431,7 @@ export async function onRequestGet(context) {
       // Continue to affiliate fallback or configuration guidance.
     }
 
-    if (fallbackAffiliateItems.length) {
+    if (fallbackAffiliateItems.length && contextMatch.scope === "home") {
       return json({
         ok: true,
         configured: true,
@@ -409,10 +443,11 @@ export async function onRequestGet(context) {
     }
 
     return json({
-      ok: false,
-      configured: false,
+      ok: true,
+      configured: Boolean(config.mcpUrl || fallbackAffiliateItems.length),
+      matched: false,
       items: [],
-      message: "MYREALTRIP_API_URL 또는 MYREALTRIP_API_KEY, MYREALTRIP_AFFILIATE_URL이 설정되지 않았습니다."
+      message: "이 글과 정확히 일치하는 마이리얼트립 상품이 없습니다."
     }, { cacheControl: "no-store" });
   }
 
@@ -428,28 +463,32 @@ export async function onRequestGet(context) {
       throw new Error(payload?.message || `MyRealTrip HTTP ${response.status}`);
     }
 
-    const items = asArray(payload)
+    const normalizedItems = asArray(payload)
       .map(normalizeItem)
       .filter((item) => item.title)
-      .slice(0, 12);
+      .slice(0, MAX_RESULT_LIMIT);
+    const items = matchedItems(normalizedItems, contextMatch, limit);
 
     return json({
       ok: true,
       configured: true,
+      matched: items.length > 0,
       items,
       totalCount: items.length,
       updatedAt: new Date().toISOString()
     });
   } catch (error) {
     try {
-      const mcpItems = await mcpSearchItems(config, `${keyword} 액티비티`, limit);
-      if (mcpItems.length) {
+      const mcpItems = await mcpSearchItems(config, `${keyword} 액티비티`, MAX_RESULT_LIMIT);
+      const items = matchedItems(mcpItems, contextMatch, limit);
+      if (items.length) {
         return json({
           ok: true,
           configured: true,
           mcp: true,
-          items: mcpItems,
-          totalCount: mcpItems.length,
+          matched: true,
+          items,
+          totalCount: items.length,
           message: "API 응답 실패로 MCP 상품 카드를 표시합니다.",
           updatedAt: new Date().toISOString()
         });
@@ -458,7 +497,7 @@ export async function onRequestGet(context) {
       // Continue to affiliate fallback or error response.
     }
 
-    if (fallbackAffiliateItems.length) {
+    if (fallbackAffiliateItems.length && contextMatch.scope === "home") {
       return json({
         ok: true,
         configured: true,
@@ -471,10 +510,11 @@ export async function onRequestGet(context) {
     }
 
     return json({
-      ok: false,
+      ok: true,
       configured: true,
+      matched: false,
       items: [],
-      message: error instanceof Error ? error.message : "마이리얼트립 정보를 불러오지 못했습니다."
-    }, { status: 502, cacheControl: "no-store" });
+      message: "이 글과 정확히 일치하는 마이리얼트립 상품이 없습니다."
+    }, { cacheControl: "no-store" });
   }
 }

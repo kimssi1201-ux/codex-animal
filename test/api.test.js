@@ -6,6 +6,7 @@ import { onRequestPost as adminPost } from "../functions/api/admin-posts.js";
 import { onRequestGet as beachesGet } from "../functions/api/beaches.js";
 import { onRequestGet as beachWeatherGet } from "../functions/api/beach-weather.js";
 import { onRequestGet as jejuGet } from "../functions/api/jeju.js";
+import { onRequestGet as myrealtripGet } from "../functions/api/myrealtrip.js";
 import { onRequestPost as accommodationPost } from "../functions/api/myrealtrip-accommodation.js";
 import { onRequestPost as flightPost } from "../functions/api/myrealtrip-flight.js";
 import { onRequestPost as tnaPost } from "../functions/api/myrealtrip-tna.js";
@@ -280,6 +281,205 @@ test("숙소 프록시는 지역 자동완성 응답을 정규화한다", async 
   const payload = await responseJson(response);
   assert.equal(response.status, 200);
   assert.deepEqual(payload.items[0], { regionId: "jeju", name: "제주", country: "대한민국", label: "대한민국 제주" });
+});
+
+test("마이리얼트립 상품은 기사 장소·카테고리와 일치할 때만 노출한다", async (t) => {
+  const mcpItems = [
+    {
+      title: "[서귀포] 프라이빗 스노클링 체험",
+      category: "해양 액티비티",
+      image: "https://images.test/snorkeling.jpg",
+      url: "https://experiences.myrealtrip.com/products/sea"
+    },
+    {
+      title: "[제주시] 동문시장 야시장 미식 투어",
+      category: "푸드 투어",
+      image: "https://images.test/food.jpg",
+      url: "https://experiences.myrealtrip.com/products/food"
+    }
+  ];
+
+  await t.test("관련 상품만 점수순으로 반환", async () => {
+    const response = await withMockFetch(async () => jsonResponse({
+      result: { content: [{ type: "text", text: JSON.stringify({ items: mcpItems }) }] }
+    }), () => myrealtripGet(context("https://site.test/api/myrealtrip?keyword=%EC%A0%9C%EC%A3%BC+%EB%8F%99%EB%AC%B8%EC%8B%9C%EC%9E%A5+%EB%A7%9B%EC%A7%91&scope=article&title=%EB%8F%99%EB%AC%B8%EC%8B%9C%EC%9E%A5+%EC%A0%80%EB%85%81+%EB%A8%B9%EA%B1%B0%EB%A6%AC&spot=%EB%8F%99%EB%AC%B8%EC%8B%9C%EC%9E%A5&category=%EB%A7%9B%EC%A7%91&region=%EC%A0%9C%EC%A3%BC%EC%8B%9C", {
+      MYREALTRIP_MCP_URL: "https://mcp.test/mcp"
+    })));
+    const payload = await responseJson(response);
+    assert.equal(response.status, 200);
+    assert.equal(payload.matched, true);
+    assert.deepEqual(payload.items.map((item) => item.title), ["[제주시] 동문시장 야시장 미식 투어"]);
+  });
+
+  await t.test("관련 상품이 없으면 제휴 링크를 억지로 대체하지 않음", async () => {
+    const response = await withMockFetch(async () => jsonResponse({
+      result: { content: [{ type: "text", text: JSON.stringify({ items: [mcpItems[0]] }) }] }
+    }), () => myrealtripGet(context("https://site.test/api/myrealtrip?keyword=%EC%A0%9C%EC%A3%BC+%EB%8F%99%EB%AC%B8%EC%8B%9C%EC%9E%A5+%EB%A7%9B%EC%A7%91&scope=article&title=%EB%8F%99%EB%AC%B8%EC%8B%9C%EC%9E%A5&spot=%EB%8F%99%EB%AC%B8%EC%8B%9C%EC%9E%A5&category=%EB%A7%9B%EC%A7%91&region=%EC%A0%9C%EC%A3%BC%EC%8B%9C", {
+      MYREALTRIP_MCP_URL: "https://mcp.test/mcp",
+      MYREALTRIP_AFFILIATE_URL: "https://affiliate.test/jeju"
+    })));
+    const payload = await responseJson(response);
+    assert.equal(response.status, 200);
+    assert.equal(payload.matched, false);
+    assert.deepEqual(payload.items, []);
+  });
+
+  await t.test("구조화 상품에 링크가 없으면 MCP 위젯 링크와 이미지를 결합", async () => {
+    const structuredItem = {
+      title: "성산일출봉 바다 카약",
+      category: "해양 체험"
+    };
+    const widget = {
+      children: [{
+        type: "ListViewItem",
+        onClickAction: { url: "https://experiences.myrealtrip.com/products/seongsan-kayak" },
+        children: [
+          { type: "Image", src: "https://images.test/seongsan-kayak.jpg" },
+          { type: "Text", value: structuredItem.title },
+          { type: "Text", value: "25,000원~" }
+        ]
+      }]
+    };
+    const response = await withMockFetch(async () => jsonResponse({
+      result: {
+        structuredContent: { items: [structuredItem] },
+        content: [{ type: "text", text: JSON.stringify({ widget }) }]
+      }
+    }), () => myrealtripGet(context("https://site.test/api/myrealtrip?keyword=%EC%A0%9C%EC%A3%BC+%EC%84%B1%EC%82%B0%EC%9D%BC%EC%B6%9C%EB%B4%89&scope=article&title=%EC%84%B1%EC%82%B0%EC%9D%BC%EC%B6%9C%EB%B4%89+%EC%9D%BC%EC%B6%9C+%EC%97%AC%ED%96%89&spot=%EC%84%B1%EC%82%B0%EC%9D%BC%EC%B6%9C%EB%B4%89&category=%ED%95%B4%EB%B3%80&region=%EC%A0%9C%EC%A3%BC+%EB%8F%99%EB%B6%80+%EC%84%B1%EC%82%B0", {
+      MYREALTRIP_MCP_URL: "https://mcp.test/mcp"
+    })));
+    const payload = await responseJson(response);
+    assert.equal(payload.items.length, 1);
+    assert.equal(payload.items[0].url, "https://experiences.myrealtrip.com/products/seongsan-kayak");
+    assert.equal(payload.items[0].image, "https://images.test/seongsan-kayak.jpg");
+  });
+});
+
+test("숙소 상품은 기본 날짜를 적용하고 기사 지역과 맞는 결과만 반환한다", async () => {
+  let requestBody;
+  const stayItems = [
+    {
+      gid: 1,
+      name: "더 베스트 제주 성산",
+      description: "4성급 · 호텔 · 성산 · 서귀포",
+      price: "81,000원/박",
+      rating: 4.2,
+      thumbnailUrl: "https://images.test/seongsan.jpg"
+    },
+    {
+      gid: 2,
+      name: "중문 리조트",
+      description: "5성급 · 리조트 · 중문 · 서귀포",
+      price: "300,000원/박",
+      rating: 4.7,
+      thumbnailUrl: "https://images.test/jungmun.jpg"
+    }
+  ];
+  const widget = {
+    children: stayItems.map((item) => ({
+      type: "ListViewItem",
+      onClickAction: { url: `https://accommodation.myrealtrip.com/union/products/${item.gid}` },
+      children: [
+        { type: "Image", src: item.thumbnailUrl },
+        { type: "Text", value: item.name },
+        { type: "Text", value: item.price }
+      ]
+    }))
+  };
+
+  const response = await withMockFetch(async (url, options) => {
+    requestBody = JSON.parse(options.body);
+    return jsonResponse({
+      result: {
+        structuredContent: { stays: stayItems },
+        content: [{ type: "text", text: JSON.stringify({ widget }) }]
+      }
+    });
+  }, () => accommodationPost(context("https://site.test/api/myrealtrip-accommodation?action=search", {
+    MYREALTRIP_MCP_URL: "https://mcp.test/mcp"
+  }, {
+    method: "POST",
+    body: JSON.stringify({
+      keyword: "성산",
+      title: "성산일출봉 일출 여행 코스",
+      spot: "성산일출봉",
+      region: "제주 동부 · 성산",
+      category: "숙소",
+      scope: "article",
+      limit: 4
+    })
+  })));
+
+  const payload = await responseJson(response);
+  const args = requestBody.params.arguments;
+  assert.match(args.checkIn, /^\d{4}-\d{2}-\d{2}$/);
+  assert.match(args.checkOut, /^\d{4}-\d{2}-\d{2}$/);
+  assert.notEqual(args.checkIn, args.checkOut);
+  assert.equal(payload.matched, true);
+  assert.equal(payload.items.length, 1);
+  assert.equal(payload.items[0].title, "더 베스트 제주 성산");
+  assert.equal(payload.items[0].url, "https://accommodation.myrealtrip.com/union/products/1");
+  assert.deepEqual(payload.searchDates, { checkIn: args.checkIn, checkOut: args.checkOut });
+});
+
+test("숙소 상품은 기사 세부 권역과 검색 키워드가 함께 맞는 결과를 우선한다", async () => {
+  let requestBody;
+  const stayItems = [
+    {
+      gid: 1,
+      name: "조천 해변 호텔",
+      description: "4성급 · 호텔 · 조천 · 제주시",
+      price: "95,000원/박",
+      thumbnailUrl: "https://images.test/jocheon.jpg"
+    },
+    {
+      gid: 2,
+      name: "호텔 휘슬락 제주",
+      description: "4성급 · 호텔 · 제주 시내 · 제주시",
+      price: "105,000원/박",
+      thumbnailUrl: "https://images.test/jeju-city.jpg"
+    }
+  ];
+  const widget = {
+    children: stayItems.map((item) => ({
+      type: "ListViewItem",
+      onClickAction: { url: `https://accommodation.myrealtrip.com/union/products/${item.gid}` },
+      children: [
+        { type: "Image", src: item.thumbnailUrl },
+        { type: "Text", value: item.name },
+        { type: "Text", value: item.price }
+      ]
+    }))
+  };
+
+  const response = await withMockFetch(async (url, options) => {
+    requestBody = JSON.parse(options.body);
+    return jsonResponse({
+      result: {
+        structuredContent: { stays: stayItems },
+        content: [{ type: "text", text: JSON.stringify({ widget }) }]
+      }
+    });
+  }, () => accommodationPost(context("https://site.test/api/myrealtrip-accommodation?action=search", {
+    MYREALTRIP_MCP_URL: "https://mcp.test/mcp"
+  }, {
+    method: "POST",
+    body: JSON.stringify({
+      keyword: "제주 시내",
+      title: "동문시장 저녁 먹거리 동선",
+      spot: "동문시장",
+      region: "제주시 · 원도심",
+      scope: "article",
+      limit: 1
+    })
+  })));
+
+  const payload = await responseJson(response);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.equal(requestBody.params.arguments.keyword, "제주 시내");
+  assert.equal(requestBody.params.arguments.size, 12);
+  assert.equal(payload.items.length, 1);
+  assert.equal(payload.items[0].title, "호텔 휘슬락 제주");
 });
 
 test("투어티켓 MCP 프록시는 정상 카테고리와 잘못된 action을 처리한다", async (t) => {
