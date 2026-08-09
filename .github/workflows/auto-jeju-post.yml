@@ -8,8 +8,12 @@ on:
         required: false
         default: "1"
   schedule:
-    # 07:20 KST every day
-    - cron: "20 22 * * *"
+    # Every hour at :23 (KST and UTC share the same minute value)
+    - cron: "23 * * * *"
+
+concurrency:
+  group: auto-jeju-post
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -42,4 +46,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add jeju-travel-news/assets/articles.js sitemap.xml feed.xml
           git commit -m "Auto publish Jeju travel post"
+          git pull --rebase origin main
           git push

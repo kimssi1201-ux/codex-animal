@@ -133,6 +133,12 @@ function todayKst() {
   }).format(new Date());
 }
 
+function boundedPostCount(value) {
+  const count = Number(value);
+  if (!Number.isFinite(count)) return 1;
+  return Math.min(10, Math.max(1, Math.trunc(count)));
+}
+
 function normalizeText(value) {
   return String(value || "")
     .replace(/\s+/g, "")
@@ -283,7 +289,7 @@ function buildCourse(candidate, place, nearby) {
   return [place, nearby[0] || "주변 산책", nearby[1] || "카페 휴식", nearby[2] || "식사"];
 }
 
-function buildArticle(candidate, date, official = null, usedImageKeys = new Set()) {
+function buildArticle(candidate, date, publishAt, official = null, usedImageKeys = new Set()) {
   const [place, region, nearby] = inferPlace(candidate.title);
   const course = buildCourse(candidate, place, nearby);
   const imagePool = imageByCategory[candidate.category] || [fallbackImage];
@@ -303,6 +309,7 @@ function buildArticle(candidate, date, official = null, usedImageKeys = new Set(
     slug,
     category: candidate.category,
     status: "published",
+    publishAt,
     region,
     image,
     summary: `${objectPhrase(place)} 중심으로 ${intent} 관련 정보를 확인하기 좋게 정리한 제주 여행 정보입니다.`,
@@ -383,7 +390,7 @@ function buildSitemap(articles, date) {
     },
     ...articles.filter((article) => isPublic(article, date)).map((article) => ({
       loc: `${siteUrl}/article.html?slug=${encodeURIComponent(article.slug)}`,
-      lastmod: article.date || date,
+      lastmod: article.publishAt || article.date || date,
       changefreq: "weekly",
       priority: "0.8"
     }))
@@ -392,8 +399,9 @@ function buildSitemap(articles, date) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((item) => `  <url>\n    <loc>${xmlEscape(item.loc)}</loc>\n    <lastmod>${xmlEscape(item.lastmod)}</lastmod>\n    <changefreq>${item.changefreq}</changefreq>\n    <priority>${item.priority}</priority>\n  </url>`).join("\n")}\n</urlset>\n`;
 }
 
-function pubDate(date) {
-  const parsed = new Date(`${date || todayKst()}T00:00:00+09:00`);
+function pubDate(value) {
+  const raw = value || todayKst();
+  const parsed = new Date(String(raw).includes("T") ? raw : `${raw}T00:00:00+09:00`);
   return parsed.toUTCString();
 }
 
@@ -403,15 +411,16 @@ function buildFeed(articles, date) {
     .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")))
     .slice(0, 30);
 
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0">\n<channel>\n  <title>제주여행뉴스</title>\n  <link>${siteUrl}/</link>\n  <description>제주 가볼 만한 곳, 맛집, 카페, 숙소, 계절 코스를 정리하는 제주 여행 정보 매거진</description>\n  <language>ko-KR</language>\n  <lastBuildDate>${new Date(`${date}T00:00:00+09:00`).toUTCString()}</lastBuildDate>\n${items.map((article) => {
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0">\n<channel>\n  <title>제주여행뉴스</title>\n  <link>${siteUrl}/</link>\n  <description>제주 가볼 만한 곳, 맛집, 카페, 숙소, 계절 코스를 정리하는 제주 여행 정보 매거진</description>\n  <language>ko-KR</language>\n  <lastBuildDate>${pubDate(items[0]?.publishAt || date)}</lastBuildDate>\n${items.map((article) => {
     const link = `${siteUrl}/article.html?slug=${encodeURIComponent(article.slug)}`;
-    return `  <item>\n    <title>${xmlEscape(article.title)}</title>\n    <link>${xmlEscape(link)}</link>\n    <guid isPermaLink="true">${xmlEscape(link)}</guid>\n    <description>${xmlEscape(article.summary)}</description>\n    <category>${xmlEscape(article.category)}</category>\n    <pubDate>${pubDate(article.date || date)}</pubDate>\n  </item>`;
+    return `  <item>\n    <title>${xmlEscape(article.title)}</title>\n    <link>${xmlEscape(link)}</link>\n    <guid isPermaLink="true">${xmlEscape(link)}</guid>\n    <description>${xmlEscape(article.summary)}</description>\n    <category>${xmlEscape(article.category)}</category>\n    <pubDate>${pubDate(article.publishAt || article.date || date)}</pubDate>\n  </item>`;
   }).join("\n")}\n</channel>\n</rss>\n`;
 }
 
 async function main() {
   const date = todayKst();
-  const count = Math.max(1, Number(process.env.AUTO_POST_COUNT || "1"));
+  const publishAt = new Date().toISOString();
+  const count = boundedPostCount(process.env.AUTO_POST_COUNT || "1");
   const { categories, articles } = await importArticles();
   const candidates = await parseRoadmap();
   const nextArticles = [...articles];
@@ -422,7 +431,7 @@ async function main() {
     if (added.length >= count) break;
     if (alreadyCovered(candidate, nextArticles)) continue;
     const official = await fetchOfficialInfo(candidate);
-    const article = buildArticle(candidate, date, official, usedImageKeys);
+    const article = buildArticle(candidate, date, publishAt, official, usedImageKeys);
     if (nextArticles.some((item) => item.slug === article.slug)) continue;
     nextArticles.unshift(article);
     usedImageKeys.add(imageKey(article.image));

@@ -632,3 +632,16 @@ test("정적 진입점은 제주 페이지의 모듈·해변 섹션을 유지한
     assert.match(html, /assets\/styles\.css\?v=/);
   }
 });
+
+test("자동 발행은 매시간 한 글과 실제 발행 시각을 설정한다", async () => {
+  const [workflow, generator] = await Promise.all([
+    readFile(new URL("../.github/workflows/auto-jeju-post.yml", import.meta.url), "utf8"),
+    readFile(new URL("../scripts/auto-jeju-post.mjs", import.meta.url), "utf8")
+  ]);
+  assert.match(workflow, /cron:\s*["']23 \* \* \* \*["']/);
+  assert.match(workflow, /group:\s*auto-jeju-post/);
+  assert.match(workflow, /AUTO_POST_COUNT:\s*\$\{\{ github\.event\.inputs\.count \|\| '1' \}\}/);
+  assert.match(generator, /const publishAt = new Date\(\)\.toISOString\(\)/);
+  assert.match(generator, /Math\.min\(10, Math\.max\(1, Math\.trunc\(count\)\)\)/);
+  assert.match(generator, /pubDate\(article\.publishAt \|\| article\.date \|\| date\)/);
+});

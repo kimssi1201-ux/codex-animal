@@ -44,11 +44,11 @@ API 키는 브라우저 코드, 저장소, `.env` 예제에 기록하지 않습�
 실제 GitHub 저장을 쓰려면 Cloudflare Pages 환경변수에 `ADMIN_TOKEN`과 `GITHUB_TOKEN`을 추가합니다.
 자세한 내용은 `ADMIN.md`를 확인하세요.
 
-## 매일 자동 발행
+## 매시간 자동 발행
 
-GitHub Actions의 `Auto Jeju Post` 워크플로가 매일 07:20(KST)에 실행됩니다.
+GitHub Actions의 `Auto Jeju Post` 워크플로가 매시 23분에 실행됩니다.
 
-- `scripts/auto-jeju-post.mjs`가 콘텐츠 로드맵에서 아직 쓰지 않은 주제를 1개 고릅니다.
+- `scripts/auto-jeju-post.mjs`가 콘텐츠 로드맵에서 아직 쓰지 않은 주제를 매시간 1개 고릅니다.
 - `jeju-travel-news/assets/articles.js`에 새 글을 추가합니다.
 - `sitemap.xml`, `feed.xml`을 함께 갱신합니다.
 - GitHub에 커밋하면 Cloudflare Pages가 자동 배포합니다.
