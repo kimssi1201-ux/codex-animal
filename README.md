@@ -32,6 +32,12 @@ Cloudflare Pages 환경변수에 한국관광공사 서비스 키를 저장합�
 
 해수욕장 기본정보를 사용하려면 Cloudflare Pages 환경변수에 `OCEANS_BEACH_API_KEY`를 저장합니다. 인증키는 브라우저나 GitHub 저장소에 넣지 않고 `/api/beaches` 서버 함수에서만 사용합니다.
 
+## 마이리얼트립 제휴 링크
+
+Cloudflare Pages 비밀 변수 `MYREALTRIP_API_KEY`에 마케팅 파트너 API 키를 저장합니다. 상품 카드는 `/api/myrealtrip-link`를 거쳐 공식 `POST /v1/mylink` 응답으로 이동하며, 제휴 API가 실패하면 사용자가 상품을 계속 볼 수 있도록 검증된 원본 마이리얼트립 URL로 이동합니다.
+
+API 키는 브라우저 코드, 저장소, `.env` 예제에 기록하지 않습니다. 별도의 링크 생성 주소를 발급받았다면 `MYREALTRIP_MYLINK_API_URL`로 지정할 수 있습니다.
+
 ## 관리자
 
 `/admin/`에서 제주 여행 글을 검색, 편집, 예약 상태로 관리할 수 있습니다.

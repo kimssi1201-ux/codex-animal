@@ -1,3 +1,5 @@
+import { affiliateItems as withAffiliateLinks } from "../lib/myrealtrip-link.js";
+
 const DEFAULT_TIMEOUT_MS = 9000;
 const DEFAULT_MCP_URL = "https://mcp-servers.myrealtrip.com/mcp";
 const DEFAULT_AIRPORT_AUTOCOMPLETE_PATH = "/v1/products/flight/airport-autocomplete";
@@ -324,7 +326,13 @@ export async function onRequestPost(context) {
         maxResults: boundedInteger(body.limit, 8, 1, MAX_RESULT_COUNT)
       });
       const items = mcpFlightItems(parsed);
-      return json({ ok: true, configured: true, mcp: true, action, items });
+      return json({
+        ok: true,
+        configured: true,
+        mcp: true,
+        action,
+        items: withAffiliateLinks(items, context.request.url, context.env || {})
+      });
     } catch (error) {
       return json({
         ok: false,
@@ -360,7 +368,12 @@ export async function onRequestPost(context) {
 
     if (action === "lowest-price-calendar") {
       const items = asArray(payload).map(normalizeCalendarItem).filter((item) => item.date || item.price);
-      return json({ ok: true, configured: true, action, items });
+      return json({
+        ok: true,
+        configured: true,
+        action,
+        items: withAffiliateLinks(items, context.request.url, context.env || {})
+      });
     }
 
     const items = asArray(payload).map(normalizeAirport).filter((item) => item.code || item.name);

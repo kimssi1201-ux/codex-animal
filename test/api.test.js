@@ -7,6 +7,7 @@ import { onRequestGet as beachesGet } from "../functions/api/beaches.js";
 import { onRequestGet as beachWeatherGet } from "../functions/api/beach-weather.js";
 import { onRequestGet as jejuGet } from "../functions/api/jeju.js";
 import { onRequestGet as myrealtripGet } from "../functions/api/myrealtrip.js";
+import { onRequestGet as myrealtripLinkGet } from "../functions/api/myrealtrip-link.js";
 import { onRequestPost as accommodationPost } from "../functions/api/myrealtrip-accommodation.js";
 import { onRequestPost as flightPost } from "../functions/api/myrealtrip-flight.js";
 import { onRequestPost as tnaPost } from "../functions/api/myrealtrip-tna.js";
@@ -352,6 +353,78 @@ test("마이리얼트립 상품은 기사 장소·카테고리와 일치할 때�
     assert.equal(payload.items.length, 1);
     assert.equal(payload.items[0].url, "https://experiences.myrealtrip.com/products/seongsan-kayak");
     assert.equal(payload.items[0].image, "https://images.test/seongsan-kayak.jpg");
+  });
+
+  await t.test("API 키가 있으면 상품 링크를 서버 마이링크 경유 주소로 변환", async () => {
+    const response = await withMockFetch(async () => jsonResponse({
+      result: { content: [{ type: "text", text: JSON.stringify({ items: [mcpItems[1]] }) }] }
+    }), () => myrealtripGet(context("https://site.test/api/myrealtrip?keyword=%EC%A0%9C%EC%A3%BC+%EB%8F%99%EB%AC%B8%EC%8B%9C%EC%9E%A5+%EB%A7%9B%EC%A7%91&scope=article&title=%EB%8F%99%EB%AC%B8%EC%8B%9C%EC%9E%A5+%EC%A0%80%EB%85%81+%EB%A8%B9%EA%B1%B0%EB%A6%AC&spot=%EB%8F%99%EB%AC%B8%EC%8B%9C%EC%9E%A5&category=%EB%A7%9B%EC%A7%91&region=%EC%A0%9C%EC%A3%BC%EC%8B%9C", {
+      MYREALTRIP_MCP_URL: "https://mcp.test/mcp",
+      MYREALTRIP_API_KEY: "test-key"
+    })));
+    const payload = await responseJson(response);
+    const linkedUrl = new URL(payload.items[0].url);
+    assert.equal(linkedUrl.origin, "https://site.test");
+    assert.equal(linkedUrl.pathname, "/api/myrealtrip-link");
+    assert.equal(linkedUrl.searchParams.get("target"), mcpItems[1].url);
+  });
+});
+
+test("마이리얼트립 마이링크 리디렉터는 입력과 장애를 안전하게 처리한다", async (t) => {
+  await t.test("빈 값과 외부 도메인을 거부", async () => {
+    let calls = 0;
+    await withMockFetch(async () => {
+      calls += 1;
+      return jsonResponse({});
+    }, async () => {
+      const empty = await myrealtripLinkGet(context("https://site.test/api/myrealtrip-link"));
+      const external = await myrealtripLinkGet(context("https://site.test/api/myrealtrip-link?target=https%3A%2F%2Fevil.test%2Foffer"));
+      assert.equal(empty.status, 400);
+      assert.equal(external.status, 400);
+    });
+    assert.equal(calls, 0);
+  });
+
+  await t.test("API 키가 없으면 검증된 원본 상품으로 이동", async () => {
+    const target = "https://experiences.myrealtrip.com/products/jeju-tour";
+    const response = await myrealtripLinkGet(context(`https://site.test/api/myrealtrip-link?target=${encodeURIComponent(target)}`));
+    assert.equal(response.status, 302);
+    assert.equal(response.headers.get("location"), target);
+    assert.equal(response.headers.get("x-affiliate-tracking"), "fallback");
+    assert.equal(response.headers.get("cache-control"), "no-store");
+  });
+
+  await t.test("공식 API 응답의 마이링크로 이동", async () => {
+    const target = "https://experiences.myrealtrip.com/products/jeju-tour?date=2026-08-10";
+    let request;
+    const response = await withMockFetch(async (url, options) => {
+      request = { url, options };
+      return jsonResponse({ mylink: "https://affiliate.example/mylink/123", mylinkId: 123 });
+    }, () => myrealtripLinkGet(context(`https://site.test/api/myrealtrip-link?target=${encodeURIComponent(target)}`, {
+      MYREALTRIP_API_KEY: "test-key",
+      MYREALTRIP_MYLINK_API_URL: "https://partner.test/v1/mylink"
+    })));
+
+    assert.equal(request.url, "https://partner.test/v1/mylink");
+    assert.equal(request.options.headers.authorization, "Bearer test-key");
+    assert.deepEqual(JSON.parse(request.options.body), { targetUrl: target });
+    assert.equal(response.status, 302);
+    assert.equal(response.headers.get("location"), "https://affiliate.example/mylink/123");
+    assert.equal(response.headers.get("x-affiliate-tracking"), "mylink");
+    assert.match(response.headers.get("cache-control"), /s-maxage=86400/);
+  });
+
+  await t.test("제휴 API 오류면 원본 상품 링크로 복구", async () => {
+    const target = "https://www.myrealtrip.com/offers/123";
+    const response = await withMockFetch(async () => jsonResponse({ message: "temporary error" }, 503), () => (
+      myrealtripLinkGet(context(`https://site.test/api/myrealtrip-link?target=${encodeURIComponent(target)}`, {
+        MYREALTRIP_API_KEY: "test-key",
+        MYREALTRIP_MYLINK_API_URL: "https://partner.test/v1/mylink"
+      }))
+    ));
+    assert.equal(response.status, 302);
+    assert.equal(response.headers.get("location"), target);
+    assert.equal(response.headers.get("x-affiliate-tracking"), "fallback");
   });
 });
 

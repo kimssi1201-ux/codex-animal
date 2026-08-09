@@ -1,4 +1,5 @@
 import { rankAffiliateItems } from "../lib/affiliate-match.js";
+import { affiliateItems as withAffiliateLinks } from "../lib/myrealtrip-link.js";
 
 const DEFAULT_TIMEOUT_MS = 9000;
 const DEFAULT_MCP_URL = "https://mcp-servers.myrealtrip.com/mcp";
@@ -417,13 +418,14 @@ export async function onRequestGet(context) {
       const mcpItems = await mcpSearchItems(config, `${keyword} 액티비티`, MAX_RESULT_LIMIT);
       const items = matchedItems(mcpItems, contextMatch, limit);
       if (items.length) {
+        const linkedItems = withAffiliateLinks(items, context.request.url, context.env || {});
         return json({
           ok: true,
           configured: true,
           mcp: true,
           matched: true,
-          items,
-          totalCount: items.length,
+          items: linkedItems,
+          totalCount: linkedItems.length,
           updatedAt: new Date().toISOString()
         });
       }
@@ -468,13 +470,14 @@ export async function onRequestGet(context) {
       .filter((item) => item.title)
       .slice(0, MAX_RESULT_LIMIT);
     const items = matchedItems(normalizedItems, contextMatch, limit);
+    const linkedItems = withAffiliateLinks(items, context.request.url, context.env || {});
 
     return json({
       ok: true,
       configured: true,
       matched: items.length > 0,
-      items,
-      totalCount: items.length,
+      items: linkedItems,
+      totalCount: linkedItems.length,
       updatedAt: new Date().toISOString()
     });
   } catch (error) {
@@ -482,13 +485,14 @@ export async function onRequestGet(context) {
       const mcpItems = await mcpSearchItems(config, `${keyword} 액티비티`, MAX_RESULT_LIMIT);
       const items = matchedItems(mcpItems, contextMatch, limit);
       if (items.length) {
+        const linkedItems = withAffiliateLinks(items, context.request.url, context.env || {});
         return json({
           ok: true,
           configured: true,
           mcp: true,
           matched: true,
-          items,
-          totalCount: items.length,
+          items: linkedItems,
+          totalCount: linkedItems.length,
           message: "API 응답 실패로 MCP 상품 카드를 표시합니다.",
           updatedAt: new Date().toISOString()
         });

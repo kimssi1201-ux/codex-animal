@@ -1,3 +1,5 @@
+import { affiliateItems as withAffiliateLinks } from "../lib/myrealtrip-link.js";
+
 const DEFAULT_TIMEOUT_MS = 9000;
 const DEFAULT_MCP_URL = "https://mcp-servers.myrealtrip.com/mcp";
 const DEFAULT_CATEGORIES_PATH = "/v1/products/tna/categories";
@@ -413,7 +415,13 @@ export async function onRequestPost(context) {
         if (body.sort) args.sort = boundedText(body.sort, "", 40);
         const parsed = await callMcpTool(config, "searchTnas", args);
         const items = normalizeMcpProducts(parsed).slice(0, MAX_RESULT_COUNT);
-        return json({ ok: true, configured: true, mcp: true, action, items });
+        return json({
+          ok: true,
+          configured: true,
+          mcp: true,
+          action,
+          items: withAffiliateLinks(items, context.request.url, context.env || {})
+        });
       }
 
       if (action === "detail") {
@@ -422,7 +430,13 @@ export async function onRequestPost(context) {
           url: boundedText(body.url, "", 500)
         });
         const items = normalizeMcpProducts(parsed).slice(0, 1);
-        return json({ ok: true, configured: true, mcp: true, action, items });
+        return json({
+          ok: true,
+          configured: true,
+          mcp: true,
+          action,
+          items: withAffiliateLinks(items, context.request.url, context.env || {})
+        });
       }
     } catch (error) {
       return json({
@@ -462,11 +476,17 @@ export async function onRequestPost(context) {
 
     if (action === "detail") {
       const item = target.normalize(payload?.item || payload?.data || payload);
-      return json({ ok: true, configured: true, action, item, items: item.title ? [item] : [] });
+      const items = withAffiliateLinks(item.title ? [item] : [], context.request.url, context.env || {});
+      return json({ ok: true, configured: true, action, item: items[0] || item, items });
     }
 
     const items = asArray(payload).map(target.normalize).filter((item) => item.value || item.title);
-    return json({ ok: true, configured: true, action, items: items.slice(0, MAX_RESULT_COUNT) });
+    return json({
+      ok: true,
+      configured: true,
+      action,
+      items: withAffiliateLinks(items.slice(0, MAX_RESULT_COUNT), context.request.url, context.env || {})
+    });
   } catch (error) {
     return json({
       ok: false,

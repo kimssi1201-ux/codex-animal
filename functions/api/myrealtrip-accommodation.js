@@ -1,4 +1,5 @@
 import { rankAffiliateItems } from "../lib/affiliate-match.js";
+import { affiliateItems as withAffiliateLinks } from "../lib/myrealtrip-link.js";
 
 const DEFAULT_TIMEOUT_MS = 9000;
 const DEFAULT_MCP_URL = "https://mcp-servers.myrealtrip.com/mcp";
@@ -456,14 +457,15 @@ export async function onRequestPost(context) {
         limit,
         allowUnmatched: contextMatch.scope === "home"
       });
+      const linkedItems = withAffiliateLinks(items, context.request.url, context.env || {});
       return json({
         ok: true,
         configured: true,
         mcp: true,
         action,
-        matched: items.length > 0,
+        matched: linkedItems.length > 0,
         searchDates: { checkIn, checkOut },
-        items
+        items: linkedItems
       });
     } catch (error) {
       return json({
@@ -507,8 +509,17 @@ export async function onRequestPost(context) {
           allowUnmatched: body.scope === "home"
         })
       : normalizedItems;
+    const linkedItems = isSearch
+      ? withAffiliateLinks(items, context.request.url, context.env || {})
+      : items;
 
-    return json({ ok: true, configured: true, action, matched: isSearch ? items.length > 0 : undefined, items });
+    return json({
+      ok: true,
+      configured: true,
+      action,
+      matched: isSearch ? linkedItems.length > 0 : undefined,
+      items: linkedItems
+    });
   } catch (error) {
     return json({
       ok: false,
