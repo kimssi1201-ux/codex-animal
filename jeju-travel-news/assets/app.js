@@ -185,17 +185,6 @@ let beachWeatherObserver = null;
 let articleThumbnailObserver = null;
 const observedArticleThumbs = new WeakSet();
 
-const todayKeywords = [
-  { label: "제주 가볼만한 곳", category: "가볼 만한 곳" },
-  { label: "제주 해변", category: "해변" },
-  { label: "제주 맛집", category: "맛집" },
-  { label: "카페 투어", category: "카페" },
-  { label: "오름 산책", category: "오름" },
-  { label: "계절 코스", category: "계절 코스" },
-  { label: "숙소 위치", category: "숙소" },
-  { label: "비 오는 날", category: "계절 코스" }
-];
-
 const faqItems = [
   {
     question: "제주여행뉴스에서는 무엇을 먼저 보면 좋나요?",
@@ -244,7 +233,7 @@ const languageCatalog = {
       brandName: "제주여행뉴스",
       brandTagline: "제주를 깊게 읽는 여행 매거진",
       editorialLine: "제주를 깊게 읽는 여행 매거진",
-      homeIntro: "장소 하나보다 동선과 계절, 주변 이야기를 함께 읽는 제주 여행을 제안합니다.",
+      homeIntro: "계절과 동선에 맞는 제주 여행 정보를 한눈에 정리했습니다.",
       plan: "여행 준비",
       menu: "메뉴 열기",
       list: "목록",
@@ -252,7 +241,7 @@ const languageCatalog = {
       products: "여행 상품",
       check: "방문 전 체크",
       recommended: "이번 주 제주",
-      julyTitle: "제주를 깊게 읽는 여행 가이드",
+      julyTitle: "제주 여행 가이드",
       latest: "새로 올라온 여행 이야기",
       places: "가볼 만한 곳",
       photoGallery: "사진으로 보는 제주",
@@ -271,7 +260,6 @@ const languageCatalog = {
       travelDesk: "여행 준비"
     },
     categories: { "가볼 만한 곳": "가볼 만한 곳", "맛집": "맛집", "카페": "카페", "숙소": "숙소", "해변": "해변", "오름": "오름", "계절 코스": "계절 코스" },
-    todayKeywords: ["제주 가볼만한 곳", "제주 해변", "제주 맛집", "카페 투어", "오름 산책", "계절 코스", "숙소 위치", "비 오는 날"],
     faq: [
       ["제주여행뉴스에서는 무엇을 먼저 보면 좋나요?", "추천 기사를 먼저 보고, 관심 있는 카테고리를 고르면 됩니다. 처음 방문이라면 가볼 만한 곳, 해변, 계절 코스 순서로 보는 편이 쉽습니다."],
       ["관광지 정보는 어디에서 확인하나요?", "뉴스 피드 안의 장소 카드를 열면 주소, 분류, 위치 확인 링크를 볼 수 있습니다. 운영시간과 요금은 방문 직전 공식 안내를 다시 확인하세요."],
@@ -286,7 +274,7 @@ const languageCatalog = {
       brandName: "Jeju Travel News",
       brandTagline: "An editorial guide to Jeju",
       editorialLine: "An editorial guide to Jeju",
-      homeIntro: "Read Jeju through connected routes, seasons and local stories instead of isolated stops.",
+      homeIntro: "Clear Jeju travel information organized by season and route.",
       plan: "Plan your trip",
       menu: "Open menu",
       list: "List",
@@ -294,7 +282,7 @@ const languageCatalog = {
       products: "Travel Picks",
       check: "Before You Go",
       recommended: "This Week in Jeju",
-      julyTitle: "A Deeper Guide to Jeju",
+      julyTitle: "Jeju Travel Guide",
       latest: "New from Jeju",
       places: "Places to Visit",
       photoGallery: "Jeju in Photos",
@@ -313,7 +301,6 @@ const languageCatalog = {
       travelDesk: "Trip Planning"
     },
     categories: { "가볼 만한 곳": "Places to Visit", "맛집": "Food", "카페": "Cafes", "숙소": "Stays", "해변": "Beaches", "오름": "Oreum Trails", "계절 코스": "Seasonal Routes" },
-    todayKeywords: ["Jeju places", "Jeju beaches", "Jeju food", "Cafe tours", "Oreum walks", "Seasonal routes", "Stay areas", "Rainy-day ideas"],
     faq: [["What should I read first?", "Start with the featured stories, then choose a category that matches your trip. Places, beaches and seasonal routes are a simple starting point."], ["Where can I check place details?", "Open a place card to see its address, category and map link. Confirm opening hours and fees with the official source before visiting."], ["Does the site include products or ads?", "Travel preparation product areas may appear alongside the information feed."]],
     visitCheck: [["Opening hours", "Waterfalls, museums and paid attractions may stop entry earlier than closing time."], ["Weather", "Wind, fog and rain can change the difficulty of oreum and beach visits."], ["Parking", "During busy periods, compare public parking and walking distance before driving in."], ["Route", "A single region per day is usually easier than crossing the whole island."]],
     footerGroups: [["Jeju Travel", ["Places to Visit", "Beaches", "Oreum Trails", "Seasonal Routes"]], ["Trip Planning", ["Before You Go", "Stay Areas", "Rainy-day Ideas", "Family Trips"]], ["Regions", ["Jeju City", "Seogwipo", "Seongsan", "Aewol"]], ["Language", ["한국어", "English", "日本語", "中文"]]]
@@ -324,7 +311,7 @@ const languageCatalog = {
       brandName: "済州旅行ニュース",
       brandTagline: "済州を深く読む旅行マガジン",
       editorialLine: "済州を深く読む旅行マガジン",
-      homeIntro: "一つの場所だけでなく、動線や季節、周辺の物語までつなげて済州を紹介します。",
+      homeIntro: "季節と動線に合わせた済州旅行情報を分かりやすくまとめました。",
       plan: "旅行準備",
       menu: "メニューを開く",
       list: "一覧",
@@ -332,7 +319,7 @@ const languageCatalog = {
       products: "旅行商品",
       check: "訪問前チェック",
       recommended: "今週の済州",
-      julyTitle: "済州を深く楽しむ旅行ガイド",
+      julyTitle: "済州旅行ガイド",
       latest: "済州の新着記事",
       places: "おすすめスポット",
       photoGallery: "写真で見る済州",
@@ -351,7 +338,6 @@ const languageCatalog = {
       travelDesk: "旅行準備"
     },
     categories: { "가볼 만한 곳": "観光スポット", "맛집": "グルメ", "카페": "カフェ", "숙소": "宿泊", "해변": "ビーチ", "오름": "オルム", "계절 코스": "季節コース" },
-    todayKeywords: ["済州おすすめ", "済州ビーチ", "済州グルメ", "カフェ巡り", "オルム散歩", "季節コース", "宿泊エリア", "雨の日旅行"],
     faq: [["まず何を見ればいいですか？", "おすすめ記事を見てから、興味のあるカテゴリーを選んでください。"], ["詳細情報はどこで確認できますか？", "場所カードを開くと住所、カテゴリー、地図リンクを確認できます。訪問前に公式案内も確認してください。"], ["商品や広告はありますか？", "旅行準備に役立つ商品情報が表示される場合があります。"]],
     visitCheck: [["営業時間", "滝や博物館、有料施設は入場締切が異なる場合があります。"], ["天気", "風、霧、雨によってオルムやビーチの歩きやすさが変わります。"], ["駐車", "繁忙期は公共駐車場と徒歩距離も確認してください。"], ["ルート", "一日に一つのエリアを中心にすると移動が楽です。"]],
     footerGroups: [["済州旅行", ["観光スポット", "ビーチ", "オルム", "季節コース"]], ["旅行準備", ["訪問前チェック", "宿泊エリア", "雨の日旅行", "家族旅行"]], ["地域", ["済州市", "西帰浦", "城山", "涯月"]], ["言語", ["한국어", "English", "日本語", "中文"]]]
@@ -362,7 +348,7 @@ const languageCatalog = {
       brandName: "济州旅行新闻",
       brandTagline: "深度阅读济州的旅行杂志",
       editorialLine: "深度阅读济州的旅行杂志",
-      homeIntro: "不只介绍单个景点，也连接路线、季节和周边故事来阅读济州。",
+      homeIntro: "按季节和路线整理实用的济州旅行信息。",
       plan: "旅行准备",
       menu: "打开菜单",
       list: "列表",
@@ -370,7 +356,7 @@ const languageCatalog = {
       products: "旅行产品",
       check: "出行前检查",
       recommended: "本周济州",
-      julyTitle: "深度济州旅行指南",
+      julyTitle: "济州旅行指南",
       latest: "济州最新文章",
       places: "值得去的地方",
       photoGallery: "照片中的济州",
@@ -389,7 +375,6 @@ const languageCatalog = {
       travelDesk: "旅行准备"
     },
     categories: { "가볼 만한 곳": "值得去的地方", "맛집": "美食", "카페": "咖啡馆", "숙소": "住宿", "해변": "海滩", "오름": "火山丘", "계절 코스": "季节路线" },
-    todayKeywords: ["济州景点", "济州海滩", "济州美食", "咖啡馆之旅", "火山丘散步", "季节路线", "住宿区域", "雨天旅行"],
     faq: [["应该先看什么？", "先浏览推荐文章，再选择符合行程的分类。"], ["在哪里查看地点详情？", "打开地点卡片即可查看地址、分类和地图链接。出发前请再次确认官方信息。"], ["网站有商品或广告吗？", "页面可能会显示与旅行准备相关的商品信息。"]],
     visitCheck: [["开放时间", "瀑布、博物馆和收费景点可能提前停止入场。"], ["天气", "风、雾和雨会影响火山丘及海滩的行走难度。"], ["停车", "旺季请同时确认公共停车场和步行距离。"], ["路线", "每天集中游览一个区域通常更轻松。"]],
     footerGroups: [["济州旅行", ["值得去的地方", "海滩", "火山丘", "季节路线"]], ["旅行准备", ["出行前检查", "住宿区域", "雨天旅行", "家庭旅行"]], ["地区", ["济州市", "西归浦", "城山", "涯月"]], ["语言", ["한국어", "English", "日本語", "中文"]]]
@@ -814,10 +799,8 @@ function applyLanguage(language = currentLanguage) {
 
   if ($("#newsFeedList")) {
     renderPrimaryNav();
-    renderTabs();
     renderRecommended();
     renderFeed();
-    renderTodayKeywords();
     renderFaq();
     renderVisitCheck();
     renderFooter();
@@ -1433,22 +1416,6 @@ function placeCard(place) {
   `;
 }
 
-function renderTabs() {
-  const tabs = $("#topCategoryTabs");
-  if (!tabs) return;
-  tabs.innerHTML = filterCategories
-    .map((category) => {
-      const count = publicArticles.filter((article) => article.category === category).length;
-      return `
-      <button type="button" class="${category === activeCategory ? "is-active" : ""}" data-category="${escapeHtml(category)}">
-        <span>${escapeHtml(categoryLabel(category))}</span>
-        <b>${count}</b>
-      </button>
-    `;
-    })
-    .join("");
-}
-
 function renderPrimaryNav() {
   const nav = $("#primaryNav");
   if (!nav) return;
@@ -1460,26 +1427,6 @@ function renderPrimaryNav() {
       </a>
     `)
     .join("");
-}
-
-function renderTodayKeywords() {
-  const header = $(".site-header");
-  if (!header) return;
-  const bar = $(".today-keyword-bar") || document.createElement("nav");
-  bar.className = "today-keyword-bar";
-  bar.setAttribute("aria-label", currentLanguage === "ko" ? "오늘의 여행 키워드" : "Travel keywords");
-  if (!bar.parentElement) header.after(bar);
-  const keywords = getLanguagePack().todayKeywords;
-  bar.innerHTML = `
-    <div class="today-keyword-inner">
-      <strong>${currentLanguage === "ko" ? "JEJU NOW" : "JEJU NOW"}</strong>
-      <div>
-        ${todayKeywords.map((item, index) => `
-          <a href="#july" data-category="${escapeHtml(item.category)}">${escapeHtml(keywords[index] || item.label)}</a>
-        `).join("")}
-      </div>
-    </div>
-  `;
 }
 
 function compactTravelSearchSections() {
@@ -2779,7 +2726,6 @@ function setActiveCategory(category) {
     activeCategory = category || categories[0];
   }
   renderPrimaryNav();
-  renderTabs();
   renderCategoryView([]);
   loadOfficialPlaces();
 }
@@ -2827,18 +2773,14 @@ function bindHome() {
     });
   };
 
-  bindCategoryContainer($("#topCategoryTabs"));
   bindCategoryContainer($("#primaryNav"));
-  bindCategoryContainer($(".today-keyword-bar"));
   bindCategoryContainer($("#categoryNewsSections"));
 }
 
 function renderHome() {
   if (!$("#newsFeedList")) return;
   renderEditionDate();
-  renderTodayKeywords();
   renderPrimaryNav();
-  renderTabs();
   renderCategoryView([]);
   compactTravelSearchSections();
   bindFlightSearch();
