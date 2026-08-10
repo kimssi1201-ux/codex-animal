@@ -1,5 +1,5 @@
-import { articles, categories } from "./articles.js?v=20260810-editorial-1";
-import { curateArticles } from "./editorial.js?v=20260810-editorial-1";
+import { articles, categories } from "./articles.js?v=20260810-editorial-2";
+import { curateArticles } from "./editorial.js?v=20260810-editorial-2";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
@@ -124,7 +124,8 @@ const articleImageFallbacks = new Map([
   ["sangumburi-autumn-course", "https://tong.visitkorea.or.kr/cms/resource/55/3354255_image2_1.jpg"],
   ["rainy-day-indoor-jeju", "https://tong.visitkorea.or.kr/cms/resource/63/3562163_image2_1.jpg"],
   ["east-jeju-2days", "https://tong.visitkorea.or.kr/cms/resource/64/3384664_image2_1.jpg"],
-  ["saryeoni-forest-road-check", "https://tong.visitkorea.or.kr/cms/resource/30/3525130_image2_1.jpg"],
+  ["saryeoni-forest-road-check", "https://api.cdn.visitjeju.net/photomng/imgpath/201804/30/ae89a383-ef1b-4295-8eac-75aa9c521571.webp"],
+  ["camellia-hill-season-guide", "https://api.cdn.visitjeju.net/photomng/imgpath/202406/21/ed262984-f51e-4998-a475-b9645fae4569.webp"],
   ["dongmun-market-evening-food-route", "https://tong.visitkorea.or.kr/cms/resource/38/2678438_image2_1.jpg"],
   ["spring-jeju-canola-blossom-route", "https://tong.visitkorea.or.kr/cms/resource/69/3588469_image2_1.jpg"]
 ]);
@@ -1327,7 +1328,7 @@ function homeHeroArticles() {
 
 function homeLatestArticles() {
   const heroSlugs = new Set(homeHeroArticles().map((article) => article.slug));
-  return uniqueByImage(publicArticles.filter((article) => !heroSlugs.has(article.slug))).slice(0, 6);
+  return uniqueByImage(publicArticles.filter((article) => !heroSlugs.has(article.slug))).slice(0, 8);
 }
 
 function galleryCard(article) {

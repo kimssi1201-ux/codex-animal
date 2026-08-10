@@ -651,8 +651,9 @@ test("글 생성 워크플로는 자동 예약 없이 수동 실행만 허용한
 
 test("공개 큐레이션은 검수된 고유 본문과 출처가 있는 글만 포함한다", () => {
   const curated = curateArticles(articles);
-  assert.equal(curated.length, 20);
+  assert.equal(curated.length, 32);
   assert.equal(new Set(curated.map((article) => article.slug)).size, curated.length);
+  assert.equal(new Set(curated.map((article) => article.image)).size, curated.length);
   for (const article of curated) {
     assert.equal(article.status, "published");
     assert.ok(article.author);
@@ -675,7 +676,7 @@ test("정적 기사 페이지에는 검색 메타, 구조화 데이터, 작성�
 test("사이트맵은 검수된 정적 기사만 포함한다", async () => {
   const sitemap = await readFile(new URL("../sitemap.xml", import.meta.url), "utf8");
   const articleUrls = sitemap.match(/<loc>https:\/\/www\.moneyarchive\.kr\/articles\//g) || [];
-  assert.equal(articleUrls.length, 20);
+  assert.equal(articleUrls.length, 32);
   assert.doesNotMatch(sitemap, /article\.html\?slug=/);
   assert.match(sitemap, /<loc>https:\/\/www\.moneyarchive\.kr\/about<\/loc>/);
   assert.match(sitemap, /<loc>https:\/\/www\.moneyarchive\.kr\/editorial-policy<\/loc>/);

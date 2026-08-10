@@ -1,3 +1,8 @@
+import {
+  additionalCuratedSlugs,
+  additionalEditorialOverrides
+} from "./editorial-expansion.js";
+
 export const siteOrigin = "https://www.moneyarchive.kr";
 
 export const editorialProfile = {
@@ -50,7 +55,8 @@ export const curatedSlugs = [
   "woljeongri-beach-cafe-walk",
   "osulloc-west-jeju-course",
   "dongmun-market-evening-food-route",
-  "samyang-beach-black-sand-walk-20260725"
+  "samyang-beach-black-sand-walk-20260725",
+  ...additionalCuratedSlugs
 ];
 
 const editorialOverrides = {
@@ -718,7 +724,8 @@ const editorialOverrides = {
       }
     ],
     sources: outdoorSources
-  }
+  },
+  ...additionalEditorialOverrides
 };
 
 export function curateArticles(articles = []) {

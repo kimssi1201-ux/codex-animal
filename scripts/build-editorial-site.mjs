@@ -210,7 +210,7 @@ function renderArticlePage(article) {
     <div class="footer-grid" id="footerLinks"><nav aria-label="사이트 안내"><h2>사이트 안내</h2><ul><li><a href="/about">사이트 소개</a></li><li><a href="/editorial-policy">편집 원칙</a></li><li><a href="/contact">문의·수정 요청</a></li><li><a href="/privacy">개인정보 처리방침</a></li></ul></nav></div>
     <p class="copyright">Copyright 2026 Jeju Travel News. All Rights Reserved.</p>
   </footer>
-  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260810-editorial-1"></script>
+  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260810-editorial-2"></script>
 </body>
 </html>
 `;
@@ -288,7 +288,7 @@ async function build() {
   const indexPath = path.join(rootDir, "index.html");
   let indexHtml = await readFile(indexPath, "utf8");
   indexHtml = replaceSnapshot(indexHtml, "RECOMMENDED", curatedArticles.slice(0, 4).map((article, index) => renderSnapshotRecommended(article, index === 0)).join("\n"));
-  indexHtml = replaceSnapshot(indexHtml, "FEED", curatedArticles.slice(4, 10).map(renderSnapshotRow).join("\n"));
+  indexHtml = replaceSnapshot(indexHtml, "FEED", curatedArticles.slice(4, 12).map(renderSnapshotRow).join("\n"));
   await writeFile(indexPath, indexHtml, "utf8");
   await writeFile(path.join(rootDir, "sitemap.xml"), buildSitemap(), "utf8");
   await writeFile(path.join(rootDir, "feed.xml"), buildFeed(), "utf8");
