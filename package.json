@@ -5,9 +5,10 @@
   "scripts": {
     "test": "node --test --test-reporter=spec",
     "test:watch": "node --test --watch",
-    "check:js": "node --check functions/lib/affiliate-match.js && node --check functions/lib/myrealtrip-link.js && node --check functions/api/admin-posts.js && node --check functions/api/beaches.js && node --check functions/api/beach-weather.js && node --check functions/api/jeju.js && node --check functions/api/myrealtrip.js && node --check functions/api/myrealtrip-link.js && node --check functions/api/myrealtrip-accommodation.js && node --check functions/api/myrealtrip-flight.js && node --check functions/api/myrealtrip-tna.js && node --check admin/assets/admin.js && node --check assets/travel-content.js && node --check assets/travel-home.js && node --check jeju-travel-news/assets/app.js && node --check jeju-travel-news/assets/articles.js && node --check scripts/auto-jeju-post.mjs",
+    "check:js": "node --check functions/lib/affiliate-match.js && node --check functions/lib/myrealtrip-link.js && node --check functions/api/admin-posts.js && node --check functions/api/beaches.js && node --check functions/api/beach-weather.js && node --check functions/api/jeju.js && node --check functions/api/myrealtrip.js && node --check functions/api/myrealtrip-link.js && node --check functions/api/myrealtrip-accommodation.js && node --check functions/api/myrealtrip-flight.js && node --check functions/api/myrealtrip-tna.js && node --check admin/assets/admin.js && node --check assets/travel-content.js && node --check assets/travel-home.js && node --check jeju-travel-news/assets/app.js && node --check jeju-travel-news/assets/articles.js && node --check jeju-travel-news/assets/editorial.js && node --check scripts/auto-jeju-post.mjs && node --check scripts/build-editorial-site.mjs",
+    "build:content": "node scripts/build-editorial-site.mjs",
     "lint": "npm run check:js",
-    "build": "npm run check:js",
-    "check": "npm run check:js && npm test"
+    "build": "npm run check:js && npm run build:content",
+    "check": "npm run build && npm test"
   }
 }

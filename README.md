@@ -1,13 +1,15 @@
-# 서울 축제 아카이브
+# 제주여행뉴스
 
-서울 축제, 서울 가볼 만한 곳, 방문 전 체크 정보를 모아 보여주는 Cloudflare Pages용 정적 웹사이트입니다.
+제주 가볼 만한 곳, 해변, 오름, 맛집, 카페, 숙소 위치와 방문 전 체크 정보를 정리하는 Cloudflare Pages용 여행 매거진입니다.
 
 ## 구성
 
 - `index.html` - 메인 SEO 구조와 시맨틱 섹션
-- `assets/travel-content.js` - TODAY 키워드, 카드, FAQ, 푸터 링크 데이터
-- `assets/travel-home.js` - 콘텐츠 렌더링과 모바일 메뉴 동작
-- `assets/travel-style.css` - 반응형 매거진 레이아웃 스타일
+- `jeju-travel-news/assets/articles.js` - 원본 글 데이터
+- `jeju-travel-news/assets/editorial.js` - 공개 글 큐레이션, 편집 본문과 출처
+- `jeju-travel-news/assets/app.js` - 콘텐츠 렌더링과 모바일 메뉴 동작
+- `jeju-travel-news/assets/styles.css` - 반응형 매거진 레이아웃 스타일
+- `articles/` - 빌드 시 생성되는 검색엔진용 정적 상세 페이지
 - `feed.xml`, `sitemap.xml`, `robots.txt`, `ads.txt`
 - `jeju-travel-news/` - 제주여행뉴스 정적 페이지
 - `functions/api/jeju.js` - 제주 관광정보 서버 함수
@@ -44,16 +46,16 @@ API 키는 브라우저 코드, 저장소, `.env` 예제에 기록하지 않습�
 실제 GitHub 저장을 쓰려면 Cloudflare Pages 환경변수에 `ADMIN_TOKEN`과 `GITHUB_TOKEN`을 추가합니다.
 자세한 내용은 `ADMIN.md`를 확인하세요.
 
-## 매시간 자동 발행
+## 글 발행
 
-GitHub Actions의 `Auto Jeju Post` 워크플로가 매시 23분에 실행됩니다.
+검수하지 않은 예약 발행은 사용하지 않습니다. `Auto Jeju Post` 워크플로는 GitHub Actions에서 운영자가 수동 실행할 때만 동작합니다.
 
-- `scripts/auto-jeju-post.mjs`가 콘텐츠 로드맵에서 아직 쓰지 않은 주제를 매시간 1개 고릅니다.
-- `jeju-travel-news/assets/articles.js`에 새 글을 추가합니다.
-- `sitemap.xml`, `feed.xml`을 함께 갱신합니다.
-- GitHub에 커밋하면 Cloudflare Pages가 자동 배포합니다.
+- 새 글은 먼저 원본 데이터에 추가합니다.
+- 공개 전 `editorial.js`에서 고유 본문, 출처, 검수일을 작성합니다.
+- `npm run build:content`로 정적 상세 페이지, 사이트맵과 RSS를 생성합니다.
+- `npm run check` 통과 후 배포합니다.
 
 선택 사항:
 
 - GitHub Secrets에 `KTO_TOUR_API_KEY`를 넣으면 한국관광공사 이미지와 주소를 우선 반영합니다.
-- 키가 없어도 기본 이미지와 자체 템플릿으로 글은 생성됩니다.
+- 키가 없어도 초안 생성은 가능하지만 검수 전에는 공개하지 않습니다.

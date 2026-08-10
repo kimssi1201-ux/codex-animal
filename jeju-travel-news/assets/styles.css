@@ -9,6 +9,41 @@
   --shadow: none;
 }
 
+.article-byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 24px 0;
+  padding: 16px 0;
+  border-top: 1px solid #dfe6e2;
+  border-bottom: 1px solid #dfe6e2;
+  color: #5f6965;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.article-byline strong { color: #0b6b55; }
+.article-byline p { flex-basis: 100%; margin: 0; }
+
+.article-sources {
+  margin-top: 32px;
+  padding: 24px;
+  border: 1px solid #dfe6e2;
+  border-radius: 6px;
+  background: #f7faf8;
+}
+
+.article-sources h2 { margin-top: 0; }
+.article-sources ul { margin: 14px 0; padding-left: 20px; }
+.article-sources li + li { margin-top: 6px; }
+.article-sources a { color: #0b6b55; font-weight: 700; }
+.correction-link { display: inline-block; margin-top: 4px; }
+
+@media (max-width: 560px) {
+  .article-byline { display: grid; gap: 6px; }
+  .article-sources { padding: 18px; }
+}
+
 .mrt-date-note {
   grid-column: 1 / -1;
   margin: 0 0 4px;
@@ -4263,5 +4298,49 @@ body {
   .home-page .faq-section,
   .home-page .coupang-affiliate-section {
     width: calc(100% - 32px);
+  }
+}
+
+@media (max-width: 560px) {
+  .detail-site-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .detail-site-header .brand {
+    max-width: none;
+    gap: 7px;
+  }
+
+  .detail-site-header .brand-mark {
+    width: 30px;
+    height: 30px;
+    font-size: 9px;
+  }
+
+  .detail-site-header .brand strong {
+    overflow: hidden;
+    font-size: 18px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .detail-header-actions { gap: 5px; }
+  .detail-header-actions .language-switch { gap: 1px; }
+
+  .detail-header-actions .language-switch button {
+    min-width: 25px;
+    min-height: 30px;
+    padding: 2px;
+    border: 0;
+    font-size: 10px;
+  }
+
+  .detail-site-header .list-link {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 12px;
   }
 }

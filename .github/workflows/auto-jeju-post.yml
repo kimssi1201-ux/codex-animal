@@ -7,9 +7,6 @@ on:
         description: "Number of posts to add"
         required: false
         default: "1"
-  schedule:
-    # Every hour at :23 (KST and UTC share the same minute value)
-    - cron: "23 * * * *"
 
 concurrency:
   group: auto-jeju-post
@@ -30,13 +27,16 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Generate post
+      - name: Generate editorial draft
         env:
           AUTO_POST_COUNT: ${{ github.event.inputs.count || '1' }}
           KTO_TOUR_API_KEY: ${{ secrets.KTO_TOUR_API_KEY }}
         run: node scripts/auto-jeju-post.mjs
 
-      - name: Commit changes
+      - name: Rebuild reviewed public pages
+        run: npm run build:content
+
+      - name: Commit manually requested draft
         run: |
           if git diff --quiet; then
             echo "No changes to commit."
@@ -44,7 +44,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add jeju-travel-news/assets/articles.js sitemap.xml feed.xml
-          git commit -m "Auto publish Jeju travel post"
+          git add jeju-travel-news/assets/articles.js index.html articles sitemap.xml feed.xml
+          git commit -m "Add manually requested Jeju travel draft"
           git pull --rebase origin main
           git push

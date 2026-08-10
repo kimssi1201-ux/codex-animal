@@ -1,4 +1,5 @@
-import { articles, categories } from "./articles.js?v=20260807-affiliate-match-2";
+import { articles, categories } from "./articles.js?v=20260810-editorial-1";
+import { curateArticles } from "./editorial.js?v=20260810-editorial-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
@@ -171,9 +172,10 @@ function isPublicArticle(article) {
   return true;
 }
 
-const publicArticles = articles.filter(isPublicArticle);
+const publicArticles = curateArticles(articles).filter(isPublicArticle);
 
-let activeCategory = categories[0] || "전체";
+const requestedCategory = params.get("category");
+let activeCategory = categories.includes(requestedCategory) ? requestedCategory : categories[0] || "전체";
 const filterCategories = categories.filter((category) => category !== categories[0]);
 let officialRequestId = 0;
 let beachInfoRequestId = 0;
@@ -699,6 +701,8 @@ function categoryLabel(category) {
 }
 
 function savedLanguage() {
+  const requestedLanguage = params.get("lang");
+  if (languageCatalog[requestedLanguage]) return requestedLanguage;
   try {
     const value = localStorage.getItem("jeju-language");
     return languageCatalog[value] ? value : "ko";
@@ -850,7 +854,12 @@ function escapeHtml(value) {
 }
 
 function articleUrl(article) {
-  return `${detailPath}?slug=${encodeURIComponent(article.slug)}`;
+  return `/articles/${encodeURIComponent(article.slug)}/`;
+}
+
+function articleSlugFromPath() {
+  const match = window.location.pathname.match(/\/articles\/([^/]+)\/?$/);
+  return match ? decodeURIComponent(match[1]) : "";
 }
 
 function officialUrl(place) {
@@ -2680,19 +2689,55 @@ function bindTnaSearch() {
   });
 }
 
+function footerHref(groupIndex, linkIndex) {
+  const categoryLinks = ["가볼 만한 곳", "해변", "오름", "계절 코스"];
+  const planningLinks = [
+    "/editorial-policy",
+    `/?category=${encodeURIComponent("숙소")}#july`,
+    `/?category=${encodeURIComponent("계절 코스")}#july`,
+    "/articles/family-friendly-jeju/"
+  ];
+  const regionLinks = [
+    "/articles/dongmun-market-evening-food-route/",
+    "/articles/jeongbang-waterfall-guide/",
+    "/articles/seongsan-sunrise-course/",
+    "/articles/aewol-coastal-drive/"
+  ];
+  const languageLinks = ["ko", "en", "ja", "zh"];
+  if (groupIndex === 0) return `/?category=${encodeURIComponent(categoryLinks[linkIndex] || "가볼 만한 곳")}#july`;
+  if (groupIndex === 1) return planningLinks[linkIndex] || "/editorial-policy";
+  if (groupIndex === 2) return regionLinks[linkIndex] || "/";
+  if (groupIndex === 3) return `/?lang=${languageLinks[linkIndex] || "ko"}`;
+  return "/";
+}
+
 function renderFooter() {
   const footer = $("#footerLinks");
   if (!footer) return;
-  footer.innerHTML = getLanguagePack().footerGroups
-    .map(([title, links]) => `
+  const groups = getLanguagePack().footerGroups
+    .map(([title, links], groupIndex) => `
       <nav aria-label="${escapeHtml(title)}">
         <h2>${escapeHtml(title)}</h2>
         <ul>
-          ${links.map((link) => `<li><a href="#top">${escapeHtml(link)}</a></li>`).join("")}
+          ${links.map((link, linkIndex) => `<li><a href="${escapeHtml(footerHref(groupIndex, linkIndex))}">${escapeHtml(link)}</a></li>`).join("")}
         </ul>
       </nav>
     `)
     .join("");
+  const trustTitle = currentLanguage === "ko" ? "사이트 안내" : currentLanguage === "ja" ? "サイト情報" : currentLanguage === "zh" ? "网站信息" : "Site information";
+  const trustLabels = currentLanguage === "ko"
+    ? ["사이트 소개", "편집 원칙", "문의·수정 요청", "개인정보 처리방침"]
+    : currentLanguage === "ja"
+      ? ["サイト紹介", "編集方針", "お問い合わせ", "プライバシー"]
+      : currentLanguage === "zh"
+        ? ["网站介绍", "编辑原则", "联系与更正", "隐私政策"]
+        : ["About", "Editorial policy", "Contact and corrections", "Privacy"];
+  const trustHrefs = ["/about", "/editorial-policy", "/contact", "/privacy"];
+  footer.innerHTML = `${groups}
+    <nav aria-label="${escapeHtml(trustTitle)}">
+      <h2>${escapeHtml(trustTitle)}</h2>
+      <ul>${trustLabels.map((label, index) => `<li><a href="${trustHrefs[index]}">${escapeHtml(label)}</a></li>`).join("")}</ul>
+    </nav>`;
 }
 
 async function loadOfficialPlaces() {
@@ -2863,6 +2908,10 @@ function articleBodySections(article) {
   const intro = baseContent[0] || `${article.title}은 ${article.region || "제주"}에서 일정에 넣기 좋은 ${article.category || "여행지"}입니다.`;
   const localTip = baseContent[1] || `${article.region || "제주"} 권역은 날씨와 교통 상황에 따라 체감 이동 시간이 달라질 수 있으니 여유 시간을 두고 움직이는 편이 좋습니다.`;
 
+  if (currentLanguage === "ko" && Array.isArray(article.editorialSections) && article.editorialSections.length) {
+    return article.editorialSections;
+  }
+
   if (currentLanguage !== "ko") {
     return copy.bodySections.map((title, index) => ({
       title,
@@ -2982,6 +3031,46 @@ function renderPlanningSection(article) {
   `;
 }
 
+function renderEditorialByline(article) {
+  const labels = currentLanguage === "ko"
+    ? { author: "작성", reviewed: "최종 검수", method: "검수 기준" }
+    : currentLanguage === "ja"
+      ? { author: "作成", reviewed: "最終確認", method: "確認基準" }
+      : currentLanguage === "zh"
+        ? { author: "撰写", reviewed: "最终审核", method: "审核标准" }
+        : { author: "By", reviewed: "Reviewed", method: "Review standard" };
+  return `
+    <div class="article-byline" aria-label="${escapeHtml(labels.method)}">
+      <span><strong>${escapeHtml(labels.author)}</strong> ${escapeHtml(article.author || "제주여행뉴스 편집팀")}</span>
+      <span><strong>${escapeHtml(labels.reviewed)}</strong> ${escapeHtml(article.reviewedAt || article.date)}</span>
+      ${article.reviewMethod ? `<p><strong>${escapeHtml(labels.method)}</strong> ${escapeHtml(article.reviewMethod)}</p>` : ""}
+    </div>
+  `;
+}
+
+function renderArticleSources(article) {
+  const sources = (article.sources || [])
+    .map((source) => ({ name: String(source?.name || "").trim(), url: safeExternalUrl(source?.url) }))
+    .filter((source) => source.name && source.url);
+  if (!sources.length) return "";
+  const title = currentLanguage === "ko" ? "자료 출처와 수정 요청" : currentLanguage === "ja" ? "情報源と修正依頼" : currentLanguage === "zh" ? "资料来源与更正" : "Sources and corrections";
+  const note = currentLanguage === "ko"
+    ? "운영시간·요금·통제 정보는 바뀔 수 있습니다. 방문 전 아래 공식 채널을 다시 확인해 주세요. 잘못된 정보는 문의 페이지로 알려주시면 검토 후 수정합니다."
+    : currentLanguage === "ja"
+      ? "営業時間、料金、規制情報は変更される場合があります。訪問前に公式情報をご確認ください。"
+      : currentLanguage === "zh"
+        ? "开放时间、费用和管制信息可能会变化。出发前请再次确认官方信息。"
+        : "Hours, fees and access restrictions can change. Check the official sources before visiting.";
+  return `
+    <section class="article-sources">
+      <h2>${escapeHtml(title)}</h2>
+      <p>${escapeHtml(note)}</p>
+      <ul>${sources.map((source) => `<li><a href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer">${escapeHtml(source.name)}</a></li>`).join("")}</ul>
+      <a class="correction-link" href="/contact">${currentLanguage === "ko" ? "정보 수정 요청" : currentLanguage === "ja" ? "修正を依頼" : currentLanguage === "zh" ? "提交更正" : "Request a correction"}</a>
+    </section>
+  `;
+}
+
 function placeInfoRows(place) {
   return rowsFromPairs([
     ["분류", place.category],
@@ -2994,10 +3083,32 @@ function placeInfoRows(place) {
   ]);
 }
 
-function updateMeta(title, description) {
+function setMetaProperty(property, content) {
+  let meta = document.querySelector(`meta[property="${property}"]`);
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.setAttribute("property", property);
+    document.head.append(meta);
+  }
+  meta.setAttribute("content", content);
+}
+
+function updateMeta(title, description, canonicalUrl = "") {
   document.title = `${title} | 제주여행뉴스`;
   const descriptionMeta = document.querySelector('meta[name="description"]');
   if (descriptionMeta) descriptionMeta.setAttribute("content", description);
+  setMetaProperty("og:title", `${title} | 제주여행뉴스`);
+  setMetaProperty("og:description", description);
+  if (canonicalUrl) {
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.append(canonical);
+    }
+    canonical.setAttribute("href", canonicalUrl);
+    setMetaProperty("og:url", canonicalUrl);
+  }
 }
 
 function articleSeoTitle(article) {
@@ -3136,7 +3247,7 @@ async function hydrateStaticOfficialInfo(article, displayArticle = localizedArti
 }
 
 function renderStaticDetail(detail) {
-  const slug = params.get("slug") || publicArticles[0]?.slug || "";
+  const slug = params.get("slug") || articleSlugFromPath() || publicArticles[0]?.slug || "";
   const article = publicArticles.find((item) => item.slug === slug) || publicArticles[0];
   if (!article) {
     updateMeta("제주 여행 정보", "현재 공개된 제주 여행 글이 없습니다.");
@@ -3153,13 +3264,14 @@ function renderStaticDetail(detail) {
       : currentLanguage === "zh"
         ? `根据${translateArticleText(myrealtripContext.keyword)}显示相关游览、住宿和活动。`
         : `Related tours, stays and activities for ${translateArticleText(myrealtripContext.keyword)}.`;
-  updateMeta(articleSeoTitle(view), articleSeoDescription(view));
+  updateMeta(articleSeoTitle(view), articleSeoDescription(view), `https://www.moneyarchive.kr${articleUrl(article)}`);
   detail.innerHTML = `
     ${imageTag(thumbnailForArticle(article, true), view.title, "detail-hero", `data-article-thumb="${escapeHtml(article.slug)}"`)}
     <div class="detail-body">
       <div class="meta">${metaLine([categoryLabel(article.category), view.region, article.date])}</div>
       <h1>${escapeHtml(view.title)}</h1>
       <p class="summary">${escapeHtml(view.summary)}</p>
+      ${renderEditorialByline(article)}
       <table class="info-table article-info-table"><tbody id="articleInfoRows">${staticInfoRows(view)}</tbody></table>
       ${renderNearbyTravelRecommendations(article)}
       ${renderInlineOfficialShell(article)}
@@ -3180,6 +3292,7 @@ function renderStaticDetail(detail) {
         <h2>${escapeHtml(copy.nearbyTagsTitle)}</h2>
         <div class="spot-tags">${(article.nearbySpots || []).map((spot, index) => `<a href="${escapeHtml(spotUrl(spot, article.slug))}">${escapeHtml(view.nearbySpots[index] || spot)}</a>`).join("")}</div>
       </section>
+      ${renderArticleSources(article)}
       <section class="mrt-section article-mrt-section" aria-labelledby="articleMyRealTripTitle" hidden>
         <div class="section-heading">
           <p class="eyebrow">MYREALTRIP</p>

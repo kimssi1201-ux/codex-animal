@@ -38,3 +38,5 @@ Cloudflare Pages 프로젝트의 환경변수에 아래 값을 추가합니다.
 - `status: "draft"`는 공개 사이트에서 숨김
 - `status: "scheduled"` 또는 미래 날짜 글은 해당 날짜 전까지 숨김
 - `status: "published"`이고 날짜가 현재보다 과거면 공개
+
+현재 공개 사이트는 애드센스 품질 검수를 위해 `jeju-travel-news/assets/editorial.js`의 `curatedSlugs`에 포함되고, 고유 본문·출처·작성자·검수일이 등록된 글만 노출합니다. 관리자 화면에서 `published`로 저장한 것만으로는 즉시 공개되지 않습니다.

@@ -11,6 +11,8 @@ import { onRequestGet as myrealtripLinkGet } from "../functions/api/myrealtrip-l
 import { onRequestPost as accommodationPost } from "../functions/api/myrealtrip-accommodation.js";
 import { onRequestPost as flightPost } from "../functions/api/myrealtrip-flight.js";
 import { onRequestPost as tnaPost } from "../functions/api/myrealtrip-tna.js";
+import { articles } from "../jeju-travel-news/assets/articles.js";
+import { curateArticles } from "../jeju-travel-news/assets/editorial.js";
 
 function context(url, env = {}, init = {}) {
   const requestInit = {
@@ -621,27 +623,60 @@ test("관리자 저장 API는 인증과 payload 검증을 먼저 수행한다", 
   });
 });
 
-test("정적 진입점은 제주 페이지의 모듈·해변 섹션을 유지한다", async () => {
-  const [rootHtml, nestedHtml] = await Promise.all([
-    readFile(new URL("../index.html", import.meta.url), "utf8"),
-    readFile(new URL("../jeju-travel-news/index.html", import.meta.url), "utf8")
-  ]);
-  for (const html of [rootHtml, nestedHtml]) {
-    assert.match(html, /id="beachInfo"/);
-    assert.match(html, /assets\/app\.js\?v=/);
-    assert.match(html, /assets\/styles\.css\?v=/);
-  }
+test("메인 진입점은 해변 정보와 정적 기사 링크를 제공하고 미완성 예약 폼을 노출하지 않는다", async () => {
+  const rootHtml = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(rootHtml, /id="beachInfo"/);
+  assert.match(rootHtml, /assets\/app\.js\?v=/);
+  assert.match(rootHtml, /\/articles\/seongsan-sunrise-course\//);
+  assert.doesNotMatch(rootHtml, /API 연결 전/);
+  assert.doesNotMatch(rootHtml, /PartnersCoupang/);
 });
 
-test("자동 발행은 매시간 한 글과 실제 발행 시각을 설정한다", async () => {
+test("글 생성 워크플로는 자동 예약 없이 수동 실행만 허용한다", async () => {
   const [workflow, generator] = await Promise.all([
     readFile(new URL("../.github/workflows/auto-jeju-post.yml", import.meta.url), "utf8"),
     readFile(new URL("../scripts/auto-jeju-post.mjs", import.meta.url), "utf8")
   ]);
-  assert.match(workflow, /cron:\s*["']23 \* \* \* \*["']/);
+  assert.match(workflow, /workflow_dispatch:/);
+  assert.doesNotMatch(workflow, /\bschedule:/);
+  assert.doesNotMatch(workflow, /\bcron:/);
   assert.match(workflow, /group:\s*auto-jeju-post/);
   assert.match(workflow, /AUTO_POST_COUNT:\s*\$\{\{ github\.event\.inputs\.count \|\| '1' \}\}/);
+  assert.match(workflow, /npm run build:content/);
   assert.match(generator, /const publishAt = new Date\(\)\.toISOString\(\)/);
+  assert.match(generator, /status:\s*"draft"/);
   assert.match(generator, /Math\.min\(10, Math\.max\(1, Math\.trunc\(count\)\)\)/);
   assert.match(generator, /pubDate\(article\.publishAt \|\| article\.date \|\| date\)/);
+});
+
+test("공개 큐레이션은 검수된 고유 본문과 출처가 있는 글만 포함한다", () => {
+  const curated = curateArticles(articles);
+  assert.equal(curated.length, 20);
+  assert.equal(new Set(curated.map((article) => article.slug)).size, curated.length);
+  for (const article of curated) {
+    assert.equal(article.status, "published");
+    assert.ok(article.author);
+    assert.match(article.reviewedAt, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(article.sources.length >= 2);
+    assert.ok(article.editorialSections.length >= 4);
+    assert.ok(article.content.join("").replace(/\s/g, "").length >= 500, article.slug);
+  }
+});
+
+test("정적 기사 페이지에는 검색 메타, 구조화 데이터, 작성자와 출처가 있다", async () => {
+  const html = await readFile(new URL("../articles/seongsan-sunrise-course/index.html", import.meta.url), "utf8");
+  assert.match(html, /rel="canonical" href="https:\/\/www\.moneyarchive\.kr\/articles\/seongsan-sunrise-course\/"/);
+  assert.match(html, /type="application\/ld\+json"/);
+  assert.match(html, /제주여행뉴스 편집팀/);
+  assert.match(html, /자료 출처와 수정 요청/);
+  assert.match(html, /한국관광공사/);
+});
+
+test("사이트맵은 검수된 정적 기사만 포함한다", async () => {
+  const sitemap = await readFile(new URL("../sitemap.xml", import.meta.url), "utf8");
+  const articleUrls = sitemap.match(/<loc>https:\/\/www\.moneyarchive\.kr\/articles\//g) || [];
+  assert.equal(articleUrls.length, 20);
+  assert.doesNotMatch(sitemap, /article\.html\?slug=/);
+  assert.match(sitemap, /<loc>https:\/\/www\.moneyarchive\.kr\/about<\/loc>/);
+  assert.match(sitemap, /<loc>https:\/\/www\.moneyarchive\.kr\/editorial-policy<\/loc>/);
 });

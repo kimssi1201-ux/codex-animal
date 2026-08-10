@@ -20,10 +20,10 @@
 - Run tests in watch mode: `npm run test:watch`
 - Run JavaScript syntax validation: `npm run check:js`
 - Run the complete local verification: `npm run check`
-- Build validation: `npm run build`
+- Build static article pages, sitemap and RSS: `npm run build`
 - Lint validation: `npm run lint`
 
-There is no bundler or separate lint configuration in this static project. `build` and `lint` currently run the complete JavaScript syntax check so a deployment cannot proceed with invalid server or browser JavaScript.
+There is no bundler or separate lint configuration in this static project. `build` validates JavaScript and regenerates reviewed article pages, the sitemap and RSS feed. `lint` runs the JavaScript syntax check.
 
 ## Required After Code Changes
 
@@ -32,3 +32,4 @@ There is no bundler or separate lint configuration in this static project. `buil
 3. Never put API keys in browser files, test fixtures, or committed configuration.
 4. Do not call production APIs from automated tests. Use the fetch mocks in `test/api.test.js`.
 5. For deployment changes, run a separate smoke check against the intended preview or production URL only after local tests pass.
+6. Never restore scheduled bulk publishing without an explicit editorial review step. Public articles must be listed in `jeju-travel-news/assets/editorial.js` with unique sections, sources, author and review date.

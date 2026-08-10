@@ -308,7 +308,7 @@ function buildArticle(candidate, date, publishAt, official = null, usedImageKeys
     title: candidate.title,
     slug,
     category: candidate.category,
-    status: "published",
+    status: "draft",
     publishAt,
     region,
     image,
