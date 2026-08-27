@@ -2646,10 +2646,10 @@ function footerHref(groupIndex, linkIndex) {
     "/articles/family-friendly-jeju/"
   ];
   const regionLinks = [
-    "/articles/dongmun-market-evening-food-route/",
-    "/articles/jeongbang-waterfall-guide/",
-    "/articles/seongsan-sunrise-course/",
-    "/articles/aewol-coastal-drive/"
+    "/region/jeju-si/",
+    "/region/seogwipo/",
+    "/region/dong/",
+    "/region/seo/"
   ];
   const languageLinks = ["ko", "en", "ja", "zh"];
   if (groupIndex === 0) return `/?category=${encodeURIComponent(categoryLinks[linkIndex] || "가볼 만한 곳")}#july`;

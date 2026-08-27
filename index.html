@@ -38,7 +38,7 @@
           <small data-i18n="brand.tagline">제주 여행 정보 뉴스</small>
         </span>
       </a>
-      <a class="masthead-shortcut" href="#visitCheck" data-i18n="nav.plan">여행 준비</a>
+      <a class="masthead-shortcut" href="#travelTools" data-i18n="nav.plan">여행 준비</a>
       <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="primaryNav">
         <span></span>
         <span></span>
@@ -68,6 +68,7 @@
         <h2 id="feedListTitle">새로 올라온 여행 이야기</h2>
         <span id="feedCount"></span>
       </div>
+      <p class="region-nav-link"><a href="/region/">지역별로 보기 (제주시·서귀포·동서남북) →</a></p>
       <div class="news-list-feed" id="newsFeedList">
         <!-- STATIC_FEED_START -->
 <article class="news-row"><a href="/articles/aewol-coastal-drive/"><img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&amp;fit=crop&amp;w=1200&amp;q=82" alt="애월 해안도로 드라이브" width="220" height="150" loading="lazy"><div><p class="meta">카페 · 제주 서부 · 애월</p><h2>애월 해안도로 드라이브</h2><p>애월 해안도로의 전망 구간과 산책, 카페를 연결하면서 정체와 주차 스트레스를 줄이는 서쪽 드라이브 코스입니다.</p></div></a></article>
@@ -99,6 +100,65 @@
         <p>제주 여행지를 고르기 전에 운영시간, 날씨, 이동 동선, 주차 정보를 먼저 확인하세요.</p>
       </div>
       <div class="visit-check-grid" id="visitCheckGrid"></div>
+    </section>
+
+    <section class="flight-section" id="flights" aria-labelledby="flightTitle">
+      <div class="section-heading">
+        <p class="eyebrow">Air</p>
+        <h2 id="flightTitle">제주 항공권 최저가 조회</h2>
+        <p>출발지, 도착지와 여행 월을 입력하면 캘린더 기준 최저가 흐름을 확인할 수 있습니다.</p>
+      </div>
+      <form id="flightSearchForm" class="flight-search-form">
+        <label><span>출발 공항</span><input type="text" id="flightOrigin" list="flightOriginOptions" placeholder="서울, 인천공항 등" autocomplete="off"></label>
+        <datalist id="flightOriginOptions"></datalist>
+        <label><span>도착 공항</span><input type="text" id="flightDestination" list="flightDestinationOptions" placeholder="제주, 제주공항 등" autocomplete="off"></label>
+        <datalist id="flightDestinationOptions"></datalist>
+        <label><span>여행 월</span><input type="month" id="flightMonth"></label>
+        <button type="submit">최저가 조회</button>
+      </form>
+      <div class="flight-result" id="flightResult"></div>
+    </section>
+
+    <section class="stay-section" id="stays" aria-labelledby="stayTitle">
+      <div class="section-heading">
+        <p class="eyebrow">Stay</p>
+        <h2 id="stayTitle">제주 숙소 상품 조회</h2>
+        <p>지역과 체크인·체크아웃 날짜를 입력하면 마이리얼트립 숙소 상품을 비교할 수 있습니다.</p>
+      </div>
+      <form id="staySearchForm" class="stay-search-form">
+        <label><span>지역</span><input type="text" id="stayRegion" list="stayRegionOptions" placeholder="제주시, 서귀포, 애월 등" autocomplete="off"></label>
+        <datalist id="stayRegionOptions"></datalist>
+        <label><span>체크인</span><input type="date" id="stayCheckIn"></label>
+        <label><span>체크아웃</span><input type="date" id="stayCheckOut"></label>
+        <label><span>인원</span><input type="number" id="stayGuests" min="1" max="8" value="2"></label>
+        <button type="submit">숙소 조회</button>
+      </form>
+      <div class="stay-result" id="stayResult"></div>
+    </section>
+
+    <section class="tna-section" id="tourTickets" aria-labelledby="tnaTitle">
+      <div class="section-heading">
+        <p class="eyebrow">Tour</p>
+        <h2 id="tnaTitle">제주 투어·티켓 상품 조회</h2>
+        <p>도시와 카테고리, 검색어를 입력하면 투어·액티비티·입장권 상품을 확인할 수 있습니다.</p>
+      </div>
+      <form id="tnaSearchForm" class="tna-search-form">
+        <label><span>도시</span><input type="text" id="tnaCity" value="제주" placeholder="제주"></label>
+        <label><span>카테고리</span><select id="tnaCategory"><option value="">전체</option></select></label>
+        <label><span>검색어</span><input type="text" id="tnaKeyword" placeholder="한라산, 스노클링 등"></label>
+        <button type="submit">상품 조회</button>
+      </form>
+      <div class="tna-result" id="tnaResult"></div>
+    </section>
+
+    <section class="mrt-section" id="myrealtrip" aria-labelledby="myrealtripTitle">
+      <div class="section-heading">
+        <p class="eyebrow">Pick</p>
+        <h2 id="myrealtripTitle">제주 여행 상품·제휴 추천</h2>
+        <p class="mrt-context-description">여행지와 직접 관련된 투어·체험 상품만 모았습니다.</p>
+      </div>
+      <p class="affiliate-disclosure" data-i18n="affiliate.myrealtrip">광고·제휴 안내: 이 영역에는 마이리얼트립 제휴 링크가 포함될 수 있으며, 링크를 통해 상품을 예약·구매하면 운영자에게 수수료가 지급될 수 있습니다.</p>
+      <div class="mrt-grid" id="myrealtripGrid"></div>
     </section>
 
     <section class="category-news-wrapper" id="categoryNews" aria-label="카테고리별 제주 여행 뉴스">

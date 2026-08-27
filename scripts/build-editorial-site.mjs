@@ -4,10 +4,12 @@ import { fileURLToPath } from "node:url";
 
 import { articles } from "../jeju-travel-news/assets/articles.js";
 import { curateArticles, editorialProfile, siteOrigin } from "../jeju-travel-news/assets/editorial.js";
+import { regionGroups, groupArticlesByRegion } from "../jeju-travel-news/assets/regions.js";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(scriptDir, "..");
 const articlesRoot = path.join(rootDir, "articles");
+const regionRoot = path.join(rootDir, "region");
 const curatedArticles = curateArticles(articles);
 
 function escapeHtml(value) {
@@ -129,6 +131,152 @@ function renderRelatedCard(article) {
   </article>`;
 }
 
+function regionPath(group) {
+  return `/region/${group.id}/`;
+}
+
+function regionUrl(group) {
+  return `${siteOrigin}${regionPath(group)}`;
+}
+
+function renderSiteHeader() {
+  return `<header class="site-header detail-site-header">
+    <a class="brand" href="/" aria-label="제주여행뉴스 홈">
+      <span class="brand-mark" aria-hidden="true">JN</span>
+      <span><strong data-i18n="brand.name">제주여행뉴스</strong><small data-i18n="brand.tagline">제주 여행 정보 뉴스</small></span>
+    </a>
+    <div class="detail-header-actions">
+      <div class="language-switch" id="languageSwitch" aria-label="언어 선택">
+        <button type="button" data-lang="ko">KR</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="ja">JP</button><button type="button" data-lang="zh">CN</button>
+      </div>
+      <a class="list-link" href="/" data-i18n="nav.list">목록</a>
+    </div>
+  </header>`;
+}
+
+function renderSiteFooter() {
+  return `<footer class="site-footer">
+    <div class="footer-intro"><a class="brand footer-brand" href="/"><span class="brand-mark" aria-hidden="true">JN</span><span><strong>제주여행뉴스</strong><small>제주 여행 선택을 돕는 뉴스 포털</small></span></a></div>
+    <div class="footer-grid" id="footerLinks"><nav aria-label="사이트 안내"><h2>사이트 안내</h2><ul><li><a href="/about">사이트 소개</a></li><li><a href="/editorial-policy">편집 원칙</a></li><li><a href="/contact">문의·수정 요청</a></li><li><a href="/privacy">개인정보 처리방침</a></li></ul></nav></div>
+    <p class="copyright">Copyright 2026 Jeju Travel News. All Rights Reserved.</p>
+  </footer>`;
+}
+
+function renderRegionArticleCard(article) {
+  return `<article class="news-feed-card">
+    <a class="news-thumb" href="${articlePath(article)}">
+      <img src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" width="220" height="150" loading="lazy">
+    </a>
+    <div class="news-copy">
+      <div class="meta">${escapeHtml(article.category)} · ${escapeHtml(article.region)}</div>
+      <h2><a href="${articlePath(article)}">${escapeHtml(article.title)}</a></h2>
+      <p>${escapeHtml(article.summary)}</p>
+    </div>
+  </article>`;
+}
+
+function renderRegionCrumb(currentId) {
+  const links = regionGroups
+    .filter((group) => group.id !== currentId)
+    .map((group) => `<a href="${regionPath(group)}">${escapeHtml(group.label)}</a>`)
+    .join("");
+  return `<nav class="spot-tags region-crumb" aria-label="다른 지역 보기"><a href="/region/">전체 지역</a>${links}</nav>`;
+}
+
+function renderRegionPage(group, regionArticles) {
+  const count = regionArticles.length;
+  return `<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="${escapeHtml(group.blurb)}">
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:title" content="${escapeHtml(group.label)} 여행 정보 | 제주여행뉴스">
+  <meta property="og:description" content="${escapeHtml(group.blurb)}">
+  <meta property="og:url" content="${regionUrl(group)}">
+  <link rel="canonical" href="${regionUrl(group)}">
+  <link rel="stylesheet" href="/jeju-travel-news/assets/styles.css?v=20260810-editorial-1">
+  <title>${escapeHtml(group.label)} 여행 정보 | 제주여행뉴스</title>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5751319666030430" crossorigin="anonymous"></script>
+</head>
+<body>
+  ${renderSiteHeader()}
+  <main class="article-page region-page" id="top">
+    <section class="region-hero">
+      <div class="section-heading">
+        <p class="eyebrow">${escapeHtml(group.eyebrow)}</p>
+        <h1>${escapeHtml(group.label)} 여행 정보</h1>
+        <p>${escapeHtml(group.blurb)}</p>
+        <p class="region-count">${count}개 여행 기사</p>
+      </div>
+      ${renderRegionCrumb(group.id)}
+    </section>
+    <section class="news-list-feed region-article-list" aria-label="${escapeHtml(group.label)} 여행 기사 목록">
+      ${count ? regionArticles.map(renderRegionArticleCard).join("\n") : `<p class="region-empty">${escapeHtml(group.label)} 기사를 준비하고 있습니다. 곧 추가될 예정입니다.</p>`}
+    </section>
+  </main>
+  ${renderSiteFooter()}
+  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260810-editorial-2"></script>
+</body>
+</html>
+`;
+}
+
+function renderRegionIndexPage(buckets) {
+  const cards = regionGroups.map((group) => {
+    const list = buckets.get(group.id) || [];
+    const sample = list[0];
+    return `<article class="news-feed-card region-hub-card">
+      ${sample ? `<a class="news-thumb" href="${regionPath(group)}"><img src="${escapeHtml(sample.image)}" alt="${escapeHtml(group.label)}" width="220" height="150" loading="lazy"></a>` : ""}
+      <div class="news-copy">
+        <div class="meta">${escapeHtml(group.eyebrow)} · ${list.length}개 기사</div>
+        <h2><a href="${regionPath(group)}">${escapeHtml(group.label)}</a></h2>
+        <p>${escapeHtml(group.blurb)}</p>
+      </div>
+    </article>`;
+  }).join("\n");
+
+  return `<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="제주시, 서귀포, 동부, 서부, 남부, 북부 등 지역별로 제주 여행 정보를 확인하세요.">
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:title" content="지역별 제주 여행 정보 | 제주여행뉴스">
+  <meta property="og:description" content="제주시, 서귀포, 동부, 서부, 남부, 북부 등 지역별로 제주 여행 정보를 확인하세요.">
+  <meta property="og:url" content="${siteOrigin}/region/">
+  <link rel="canonical" href="${siteOrigin}/region/">
+  <link rel="stylesheet" href="/jeju-travel-news/assets/styles.css?v=20260810-editorial-1">
+  <title>지역별 제주 여행 정보 | 제주여행뉴스</title>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5751319666030430" crossorigin="anonymous"></script>
+</head>
+<body>
+  ${renderSiteHeader()}
+  <main class="article-page region-page" id="top">
+    <section class="region-hero">
+      <div class="section-heading">
+        <p class="eyebrow">Regions</p>
+        <h1>지역별 제주 여행 정보</h1>
+        <p>제주시, 서귀포, 동부, 서부, 남부, 북부 권역으로 나눠 여행지와 코스를 확인하세요.</p>
+      </div>
+    </section>
+    <section class="news-list-feed region-hub-list" aria-label="지역 목록">
+      ${cards}
+    </section>
+  </main>
+  ${renderSiteFooter()}
+  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260810-editorial-2"></script>
+</body>
+</html>
+`;
+}
+
 function jsonLd(article) {
   const data = {
     "@context": "https://schema.org",
@@ -238,10 +386,12 @@ function buildSitemap() {
     { loc: `${siteOrigin}/about`, priority: "0.5" },
     { loc: `${siteOrigin}/editorial-policy`, priority: "0.5" },
     { loc: `${siteOrigin}/contact`, priority: "0.4" },
-    { loc: `${siteOrigin}/privacy`, priority: "0.4" }
+    { loc: `${siteOrigin}/privacy`, priority: "0.4" },
+    { loc: `${siteOrigin}/region/`, priority: "0.6" }
   ];
+  const regionPages = regionGroups.map((group) => ({ loc: regionUrl(group), priority: "0.6" }));
   const articlePages = curatedArticles.map((article) => ({ loc: articleUrl(article), priority: "0.8", lastmod: article.dateModified || article.reviewedAt || article.date }));
-  const pages = [...staticPages, ...articlePages];
+  const pages = [...staticPages, ...regionPages, ...articlePages];
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${pages.map((page) => `  <url><loc>${escapeXml(page.loc)}</loc>${page.lastmod ? `<lastmod>${escapeXml(page.lastmod)}</lastmod>` : ""}<changefreq>${page.loc === `${siteOrigin}/` ? "daily" : "monthly"}</changefreq><priority>${page.priority}</priority></url>`).join("\n")}
@@ -283,6 +433,16 @@ async function build() {
     const outputDir = path.join(articlesRoot, article.slug);
     await mkdir(outputDir, { recursive: true });
     await writeFile(path.join(outputDir, "index.html"), renderArticlePage(article), "utf8");
+  }));
+
+  const regionBuckets = groupArticlesByRegion(curatedArticles);
+  await rm(regionRoot, { recursive: true, force: true });
+  await mkdir(regionRoot, { recursive: true });
+  await writeFile(path.join(regionRoot, "index.html"), renderRegionIndexPage(regionBuckets), "utf8");
+  await Promise.all(regionGroups.map(async (group) => {
+    const outputDir = path.join(regionRoot, group.id);
+    await mkdir(outputDir, { recursive: true });
+    await writeFile(path.join(outputDir, "index.html"), renderRegionPage(group, regionBuckets.get(group.id) || []), "utf8");
   }));
 
   const indexPath = path.join(rootDir, "index.html");

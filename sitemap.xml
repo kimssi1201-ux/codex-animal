@@ -5,6 +5,14 @@
   <url><loc>https://www.moneyarchive.kr/editorial-policy</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://www.moneyarchive.kr/contact</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://www.moneyarchive.kr/privacy</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.moneyarchive.kr/region/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.moneyarchive.kr/region/jeju-si/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.moneyarchive.kr/region/seogwipo/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.moneyarchive.kr/region/dong/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.moneyarchive.kr/region/seo/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.moneyarchive.kr/region/nam/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.moneyarchive.kr/region/buk/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.moneyarchive.kr/region/jeonyeok/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.moneyarchive.kr/articles/seongsan-sunrise-course/</loc><lastmod>2026-08-10</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.moneyarchive.kr/articles/hyeopjae-half-day/</loc><lastmod>2026-08-10</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.moneyarchive.kr/articles/hamdeok-cafe-street/</loc><lastmod>2026-08-10</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
