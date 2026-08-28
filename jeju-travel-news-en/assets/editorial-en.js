@@ -53,7 +53,24 @@ export const translatedSlugs = [
   "hallasan-beginner-trail",
   "jeju-stay-location-guide",
   "family-friendly-jeju",
-  "rainy-day-indoor-jeju"
+  "rainy-day-indoor-jeju",
+  "aewol-coastal-drive",
+  "seogwipo-olle-market-food",
+  "sangumburi-autumn-course",
+  "east-jeju-2days",
+  "seopjikoji-coastal-walk-guide",
+  "bijarim-forest-walk-guide"
+  // Remaining slugs (yongmeori-coast-visit-check, jeongbang-waterfall-guide,
+  // woljeongri-beach-cafe-walk, osulloc-west-jeju-course,
+  // dongmun-market-evening-food-route,
+  // samyang-beach-black-sand-walk-20260725, saryeoni-forest-road-check,
+  // cheonjiyeon-night-walk-course, gimnyeong-beach-light-guide,
+  // jeju-stone-park-rainy-day-course, soesokkak-hahyo-walk-guide,
+  // geum-oreum-sunset-walk-guide, saebyeol-oreum-silvergrass-guide,
+  // camellia-hill-season-guide, aqua-planet-jeju-family-guide,
+  // lee-jung-seop-street-walk-guide, suwolbong-geotrail-guide,
+  // songaksan-dulle-gil-guide) are tracked in
+  // docs/en-site-continuation.md for a follow-up batch.
 ];
 
 export const editorialOverridesEn = {
@@ -462,6 +479,275 @@ export const editorialOverridesEn = {
         title: "If the weather clears up",
         paragraphs: [
           "Even after the rain eases, forest trails and coastal walkways can still be slippery. Rather than jumping straight into a long outdoor route, ease back in with something easy to retreat from, like a stroll around a market or a short harbor walk."
+        ]
+      }
+    ],
+    sources: outdoorSourcesEn
+  },
+
+  "aewol-coastal-drive": {
+    title: "Aewol Coastal Drive",
+    category: "Cafes",
+    region: "Western Jeju · Aewol",
+    address: "Aewol Haean-ro, Aewol-eup, Jeju-si, Jeju",
+    parking:
+      "Parking varies a lot from café to café. Around Handam Beach, plan on parking and walking rather than driving right up.",
+    fee: "The coast road and beaches are free to walk. Cafés charge separately.",
+    operatingHours: "The road and beaches are accessible any time. Café hours vary by shop.",
+    course: ["Iho Tewoo Beach", "Aewol coast road", "Handam Beach walk", "Gwakji Beach"],
+    nearbySpots: ["Handam Beach", "Gwakji Beach", "Iho Tewoo Beach", "Aewol café strip"],
+    summary:
+      "A relaxed drive along the Aewol coast road, not far from the airport, alternating between café stops and ocean views.",
+    editorialSections: [
+      {
+        title: "Break the drive into short stops",
+        paragraphs: [
+          "The Aewol coast road works better as a series of planned stops — Gwakji, Handam, Aewol Port — than as one continuous drive. Check the public parking lots and approach direction on a map ahead of time rather than pulling over wherever looks convenient.",
+          "Around sunset, both cars and pedestrians pick up fast. If you're planning to walk the Handam trail at dusk, don't count on café parking — find a spot you can walk from instead."
+        ]
+      },
+      {
+        title: "A workable order and how long to stay",
+        paragraphs: [
+          "Gwakji Beach and the Handam trail in the morning, one Aewol café in the afternoon, is a solid structure. If you're heading to a western hotel that night, it's easier to finish dinner in the Aewol area than to push on to Hyeopjae as well.",
+          "For photos, stop only where the view actually opens up, and choose a café with reliable parking and table turnover. Stacking several popular spots back to back usually means spending most of your time waiting and parking, not looking at the coast."
+        ]
+      },
+      {
+        title: "Wind and road safety",
+        paragraphs: [
+          "Watch for crosswinds and pedestrians stepping out unexpectedly on the coast road. Have a passenger check locations rather than sightseeing while driving, and only stop in marked parking areas.",
+          "In rain, parts of the walking trail get slippery and waves can pick up. Cut back on getting close to the coastline and have an indoor café or a central Jeju-si route ready as a backup."
+        ]
+      },
+      {
+        title: "Who this suits",
+        paragraphs: [
+          "This works well if you're heading west on your arrival or departure day. Without a car, space out bus intervals in mind and pick one area — Handam or Aewol Port — to walk rather than trying to cover the whole coast road."
+        ]
+      }
+    ],
+    sources: outdoorSourcesEn
+  },
+
+  "seogwipo-olle-market-food": {
+    title: "Seogwipo Maeil Olle Market Food Route",
+    category: "Food",
+    region: "Downtown Seogwipo",
+    address: "Jungang-ro 62beon-gil, Seogwipo-si, Jeju",
+    parking: "Use the public lots around the market. Evenings can get crowded.",
+    fee: "Free to enter the market. Food and parking are paid separately.",
+    operatingHours: "Hours vary by stall. Check whether your target stall is open before an evening visit.",
+    course: ["Seogwipo Maeil Olle Market", "Lee Jung-seop Street", "Saeyeon Bridge at night", "Around Cheonjiyeon Waterfall"],
+    nearbySpots: ["Lee Jung-seop Street", "Saeyeon Bridge", "Cheonjiyeon Waterfall", "Seogwipo Port"],
+    summary:
+      "A market-food and late-snack route that pairs well with a night in downtown Seogwipo — dinner, dessert, and an evening walk.",
+    editorialSections: [
+      {
+        title: "Narrow down the menu before you go in",
+        paragraphs: [
+          "Snacks, takeout food and full meals are all on display at once at Maeil Olle Market, and walking in without a plan makes it easy to buy the same kind of thing twice. Decide on one real meal and one or two snacks to split, and stick to that.",
+          "Rather than just following the longest line, think about where you'll actually eat what you buy, whether it needs refrigeration, and how far it is back to your hotel. Seafood and hot food especially shouldn't sit around for long after you buy it."
+        ]
+      },
+      {
+        title: "A walkable Seogwipo evening",
+        paragraphs: [
+          "A natural order is a walk on Lee Jung-seop Street, dinner at the market, then checking whether Cheonjiyeon Waterfall's night viewing is running. If the timing doesn't line up, swap it for a walk around Saeyeon Bridge or Seogwipo Port instead.",
+          "It's easier to park once and walk than to move the car repeatedly. With kids or older family members, factor in the hills and the walk back — it may be worth trimming either the market or the walk, not both."
+        ]
+      },
+      {
+        title: "Parking and busy hours",
+        paragraphs: [
+          "Evening and weekend parking near the market can involve a wait. Rather than waiting for a spot right by the market, check the nearby public lots and their hours in advance.",
+          "The market aisles get tight when busy, which makes moving with big bags or a stroller harder. Do one loop first to see what's on offer, then decide what to buy — it saves backtracking through the same aisle."
+        ]
+      },
+      {
+        title: "Before you go",
+        paragraphs: [
+          "Hours and closed days differ by stall. If you're set on a specific stall, check its posted hours; otherwise, treat the whole market as an area with plenty of options, which gives you room to adjust on the fly."
+        ]
+      }
+    ],
+    sources: commonSourcesEn
+  },
+
+  "sangumburi-autumn-course": {
+    title: "Sangumburi Autumn Silver Grass Trip",
+    category: "Seasonal Routes",
+    region: "Eastern Jeju · Jocheon",
+    address: "Bijarim-ro, Jocheon-eup, Jeju-si, Jeju",
+    parking: "Use the site's parking lot. Weekends and peak autumn get crowded.",
+    fee: "Paid admission — check current pricing on the official site before you go.",
+    operatingHours: "Hours shift by season. Confirm the last-entry cutoff for a late-afternoon visit.",
+    course: ["Sangumburi", "Around Gyorae Natural Recreation Forest", "Jeju Stone Park", "Jocheon café"],
+    nearbySpots: ["Jeju Stone Park", "Gyorae Natural Recreation Forest", "Bijarim", "Jeolmul Natural Recreation Forest"],
+    summary:
+      "A light eastern oreum outing built around Sangumburi's autumn silver grass and crater views.",
+    editorialSections: [
+      {
+        title: "Check the light along with the season",
+        paragraphs: [
+          "The look of Sangumburi's silver grass depends more on weather and growing conditions than on any single date. Check recent official photos and notices before you go, and account for glare and exposure if you're visiting during strong backlight hours.",
+          "Much of the crater rim is exposed to wind. Don't judge by the temperature back in town — bring a light windbreaker so the viewpoint is actually comfortable to linger at."
+        ]
+      },
+      {
+        title: "How to walk it",
+        paragraphs: [
+          "Build in time for the walk from the entrance to the viewing area, the walk back, and photos. If anyone in your group finds stairs or slopes difficult, stick to the accessible viewing section rather than the full loop.",
+          "Sangumburi in the morning, then somewhere sheltered from the wind — Bijarim or a Jocheon café — in the afternoon works well. Stacking several oreum visits in a row tends to blur together and adds up in fatigue."
+        ]
+      },
+      {
+        title: "Parking and admission",
+        paragraphs: [
+          "In peak season, expect a wait to get into the parking lot and at the ticket counter. If you're arriving late in the day, check the last-entry time and how long you'll actually need first.",
+          "Prices and hours change by season, so don't rely on old reviews. Check the official notice, and switch to a forest or indoor route if it's raining or foggy."
+        ]
+      },
+      {
+        title: "An autumn travel tip",
+        paragraphs: [
+          "Rather than making the trip just for silver-grass photos, pair it with eastern Jeju's stone walls, forests and a meal — that way the day still works even if the weather turns. White or light-colored clothing stands out against the grass, but skip anything loose enough to blow around in the wind."
+        ]
+      }
+    ],
+    sources: outdoorSourcesEn
+  },
+
+  "east-jeju-2days": {
+    title: "Eastern Jeju in 2 Days, 1 Night",
+    category: "Seasonal Routes",
+    region: "Eastern Jeju",
+    address: "Jocheon-eup, Gujwa-eup, Jeju-si and Seongsan-eup, Seogwipo-si",
+    parking: "Use each site's public lot. If you're visiting Udo, plan for parking near Seongsan Port.",
+    fee: "Admission and ferry fares are separate at each stop.",
+    operatingHours: "Check Udo's ferry schedule and any paid sites' hours first — they anchor the rest of the plan.",
+    course: ["Day 1: Hamdeok & Bijarim", "Overnight in Seongsan", "Day 2: Seongsan Ilchulbong", "Udo or Seopjikoji"],
+    nearbySpots: ["Hamdeok Beach", "Bijarim", "Seongsan Ilchulbong", "Udo Island", "Seopjikoji"],
+    summary:
+      "A no-backtracking 2-day, 1-night route through eastern Jeju, splitting Seongsan, Udo, Hamdeok and Bijarim across two days.",
+    editorialSections: [
+      {
+        title: "Front-load the northeast on day one",
+        paragraphs: [
+          "Coming from the airport, Jocheon, then Hamdeok, then Gimnyeong or Woljeongri is a simple sequence. Trying to also fit in Seongsan and Udo on day one usually means less actual beach time once you account for arrival and meal waits.",
+          "If you're staying in Seongsan, keep heading east through the afternoon, but don't stack multiple cafés and multiple beaches. One walk at Hamdeok and one meal or café stop in Gujwa is enough to avoid rushing check-in."
+        ]
+      },
+      {
+        title: "Day two: the Seongsan area",
+        paragraphs: [
+          "If sunrise is the plan, check your parking spot and the forecast the evening before. If you're also doing Udo, plan around the morning ferry and pick just one of Seongsan Ilchulbong or Seopjikoji for the same day.",
+          "If the ferry gets cancelled, Seongsan Ilchulbong, Gwangchigi Beach and Seopjikoji make a reasonable substitute loop. Having that backup ready means you're not burning time at the port figuring out plan B."
+        ]
+      },
+      {
+        title: "Where to stay and what to pack",
+        paragraphs: [
+          "For a single overnight, it's usually more efficient to base in either Seongsan or Gujwa rather than switching hotels. Check whether luggage storage is available before check-in so you're not leaving bags in the car all day.",
+          "Without a car, bus intervals make it hard to follow this exact route. Cut back on either the Hamdeok or the Seongsan leg and build the day around whichever major stops have the simplest transfers."
+        ]
+      },
+      {
+        title: "Adjusting by season",
+        paragraphs: [
+          "In summer, cut back on midday beach time; in winter, plan around shorter daylight hours. If rain or strong wind is forecast, drop Udo and the oreum from the plan and center the day on Bijarim or an indoor sight instead."
+        ]
+      }
+    ],
+    sources: outdoorSourcesEn
+  },
+
+  "seopjikoji-coastal-walk-guide": {
+    title: "Seopjikoji Coastal Walk Guide",
+    category: "Places to Visit",
+    region: "Eastern Jeju · Seongsan",
+    address: "Goseong-ri, Seongsan-eup, Seogwipo-si, Jeju",
+    parking:
+      "Use the entrance parking lot. In peak season and on weekends, the access road can back up — a morning visit is easier.",
+    fee: "Most of the coastal walk is free; a few facilities may charge — check on-site.",
+    operatingHours:
+      "This is a heavily weather-dependent outdoor walk. Check the on-site advisory before approaching the coast in strong wind or rain.",
+    course: ["Seopjikoji entrance", "Coastal walking trail", "Viewpoint", "Seongsan Ilchulbong or Gwangchigi Beach"],
+    nearbySpots: ["Seongsan Ilchulbong", "Gwangchigi Beach", "Sinyang-Seopji Beach", "Seongsan Port"],
+    summary:
+      "Parking, wind, slope and timing for pairing a Seopjikoji coastal walk with Seongsan Ilchulbong.",
+    editorialSections: [
+      {
+        title: "Budget your round-trip time first",
+        paragraphs: [
+          "Seopjikoji isn't a stop-and-photograph spot — it's a walking trail where the view changes as you follow the coast. Set aside at least an hour, including the walk from parking, photo stops, and rest breaks.",
+          "You don't have to walk all the way to the end. If it's windy or anyone in your group finds walking difficult, turn back once you reach an open viewpoint rather than pushing further."
+        ]
+      },
+      {
+        title: "Pairing it with the Seongsan area",
+        paragraphs: [
+          "Morning at Seongsan Ilchulbong, lunch, afternoon at Seopjikoji is a simple order, but in midsummer that puts you there during the hottest part of the day. In summer, consider walking Seopjikoji in the morning and doing Seongsan after an indoor lunch instead.",
+          "Adding Udo the same day can leave all three feeling rushed. On a day with a ferry, prioritize Udo and Seongsan Ilchulbong, and treat Seopjikoji as optional depending on weather and time left."
+        ]
+      },
+      {
+        title: "Wind and footwear",
+        paragraphs: [
+          "There's little shelter along the coastal stretch, and the surface can be slick after rain. Wear shoes with good grip and a windproof layer, and stay back from the edge on days with high waves.",
+          "Parking availability and site operations can shift on the day. If you're visiting late afternoon, check not just sunset time but also exit traffic and nearby dinner hours."
+        ]
+      },
+      {
+        title: "A tip for photos",
+        paragraphs: [
+          "Rather than waiting at one spot for the perfect shot, keep moving and alternate between angles that show Seongsan Ilchulbong and the coastal grassland. If you're using a tripod or larger gear, be mindful not to block the trail."
+        ]
+      }
+    ],
+    sources: outdoorSourcesEn
+  },
+
+  "bijarim-forest-walk-guide": {
+    title: "Bijarim Forest Walk Guide",
+    category: "Places to Visit",
+    region: "Eastern Jeju · Gujwa",
+    address: "Bijasup-gil, Gujwa-eup, Jeju-si, Jeju",
+    parking: "Use the site's parking lot. Dirt paths can be slick after rain.",
+    fee: "Admission may apply — check the official notice and on-site pricing before you go.",
+    operatingHours:
+      "Last-entry times shift by season. If you're visiting late afternoon, check the cutoff first.",
+    course: ["Bijarim entrance", "Loop forest walk", "Gujwa café", "Woljeongri or Sehwa Beach"],
+    nearbySpots: ["Woljeongri Beach", "Sehwa Beach", "Pyeongdae-ri cafés", "Manjanggul Cave"],
+    summary:
+      "How much time to actually give Bijarim, what to wear, and how to pair it with the rest of an eastern-Jeju day, rain or shine.",
+    editorialSections: [
+      {
+        title: "A short-looking forest takes longer than it looks",
+        paragraphs: [
+          "Between photos and slowing down to look at the trees, Bijarim tends to take longer than the map distance suggests. Don't arrive close to the last-entry cutoff — build in time for rest stops and restrooms.",
+          "Most of the loop is gentle, but the dirt and stone can be slippery after rain. Skip sandals or smooth-soled shoes in favor of sneakers that still grip when wet."
+        ]
+      },
+      {
+        title: "Deciding whether to visit in the rain",
+        paragraphs: [
+          "Light rain actually suits the forest's atmosphere, but strong wind or heavy rain raises the risk of falling branches and slick footing. Don't rely on an umbrella alone — bring a waterproof layer, and switch to an indoor plan if there's an on-site closure notice.",
+          "A towel and spare socks are useful after rain. With kids, check ahead whether the muddier sections make a stroller impractical that day."
+        ]
+      },
+      {
+        title: "Pairing it with the eastern coast",
+        paragraphs: [
+          "Bijarim plus Woljeongri or Sehwa Beach gives you both forest and coast in one day. On a windy day, though, cut back on beach time and swap in Jeju Stone Park or a café instead.",
+          "If you're heading to a Seongsan hotel, treat Bijarim as a midpoint stop and eat in Gujwa. Adding an oreum climb the same day adds up in walking distance, so check your energy level first."
+        ]
+      },
+      {
+        title: "Check the official notice",
+        paragraphs: [
+          "Admission, hours, closed days and which sections are open should be confirmed through official channels. Parts of the forest may be closed for conservation or safety, so don't expect the exact route from an old review.",
+          "Stay on the marked trail and don't touch the trees or plants. This is a quiet place to walk — keep noise and food to a minimum, and carry your own trash back out with you."
         ]
       }
     ],
