@@ -2,3 +2,4 @@ User-agent: *
 Disallow: /admin/
 Allow: /
 Sitemap: https://www.moneyarchive.kr/sitemap.xml
+Sitemap: https://www.moneyarchive.kr/en/sitemap.xml
