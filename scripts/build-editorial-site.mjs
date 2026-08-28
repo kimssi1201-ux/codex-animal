@@ -320,18 +320,7 @@ function renderArticlePage(article) {
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5751319666030430" crossorigin="anonymous"></script>
 </head>
 <body>
-  <header class="site-header detail-site-header">
-    <a class="brand" href="/" aria-label="제주여행뉴스 홈">
-      <span class="brand-mark" aria-hidden="true">JN</span>
-      <span><strong data-i18n="brand.name">제주여행뉴스</strong><small data-i18n="brand.tagline">제주 여행 정보 뉴스</small></span>
-    </a>
-    <div class="detail-header-actions">
-      <div class="language-switch" id="languageSwitch" aria-label="언어 선택">
-        <button type="button" data-lang="ko">KR</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="ja">JP</button><button type="button" data-lang="zh">CN</button>
-      </div>
-      <a class="list-link" href="/" data-i18n="nav.list">목록</a>
-    </div>
-  </header>
+  ${renderSiteHeader()}
   <main class="article-page" id="top">
     <article class="article-detail" id="articleDetail">
       <img class="detail-hero" src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" width="1200" height="720">
@@ -353,11 +342,7 @@ function renderArticlePage(article) {
       <div id="relatedArticles">${related.map(renderRelatedCard).join("")}</div>
     </aside>
   </main>
-  <footer class="site-footer">
-    <div class="footer-intro"><a class="brand footer-brand" href="/"><span class="brand-mark" aria-hidden="true">JN</span><span><strong>제주여행뉴스</strong><small>제주 여행 선택을 돕는 뉴스 포털</small></span></a></div>
-    <div class="footer-grid" id="footerLinks"><nav aria-label="사이트 안내"><h2>사이트 안내</h2><ul><li><a href="/about">사이트 소개</a></li><li><a href="/editorial-policy">편집 원칙</a></li><li><a href="/contact">문의·수정 요청</a></li><li><a href="/privacy">개인정보 처리방침</a></li></ul></nav></div>
-    <p class="copyright">Copyright 2026 Jeju Travel News. All Rights Reserved.</p>
-  </footer>
+  ${renderSiteFooter()}
   <script type="module" src="/jeju-travel-news/assets/app.js?v=20260810-editorial-2"></script>
 </body>
 </html>

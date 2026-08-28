@@ -14,13 +14,13 @@ export const regionGroups = [
     id: "seogwipo",
     label: "서귀포",
     eyebrow: "Seogwipo",
-    blurb: "서귀포 시내, 중문, 동홍동·천지동 등 서귀포 권역의 여행 정보를 모았습니다."
+    blurb: "서귀포 시내, 중문, 안덕, 동홍동·천지동 등 서귀포 권역의 여행 정보를 모았습니다."
   },
   {
     id: "dong",
     label: "동부",
     eyebrow: "East",
-    blurb: "구좌, 성산, 우도, 표선 등 제주 동부 권역의 여행 정보를 모았습니다."
+    blurb: "구좌, 성산, 우도, 표선, 조천 등 제주 동부 권역의 여행 정보를 모았습니다."
   },
   {
     id: "seo",
@@ -32,13 +32,13 @@ export const regionGroups = [
     id: "nam",
     label: "남부",
     eyebrow: "South",
-    blurb: "안덕, 대정 등 제주 서남부 권역의 여행 정보를 모았습니다."
+    blurb: "대정 등 제주 서남부 권역의 여행 정보를 모았습니다."
   },
   {
     id: "buk",
     label: "북부",
     eyebrow: "North",
-    blurb: "조천, 삼양 등 제주 북동부 해안 권역의 여행 정보를 모았습니다."
+    blurb: "삼양 등 제주 북부 해안 권역의 여행 정보를 모았습니다."
   },
   {
     id: "jeonyeok",
@@ -49,6 +49,15 @@ export const regionGroups = [
 ];
 
 export const regionGroupsById = new Map(regionGroups.map((group) => [group.id, group]));
+
+// Individual place names get tagged inconsistently across content passes
+// (e.g. "제주 서남부 · 안덕", "제주 서부 · 안덕" and "제주 서귀포 · 안덕" all
+// refer to the same neighborhood). Checked before the broader directional
+// rules below so every article about the same place lands in one bucket.
+const neighborhoodOverrides = [
+  ["안덕", "seogwipo"],
+  ["조천", "dong"]
+];
 
 // Priority-ordered keyword matches. Checked top to bottom, first match wins.
 const regionRules = [
@@ -65,6 +74,9 @@ const regionRules = [
 
 export function classifyRegion(article = {}) {
   const region = String(article.region || "");
+  for (const [keyword, id] of neighborhoodOverrides) {
+    if (region.includes(keyword)) return id;
+  }
   for (const [keyword, id] of regionRules) {
     if (region.includes(keyword)) return id;
   }

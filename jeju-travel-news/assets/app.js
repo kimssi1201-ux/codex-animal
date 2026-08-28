@@ -2648,8 +2648,8 @@ function footerHref(groupIndex, linkIndex) {
   const regionLinks = [
     "/region/jeju-si/",
     "/region/seogwipo/",
-    "/region/dong/",
-    "/region/seo/"
+    "/articles/seongsan-sunrise-course/",
+    "/articles/aewol-coastal-drive/"
   ];
   const languageLinks = ["ko", "en", "ja", "zh"];
   if (groupIndex === 0) return `/?category=${encodeURIComponent(categoryLinks[linkIndex] || "가볼 만한 곳")}#july`;
