@@ -14,7 +14,7 @@
   <link rel="canonical" href="https://www.moneyarchive.kr/">
   <link rel="alternate" type="application/rss+xml" title="RSS" href="https://www.moneyarchive.kr/feed.xml">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/jeju-travel-news/assets/styles.css?v=20260829-telltrip-ref-1">
+  <link rel="stylesheet" href="/jeju-travel-news/assets/styles.css?v=20260829-telltrip-ref-2">
   <title>제주여행뉴스 | 제주도 여행 정보 뉴스</title>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5751319666030430" crossorigin="anonymous"></script>
 </head>
@@ -39,6 +39,9 @@
         </span>
       </a>
       <a class="masthead-shortcut" href="#visitCheck" data-i18n="nav.plan">여행 준비</a>
+      <button class="search-toggle" id="searchToggle" type="button" aria-expanded="false" aria-controls="siteSearch">
+        <span class="sr-only">검색 열기</span>
+      </button>
       <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="primaryNav">
         <span></span>
         <span></span>
@@ -46,6 +49,14 @@
       </button>
     </div>
     <nav class="primary-nav" id="primaryNav" aria-label="주요 메뉴"></nav>
+    <div class="site-search" id="siteSearch" hidden>
+      <form class="site-search-form" id="siteSearchForm" role="search">
+        <label class="sr-only" for="siteSearchInput">기사 검색</label>
+        <input id="siteSearchInput" type="search" placeholder="제주 여행 기사 검색" autocomplete="off">
+        <button type="submit">검색</button>
+      </form>
+      <div class="site-search-results" id="siteSearchResults" aria-live="polite"></div>
+    </div>
   </header>
 
   <main id="top">
@@ -144,6 +155,6 @@
   <noscript>
     <p class="noscript">제주 여행 카드를 보려면 브라우저에서 JavaScript를 켜주세요.</p>
   </noscript>
-  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260829-telltrip-ref-1"></script>
+  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260829-telltrip-ref-2"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
-import { articles, categories } from "./articles.js?v=20260829-telltrip-ref-1";
-import { curateArticles } from "./editorial.js?v=20260829-telltrip-ref-1";
+import { articles, categories } from "./articles.js?v=20260829-telltrip-ref-2";
+import { curateArticles } from "./editorial.js?v=20260829-telltrip-ref-2";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
@@ -2732,7 +2732,104 @@ function setActiveCategory(category) {
   loadOfficialPlaces();
 }
 
+function searchResultCard(article) {
+  const view = localizedArticle(article);
+  return `
+    <a class="site-search-result" href="${articleUrl(article)}">
+      <span>${escapeHtml(categoryLabel(article.category))} · ${escapeHtml(view.region || article.region || "제주")}</span>
+      <strong>${escapeHtml(view.title)}</strong>
+    </a>
+  `;
+}
+
+function matchingSearchArticles(query) {
+  const terms = String(query || "")
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!terms.length) return [];
+
+  return publicArticles.map((article) => {
+    const view = localizedArticle(article);
+    const title = `${view.title} ${article.title}`.toLowerCase();
+    const category = `${categoryLabel(article.category)} ${article.category}`.toLowerCase();
+    const region = `${view.region || ""} ${article.region || ""}`.toLowerCase();
+    const body = [
+      view.summary,
+      article.summary,
+      ...(article.course || []),
+      ...(article.nearbySpots || [])
+    ].join(" ").toLowerCase();
+    const haystack = `${title} ${category} ${region} ${body}`;
+    if (!terms.every((term) => haystack.includes(term))) return null;
+    const score = terms.reduce((total, term) => {
+      if (title.includes(term)) return total + 40;
+      if (category.includes(term)) return total + 18;
+      if (region.includes(term)) return total + 12;
+      return total + 4;
+    }, 0);
+    return { article, score };
+  })
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score)
+    .map(({ article }) => article);
+}
+
+function renderSiteSearchResults(query) {
+  const results = $("#siteSearchResults");
+  if (!results) return [];
+  const value = String(query || "").trim();
+  if (!value) {
+    results.innerHTML = `<p>검색어를 입력하세요.</p>`;
+    return [];
+  }
+
+  const matches = matchingSearchArticles(value).slice(0, 6);
+  results.innerHTML = matches.length
+    ? matches.map(searchResultCard).join("")
+    : `<p>일치하는 기사가 없습니다.</p>`;
+  return matches;
+}
+
+function bindSiteSearch() {
+  const button = $("#searchToggle");
+  const panel = $("#siteSearch");
+  const input = $("#siteSearchInput");
+  const form = $("#siteSearchForm");
+  if (!button || !panel || !input || !form) return;
+
+  const setOpen = (open) => {
+    button.setAttribute("aria-expanded", String(open));
+    panel.hidden = !open;
+    document.body.classList.toggle("search-open", open);
+    if (open) {
+      renderSiteSearchResults(input.value);
+      window.setTimeout(() => input.focus(), 0);
+    }
+  };
+
+  button.addEventListener("click", () => {
+    setOpen(button.getAttribute("aria-expanded") !== "true");
+  });
+
+  input.addEventListener("input", () => {
+    renderSiteSearchResults(input.value);
+  });
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const [first] = renderSiteSearchResults(input.value);
+    if (first) window.location.href = articleUrl(first);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setOpen(false);
+  });
+}
+
 function bindHeader() {
+  bindSiteSearch();
   const menuButton = $("#menuToggle") || $("#menuButton");
   const nav = $("#primaryNav");
   if (menuButton && nav) {
