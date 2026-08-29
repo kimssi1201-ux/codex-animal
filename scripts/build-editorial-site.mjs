@@ -76,6 +76,13 @@ function renderByline(article) {
   </div>`;
 }
 
+function renderShareBar(article) {
+  return `<div class="article-share-row" aria-label="기사 공유">
+    <span>공유</span>
+    <button type="button" data-share-url="${escapeHtml(articleUrl(article))}" data-share-title="${escapeHtml(article.title)}">URL</button>
+  </div>`;
+}
+
 function renderEditorialSections(article) {
   return `<section class="article-readable-section">
     <div class="section-kicker">TRAVEL NOTE</div>
@@ -166,7 +173,7 @@ function renderArticlePage(article) {
   <meta property="article:published_time" content="${escapeHtml(article.date)}">
   <meta property="article:modified_time" content="${escapeHtml(article.dateModified || article.reviewedAt || article.date)}">
   <link rel="canonical" href="${articleUrl(article)}">
-  <link rel="stylesheet" href="/jeju-travel-news/assets/styles.css?v=20260829-telltrip-ref-2">
+  <link rel="stylesheet" href="/jeju-travel-news/assets/styles.css?v=20260830-telltrip-mobile-2">
   <title>${escapeHtml(article.title)} | 제주여행뉴스</title>
   <script type="application/ld+json">${jsonLd(article)}</script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5751319666030430" crossorigin="anonymous"></script>
@@ -186,15 +193,16 @@ function renderArticlePage(article) {
   </header>
   <main class="article-page" id="top">
     <article class="article-detail" id="articleDetail">
-      <img class="detail-hero" src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" width="1200" height="720">
       <div class="detail-body">
         <div class="meta">${escapeHtml(article.category)} · ${escapeHtml(article.region)} · ${escapeHtml(article.date)}</div>
         <h1>${escapeHtml(article.title)}</h1>
         <p class="summary">${escapeHtml(article.summary)}</p>
+        ${renderShareBar(article)}
+        <img class="detail-hero" src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" width="1200" height="720">
         ${renderByline(article)}
-        ${renderInfoTable(article)}
         ${renderEditorialSections(article)}
         <section><h2>추천 여행 코스</h2><ol class="course-list">${course}</ol></section>
+        ${renderInfoTable(article)}
         <section><h2>방문 전 체크포인트</h2><ul class="check-list"><li>운영시간과 입장료는 방문 당일 공식 안내를 확인하세요.</li><li>해변과 오름은 바람, 비, 안개와 현장 통제 안내를 우선하세요.</li><li>성수기에는 목적지 바로 앞뿐 아니라 주변 공영 주차장도 확인하세요.</li></ul></section>
         ${renderNearby(article)}
         ${renderSources(article)}
@@ -210,7 +218,7 @@ function renderArticlePage(article) {
     <div class="footer-grid" id="footerLinks"><nav aria-label="사이트 안내"><h2>사이트 안내</h2><ul><li><a href="/about">사이트 소개</a></li><li><a href="/editorial-policy">편집 원칙</a></li><li><a href="/contact">문의·수정 요청</a></li><li><a href="/privacy">개인정보 처리방침</a></li></ul></nav></div>
     <p class="copyright">Copyright 2026 Jeju Travel News. All Rights Reserved.</p>
   </footer>
-  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260829-telltrip-ref-2"></script>
+  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260830-telltrip-mobile-2"></script>
 </body>
 </html>
 `;

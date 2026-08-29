@@ -1,5 +1,5 @@
-import { articles, categories } from "./articles.js?v=20260829-telltrip-ref-2";
-import { curateArticles } from "./editorial.js?v=20260829-telltrip-ref-2";
+import { articles, categories } from "./articles.js?v=20260830-telltrip-mobile-2";
+import { curateArticles } from "./editorial.js?v=20260830-telltrip-mobile-2";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
@@ -3090,6 +3090,40 @@ function renderEditorialByline(article) {
   `;
 }
 
+function renderArticleShareBar(article, view = localizedArticle(article)) {
+  const shareUrl = `https://www.moneyarchive.kr${articleUrl(article)}`;
+  const title = view?.title || article.title || "제주여행뉴스";
+  return `
+    <div class="article-share-row" aria-label="기사 공유">
+      <span>공유</span>
+      <button type="button" data-share-url="${escapeHtml(shareUrl)}" data-share-title="${escapeHtml(title)}">URL</button>
+    </div>
+  `;
+}
+
+function bindArticleShare() {
+  document.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-share-url]");
+    if (!button) return;
+    event.preventDefault();
+    const url = button.dataset.shareUrl || window.location.href;
+    const title = button.dataset.shareTitle || document.title;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url });
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      }
+      button.textContent = currentLanguage === "ko" ? "완료" : "Done";
+      window.setTimeout(() => {
+        button.textContent = "URL";
+      }, 1400);
+    } catch {
+      button.textContent = "URL";
+    }
+  });
+}
+
 function renderArticleSources(article) {
   const sources = (article.sources || [])
     .map((source) => ({ name: String(source?.name || "").trim(), url: safeExternalUrl(source?.url) }))
@@ -3308,22 +3342,23 @@ function renderStaticDetail(detail) {
         : `Related tours, stays and activities for ${translateArticleText(myrealtripContext.keyword)}.`;
   updateMeta(articleSeoTitle(view), articleSeoDescription(view), `https://www.moneyarchive.kr${articleUrl(article)}`);
   detail.innerHTML = `
-    ${imageTag(thumbnailForArticle(article, true), view.title, "detail-hero", `data-article-thumb="${escapeHtml(article.slug)}"`)}
     <div class="detail-body">
       <div class="meta">${metaLine([categoryLabel(article.category), view.region, article.date])}</div>
       <h1>${escapeHtml(view.title)}</h1>
       <p class="summary">${escapeHtml(view.summary)}</p>
+      ${renderArticleShareBar(article, view)}
+      ${imageTag(thumbnailForArticle(article, true), view.title, "detail-hero", `data-article-thumb="${escapeHtml(article.slug)}"`)}
       ${renderEditorialByline(article)}
-      <table class="info-table article-info-table"><tbody id="articleInfoRows">${staticInfoRows(view)}</tbody></table>
-      ${renderNearbyTravelRecommendations(article)}
-      ${renderInlineOfficialShell(article)}
+      ${renderArticleBodySection(view)}
       ${renderAudienceSection(view)}
       ${renderPlanningSection(view)}
-      ${renderArticleBodySection(view)}
       <section>
         <h2>${escapeHtml(copy.routeTitle)}</h2>
         <ol class="course-list">${(view.course || []).map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
       </section>
+      <table class="info-table article-info-table"><tbody id="articleInfoRows">${staticInfoRows(view)}</tbody></table>
+      ${renderNearbyTravelRecommendations(article)}
+      ${renderInlineOfficialShell(article)}
       <section>
         <h2>${escapeHtml(copy.checklistTitle)}</h2>
         <ul class="check-list">
@@ -3518,6 +3553,7 @@ function renderDetail() {
 
 bindImageFallbacks();
 bindHeader();
+bindArticleShare();
 renderHome();
 renderDetail();
 bindLanguageSwitch();
