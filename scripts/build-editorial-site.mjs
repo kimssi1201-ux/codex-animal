@@ -166,7 +166,7 @@ function renderArticlePage(article) {
   <meta property="article:published_time" content="${escapeHtml(article.date)}">
   <meta property="article:modified_time" content="${escapeHtml(article.dateModified || article.reviewedAt || article.date)}">
   <link rel="canonical" href="${articleUrl(article)}">
-  <link rel="stylesheet" href="/jeju-travel-news/assets/styles.css?v=20260810-editorial-1">
+  <link rel="stylesheet" href="/jeju-travel-news/assets/styles.css?v=20260829-telltrip-ref-1">
   <title>${escapeHtml(article.title)} | 제주여행뉴스</title>
   <script type="application/ld+json">${jsonLd(article)}</script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5751319666030430" crossorigin="anonymous"></script>
@@ -210,7 +210,7 @@ function renderArticlePage(article) {
     <div class="footer-grid" id="footerLinks"><nav aria-label="사이트 안내"><h2>사이트 안내</h2><ul><li><a href="/about">사이트 소개</a></li><li><a href="/editorial-policy">편집 원칙</a></li><li><a href="/contact">문의·수정 요청</a></li><li><a href="/privacy">개인정보 처리방침</a></li></ul></nav></div>
     <p class="copyright">Copyright 2026 Jeju Travel News. All Rights Reserved.</p>
   </footer>
-  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260810-editorial-2"></script>
+  <script type="module" src="/jeju-travel-news/assets/app.js?v=20260829-telltrip-ref-1"></script>
 </body>
 </html>
 `;
@@ -287,8 +287,8 @@ async function build() {
 
   const indexPath = path.join(rootDir, "index.html");
   let indexHtml = await readFile(indexPath, "utf8");
-  indexHtml = replaceSnapshot(indexHtml, "RECOMMENDED", curatedArticles.slice(0, 4).map((article, index) => renderSnapshotRecommended(article, index === 0)).join("\n"));
-  indexHtml = replaceSnapshot(indexHtml, "FEED", curatedArticles.slice(4, 12).map(renderSnapshotRow).join("\n"));
+  indexHtml = replaceSnapshot(indexHtml, "RECOMMENDED", curatedArticles.slice(0, 6).map((article, index) => renderSnapshotRecommended(article, index === 0)).join("\n"));
+  indexHtml = replaceSnapshot(indexHtml, "FEED", curatedArticles.slice(6, 14).map(renderSnapshotRow).join("\n"));
   await writeFile(indexPath, indexHtml, "utf8");
   await writeFile(path.join(rootDir, "sitemap.xml"), buildSitemap(), "utf8");
   await writeFile(path.join(rootDir, "feed.xml"), buildFeed(), "utf8");

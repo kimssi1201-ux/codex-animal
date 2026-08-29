@@ -981,7 +981,7 @@ export const articles = [
     "slug": "seongsan-sunrise-course",
     "category": "가볼 만한 곳",
     "region": "제주 동부 · 성산",
-    "image": "https://tong.visitkorea.or.kr/cms/resource/82/2944282_image2_1.bmp",
+    "image": "https://tong.visitkorea.or.kr/cms/resource/92/3527092_image2_1.jpg",
     "summary": "일출 명소 성산일출봉을 중심으로 광치기해변과 성산항 주변 식사까지 묶는 아침 코스입니다.",
     "date": "2026-07-08",
     "course": [

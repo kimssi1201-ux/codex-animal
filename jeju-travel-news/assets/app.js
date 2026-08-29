@@ -1,5 +1,5 @@
-import { articles, categories } from "./articles.js?v=20260810-editorial-2";
-import { curateArticles } from "./editorial.js?v=20260810-editorial-2";
+import { articles, categories } from "./articles.js?v=20260829-telltrip-ref-1";
+import { curateArticles } from "./editorial.js?v=20260829-telltrip-ref-1";
 
 const $ = (selector) => document.querySelector(selector);
 const params = new URLSearchParams(window.location.search);
@@ -1301,12 +1301,14 @@ function homeHeroArticles() {
     "seongsan-sunrise-course",
     "hyeopjae-half-day",
     "hamdeok-cafe-street",
-    "udo-day-trip"
+    "udo-day-trip",
+    "aewol-coastal-drive",
+    "seogwipo-olle-market-food"
   ];
   const editorialPicks = editorialSlugs
     .map((slug) => publicArticles.find((article) => article.slug === slug))
     .filter(Boolean);
-  return uniqueByImage([...editorialPicks, ...publicArticles]).slice(0, 4);
+  return uniqueByImage([...editorialPicks, ...publicArticles]).slice(0, 6);
 }
 
 function homeLatestArticles() {
